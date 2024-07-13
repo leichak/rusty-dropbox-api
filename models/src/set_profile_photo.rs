@@ -1,7 +1,7 @@
 use anyhow::Result;
 use api::{
-    anyhow, async_trait, reqwest, ApiError, AsyncClient, AsyncService, BoxFuture, CallType,
-    Endpoint, Headers, SyncClient, SyncService,
+    anyhow, anyhow::anyhow, async_trait, reqwest, tokio, ApiError, AsyncClient, AsyncService,
+    BoxFuture, Endpoint, Headers, SyncClient, SyncService,
 };
 
 use serde::{Deserialize, Serialize};
@@ -20,20 +20,9 @@ pub struct SetProfilePhotoResponse {
     profile_photo_url: String,
 }
 
-// impl Api<SetProfilePhotoResponse, ApiError, Box<RequestFuture>> for SetProfilePhotoRequest<'_> {
-//     fn call(
-//         &self,
-//         call_type: CallType<SetProfilePhotoResponse, ApiError, Box<RequestFuture>>,
-//     ) -> CallType<SetProfilePhotoResponse, ApiError, Box<RequestFuture>> {
-//         match call_type {
-//             CallType::Sync(_) => CallType::Sync(Some(SyncService::call(self))),
-//             CallType::Async(_) => CallType::Async(None),
-//         }
-//     }
-// }
-
-impl SyncService<SetProfilePhotoResponse, ApiError> for SetProfilePhotoRequest<'_> {
-    fn call(&self) -> Result<SetProfilePhotoResponse, ApiError> {
+/// Implementation of SyncService trait that provides functions related to synchronous query
+impl SyncService<SetProfilePhotoResponse> for SetProfilePhotoRequest<'_> {
+    fn call(&self) -> Result<SetProfilePhotoResponse> {
         let endpoint = Endpoint::SetProfilePhotoPost.get_endpoint_url();
         let mut payload: std::collections::HashMap<&str, std::collections::HashMap<&str, &str>> =
             std::collections::HashMap::new();
@@ -59,25 +48,18 @@ impl SyncService<SetProfilePhotoResponse, ApiError> for SetProfilePhotoRequest<'
                     .map_err(|err| ApiError::ParsingError(err.into()))?;
                 return Ok(response);
             }
-            Err(err) => return Err(ApiError::DropBoxError(err.into())),
+            Err(err) => return Err(ApiError::DropBoxError(err.into()).into()),
         }
     }
 }
 
-//#[async_trait::async_trait]
-impl
-    AsyncService<
-        SetProfilePhotoResponse,
-        ApiError,
-        BoxFuture<'_, Result<SetProfilePhotoResponse, ApiError>>,
-    > for SetProfilePhotoRequest<'_>
+/// Implementation of AsyncService trait that provides functions related to asynchronous query
+impl AsyncService<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoResponse>>>
+    for SetProfilePhotoRequest<'_>
 {
     fn call(
         &self,
-    ) -> Result<
-        Pin<Box<dyn Future<Output = Result<SetProfilePhotoResponse, ApiError>> + Send>>,
-        ApiError,
-    > {
+    ) -> Result<Pin<Box<dyn Future<Output = Result<SetProfilePhotoResponse>> + Send>>> {
         let endpoint = Endpoint::SetProfilePhotoPost.get_endpoint_url();
         let mut payload: std::collections::HashMap<&str, std::collections::HashMap<&str, &str>> =
             std::collections::HashMap::new();
@@ -108,53 +90,19 @@ impl
                 .await
                 .map_err(|err| ApiError::ParsingError(err.into()))?;
 
-            Result::<SetProfilePhotoResponse, ApiError>::Ok(response)
+            Result::<SetProfilePhotoResponse>::Ok(response)
         };
         Ok(Box::pin(block))
     }
 }
 
-/*
-    let endpoint = Endpoint::SetProfilePhotoPost.get_endpoint_url();
-        let mut payload: std::collections::HashMap<&str, std::collections::HashMap<&str, &str>> =
-            std::collections::HashMap::new();
-        let mut nested = HashMap::new();
-        nested.insert(".tag", "base64_data");
-        nested.insert("base64_data", &self.base64_data);
-        payload.insert("image", nested);
-        let response = AsyncClient
-            .post(endpoint)
-            .bearer_auth(self.access_token)
-            .header(
-                Headers::ContentTypeAppJson.get_str().0,
-                Headers::ContentTypeAppJson.get_str().1,
-            )
-            .json(&payload)
-            .send()
-            .await
-            .map_err(|err| ApiError::RequestError(err.into()))?;
-
-        match response.error_for_status() {
-            Ok(response) => {
-                let response: SetProfilePhotoResponse = response
-                    .json()
-                    .await
-                    .map_err(|err| ApiError::ParsingError(err.into()))?;
-                return Ok(response);
-            }
-            Err(err) => return Err(ApiError::DropBoxError(err.into())),
-        }
-*/
-
 #[cfg(test)]
 mod tests {
 
-    use api::SyncClient;
+    use api::{AsyncService, SyncClient};
 
     use super::anyhow::Result;
-    use super::{
-        Api, ApiError, CallType, SetProfilePhotoRequest, SetProfilePhotoResponse, SyncService,
-    };
+    use super::{tokio, SetProfilePhotoRequest, SetProfilePhotoResponse, SyncService};
     #[test]
     pub fn test() -> Result<(), Box<dyn std::error::Error>> {
         let access_token = "token";
@@ -164,14 +112,10 @@ mod tests {
             base64_data,
         };
 
-        // // Can add some helper that will make us just wrting let type =, instead of that weird logic
-        // let response = match Api::call(&request, CallType::Sync(None)) {
-        //     CallType::Sync(response) => response.unwrap(),
-        //     _ => Err(ApiError::Unknown),
-        // };
-
-        // let response = response?;
-        // println!("response {:#?}", response);
+        let f = AsyncService::call(&request)?;
+        async {
+            let r = tokio::spawn(f).await;
+        };
 
         Ok(())
     }

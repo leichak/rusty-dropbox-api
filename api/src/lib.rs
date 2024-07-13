@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use thiserror::Error;
+use thiserror;
 
 /// Async and sync clients
 lazy_static! {
@@ -7,20 +7,22 @@ lazy_static! {
     pub static ref AsyncClient: reqwest::Client = reqwest::Client::new();
 }
 
-pub use {anyhow, anyhow::Result, async_trait, futures::future::BoxFuture, reqwest, serde_json};
+pub use {
+    anyhow, anyhow::Result, async_trait, futures::future::BoxFuture, reqwest, serde_json, tokio,
+};
 
 /// Enum describing set of errors that can occur possibly
 /// Thiserror macro to derive std::error::Error trait
-#[derive(Error, Debug)]
+#[derive(thiserror::Error, Debug)]
 pub enum ApiError {
     #[error("Unknown")] // display trait
     Unknown,
     #[error("Reqwest error {0}")] // display trait
-    RequestError(Box<dyn std::error::Error>),
+    RequestError(anyhow::Error),
     #[error("Parsing error {0}")] // display trait
-    ParsingError(Box<dyn std::error::Error>),
+    ParsingError(anyhow::Error),
     #[error("Dropbox error {0}")] // display trait
-    DropBoxError(Box<dyn std::error::Error>),
+    DropBoxError(anyhow::Error),
 }
 
 // /// Enum that stores optional input to
@@ -37,13 +39,13 @@ pub enum ApiError {
 // }
 
 // Trait for sync
-pub trait SyncService<O: Sized, E: Sized> {
-    fn call(&self) -> Result<O, E>;
+pub trait SyncService<O: Sized> {
+    fn call(&self) -> Result<O>;
 }
 
 // Trait for async
-pub trait AsyncService<O: Sized, E: Sized, F: Sized> {
-    fn call(&self) -> Result<F, E>;
+pub trait AsyncService<O: Sized, F: Sized> {
+    fn call(&self) -> Result<F>;
 }
 
 /// Enum representing api available endpoints
