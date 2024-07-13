@@ -23,11 +23,11 @@ pub enum ApiError {
     DropBoxError(Box<dyn std::error::Error>),
 }
 
-/// Enum that stores optional input to
-pub enum CallType<'a, O: Sized, E: Sized, F: ?Sized> {
-    Sync(Option<Result<O, E>>),
-    Async(Option<Result<&'a mut F, E>>),
-}
+// /// Enum that stores optional input to
+// pub enum CallType<'a, O: Sized, E: Sized, F: ?Sized> {
+//     Sync(Option<Result<O, E>>),
+//     Async(Option<Result<&'a mut F, E>>),
+// }
 
 // /// Trait bundling async and sync requests
 // /// It has call that takes CallType and returns Call type that stores Result
