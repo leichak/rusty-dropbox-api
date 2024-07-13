@@ -1,7 +1,5 @@
 use lazy_static::lazy_static;
-use thiserror;
 
-/// Async and sync clients
 lazy_static! {
     pub static ref SyncClient: reqwest::blocking::Client = reqwest::blocking::Client::new();
     pub static ref AsyncClient: reqwest::Client = reqwest::Client::new();

@@ -1,14 +1,12 @@
 use anyhow::Result;
 use api::{
-    anyhow, anyhow::anyhow, async_trait, reqwest, tokio, ApiError, AsyncClient, AsyncService,
-    BoxFuture, Endpoint, Headers, SyncClient, SyncService,
+    anyhow, ApiError, AsyncClient, AsyncService, BoxFuture, Endpoint, Headers, SyncClient,
+    SyncService,
 };
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use std::{collections::HashMap, future::Future, pin::Pin};
-
-type RequestFuture = dyn Future<Output = Result<SetProfilePhotoResponse, ApiError>>;
 
 pub struct SetProfilePhotoRequest<'a> {
     access_token: &'a str,
@@ -28,7 +26,7 @@ impl SyncService<SetProfilePhotoResponse> for SetProfilePhotoRequest<'_> {
             std::collections::HashMap::new();
         let mut nested = HashMap::new();
         nested.insert(".tag", "base64_data");
-        nested.insert("base64_data", &self.base64_data);
+        nested.insert("base64_data", self.base64_data);
         payload.insert("image", nested);
         let response = SyncClient
             .post(endpoint)
@@ -46,9 +44,9 @@ impl SyncService<SetProfilePhotoResponse> for SetProfilePhotoRequest<'_> {
                 let response: SetProfilePhotoResponse = response
                     .json()
                     .map_err(|err| ApiError::ParsingError(err.into()))?;
-                return Ok(response);
+                Ok(response)
             }
-            Err(err) => return Err(ApiError::DropBoxError(err.into()).into()),
+            Err(err) => Err(ApiError::DropBoxError(err.into()).into()),
         }
     }
 }
@@ -65,7 +63,7 @@ impl AsyncService<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoR
             std::collections::HashMap::new();
         let mut nested = HashMap::new();
         nested.insert(".tag", "base64_data");
-        nested.insert("base64_data", &self.base64_data);
+        nested.insert("base64_data", self.base64_data);
         payload.insert("image", nested);
         let response = AsyncClient
             .post(endpoint)
