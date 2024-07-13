@@ -36,13 +36,11 @@ pub enum ApiError {
 //     fn call(&self, call_type: CallType<O, E, F>) -> CallType<O, E, F>;
 // }
 
-// Trait for sync
-pub trait SyncService<O: Sized> {
-    fn call(&self) -> Result<O>;
-}
-
-// Trait for async
-pub trait AsyncService<O: Sized, F: Sized> {
+/// Trait for both sync and async calls
+/// Async call will return future that needs to be awaited using own executor
+/// Sync will block and return result
+pub trait Service<O: Sized, F: Sized> {
+    fn call_sync(&self) -> Result<O>;
     fn call(&self) -> Result<F>;
 }
 
