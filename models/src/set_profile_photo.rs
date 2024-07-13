@@ -97,12 +97,13 @@ impl AsyncService<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoR
 #[cfg(test)]
 mod tests {
 
+    use anyhow::Result;
     use api::{AsyncService, SyncClient};
+    use tokio;
 
-    use super::anyhow::Result;
-    use super::{tokio, SetProfilePhotoRequest, SetProfilePhotoResponse, SyncService};
-    #[test]
-    pub fn test() -> Result<(), Box<dyn std::error::Error>> {
+    use super::{SetProfilePhotoRequest, SetProfilePhotoResponse, SyncService};
+    #[tokio::test]
+    pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
         let access_token = "token";
         let base64_data = "data";
         let request = SetProfilePhotoRequest {
@@ -111,15 +112,20 @@ mod tests {
         };
 
         let f = AsyncService::call(&request)?;
-        async {
+        let r = async {
             let r = tokio::spawn(f).await;
-        };
+            let r = r?;
+            let r = r?;
+
+            Result::<SetProfilePhotoResponse>::Ok(r)
+        }
+        .await?;
 
         Ok(())
     }
 
     #[test]
-    pub fn test_json_from_nested_hmap() -> Result<()> {
+    pub fn test_json_from_nested_hash_map() -> Result<()> {
         let body = r##"{\"photo\":{\".tag\":\"base64_data\",\"base64_data\":\"SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=\"}}"##;
         let mut nested = std::collections::HashMap::new();
         let mut payload: std::collections::HashMap<&str, std::collections::HashMap<&str, &str>> =
