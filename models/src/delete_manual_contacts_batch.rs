@@ -11,7 +11,7 @@ pub struct DeleteManualContactsBatchRequest<'a> {
     email_addresses: &'a Vec<&'a str>,
 }
 
-/// Response struct for delete manual contacts
+/// No return values
 #[derive(Deserialize, Debug)]
 pub struct DeleteManualContactsBatchResponse {}
 
@@ -96,22 +96,16 @@ mod tests {
     #[tokio::test]
     pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
         let access_token = "token";
-        let email_addresses = vec!["@.com", "@#.com"];
+        let email_addresses = vec!["@.com", "@.com"];
         let request = DeleteManualContactsBatchRequest {
             access_token,
             email_addresses: &email_addresses,
         };
 
         let f = request.call()?;
-        let r = async {
-            let r = tokio::spawn(f).await;
-            let r = r?;
-            let r = r?;
-
-            Result::<DeleteManualContactsBatchResponse>::Ok(r)
-        }
-        .await?;
-
+        let r = async { Result::<DeleteManualContactsBatchResponse>::Ok(tokio::spawn(f).await??) }
+            .await?;
+        println!("{:#?}", r);
         Ok(())
     }
 

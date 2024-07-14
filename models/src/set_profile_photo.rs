@@ -1,9 +1,11 @@
 use anyhow::Result;
 use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, SyncClient};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use std::{collections::HashMap, future::Future, pin::Pin};
+
+use crate::utils::{self, Utils};
 
 /// Sets a user's profile photo.
 pub struct SetProfilePhotoRequest<'a> {
@@ -17,6 +19,18 @@ pub struct SetProfilePhotoResponse {
     profile_photo_url: String,
 }
 
+/// Implementation of trait for parameters payload
+impl utils::Utils for SetProfilePhotoRequest<'_> {
+    fn parameters(&self) -> impl Serialize + Deserialize {
+        let mut parameters: HashMap<&str, HashMap<&str, &str>> = HashMap::new();
+        let mut nested: HashMap<&str, &str> = HashMap::new();
+        nested.insert(".tag", "base64_data");
+        nested.insert("base64_data", self.base64_data);
+        parameters.insert("photo", nested);
+        parameters
+    }
+}
+
 /// Implementation of Service trait that provides functions related to async and sync queries
 impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoResponse>>>
     for SetProfilePhotoRequest<'_>
@@ -25,12 +39,6 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
         &self,
     ) -> Result<Pin<Box<dyn Future<Output = Result<SetProfilePhotoResponse>> + Send>>> {
         let endpoint = Endpoint::SetProfilePhotoPost.get_endpoint_url();
-        let mut payload: std::collections::HashMap<&str, std::collections::HashMap<&str, &str>> =
-            std::collections::HashMap::new();
-        let mut nested = HashMap::new();
-        nested.insert(".tag", "base64_data");
-        nested.insert("base64_data", self.base64_data);
-        payload.insert("image", nested);
         let response = AsyncClient
             .post(endpoint)
             .bearer_auth(self.access_token)
@@ -38,7 +46,7 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
                 Headers::ContentTypeAppJson.get_str().0,
                 Headers::ContentTypeAppJson.get_str().1,
             )
-            .json(&payload)
+            .json(&self.parameters())
             .send();
         let block = async {
             let response = response
@@ -60,12 +68,7 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
     }
     fn call_sync(&self) -> Result<SetProfilePhotoResponse> {
         let endpoint = Endpoint::SetProfilePhotoPost.get_endpoint_url();
-        let mut payload: std::collections::HashMap<&str, std::collections::HashMap<&str, &str>> =
-            std::collections::HashMap::new();
-        let mut nested = HashMap::new();
-        nested.insert(".tag", "base64_data");
-        nested.insert("base64_data", self.base64_data);
-        payload.insert("image", nested);
+
         let response = SyncClient
             .post(endpoint)
             .bearer_auth(self.access_token)
@@ -73,7 +76,7 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
                 Headers::ContentTypeAppJson.get_str().0,
                 Headers::ContentTypeAppJson.get_str().1,
             )
-            .json(&payload)
+            .json(&self.parameters())
             .send()
             .map_err(|err| ApiError::RequestError(err.into()))?;
 
@@ -107,15 +110,8 @@ mod tests {
         };
 
         let f = request.call()?;
-        let r = async {
-            let r = tokio::spawn(f).await;
-            let r = r?;
-            let r = r?;
-
-            Result::<SetProfilePhotoResponse>::Ok(r)
-        }
-        .await?;
-
+        let r = async { Result::<SetProfilePhotoResponse>::Ok(tokio::spawn(f).await??) }.await?;
+        println!("{:#?}", r);
         Ok(())
     }
 

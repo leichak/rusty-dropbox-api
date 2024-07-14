@@ -5,12 +5,14 @@ use serde::Deserialize;
 
 use std::{collections::HashMap, future::Future, pin::Pin};
 
+use crate::utils::Utils;
+
 /// Removes manually added contacts from the given list.
 pub struct DeleteManualContactsRequest<'a> {
     access_token: &'a str,
 }
 
-/// Response struct for delete manual contacts batch
+/// No return values
 #[derive(Deserialize, Debug)]
 pub struct DeleteManualContactsResponse {}
 
@@ -79,14 +81,9 @@ mod tests {
         let request = DeleteManualContactsRequest { access_token };
 
         let f = request.call()?;
-        let r = async {
-            let r = tokio::spawn(f).await;
-            let r = r?;
-            let r = r?;
-
-            Result::<DeleteManualContactsResponse>::Ok(r)
-        }
-        .await?;
+        let r =
+            async { Result::<DeleteManualContactsResponse>::Ok(tokio::spawn(f).await??) }.await?;
+        println!("{:#?}", r);
 
         Ok(())
     }

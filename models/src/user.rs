@@ -3,7 +3,9 @@ use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, 
 
 use serde::Deserialize;
 
-use std::{future::Future, pin::Pin};
+use std::{collections::HashMap, future::Future, pin::Pin};
+
+use crate::utils::{self, Utils};
 /// This endpoint performs User Authentication, validating the supplied access token, and returns the supplied string, to allow you to test your code and connection to the Dropbox API. It has no other effect. If you receive an HTTP 200 response with the supplied query, it indicates at least part of the Dropbox API infrastructure is working and that the access token is valid.
 pub struct UserRequest<'a> {
     access_token: &'a str,
@@ -16,16 +18,22 @@ pub struct UserResponse {
     result: String,
 }
 
+impl utils::Utils for UserRequest<'_> {
+    fn parameters(&self) -> impl serde::Serialize + Deserialize {
+        let mut parameters: HashMap<&str, &str> = HashMap::new();
+        parameters.insert("query", self.data);
+        parameters
+    }
+}
+
 /// Implementation of Service trait that provides functions related to async and sync queries
 impl Service<UserResponse, BoxFuture<'_, Result<UserResponse>>> for UserRequest<'_> {
     fn call(&self) -> Result<Pin<Box<dyn Future<Output = Result<UserResponse>> + Send>>> {
         let endpoint = Endpoint::UserPost.get_endpoint_url();
-        let mut payload: std::collections::HashMap<&str, &str> = std::collections::HashMap::new();
-        payload.insert("query", self.data);
         let response = AsyncClient
             .post(endpoint)
             .bearer_auth(self.access_token)
-            .json(&payload)
+            .json(&self.parameters())
             .send();
         let block = async {
             let response = response
@@ -56,7 +64,7 @@ impl Service<UserResponse, BoxFuture<'_, Result<UserResponse>>> for UserRequest<
                 Headers::ContentTypeAppJson.get_str().0,
                 Headers::ContentTypeAppJson.get_str().1,
             )
-            .json(&payload)
+            .json(&self.parameters())
             .send()
             .map_err(|err| ApiError::RequestError(err.into()))?;
 
@@ -87,14 +95,8 @@ mod tests {
         let request = UserRequest { access_token, data };
 
         let f = request.call()?;
-        let r = async {
-            let r = tokio::spawn(f).await;
-            let r = r?;
-            let r = r?;
-
-            Result::<UserResponse>::Ok(r)
-        }
-        .await?;
+        let r = async { Result::<UserResponse>::Ok(tokio::spawn(f).await??) }.await?;
+        println!("{:#?}", r);
 
         Ok(())
     }

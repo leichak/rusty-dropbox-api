@@ -5,11 +5,12 @@ use serde::Deserialize;
 
 use std::{future::Future, pin::Pin};
 
+/// Disables the access token used to authenticate the call. If there is a corresponding refresh token for the access token, this disables that refresh token, as well as any other access tokens for that refresh token.
 pub struct TokenRevokeRequest<'a> {
     access_token: &'a str,
 }
 
-/// Disables the access token used to authenticate the call. If there is a corresponding refresh token for the access token, this disables that refresh token, as well as any other access tokens for that refresh token.
+/// No return values
 #[derive(Deserialize, Debug)]
 pub struct TokenRevokeResponse {}
 
@@ -79,14 +80,8 @@ mod tests {
         let request = TokenRevokeRequest { access_token };
 
         let f = request.call()?;
-        let r = async {
-            let r = tokio::spawn(f).await;
-            let r = r?;
-            let r = r?;
-
-            Result::<TokenRevokeResponse>::Ok(r)
-        }
-        .await?;
+        let r = async { Result::<TokenRevokeResponse>::Ok(tokio::spawn(f).await??) }.await?;
+        println!("{:#?}", r);
 
         Ok(())
     }
@@ -94,11 +89,9 @@ mod tests {
     #[test]
     pub fn test_sync() -> Result<(), Box<dyn std::error::Error>> {
         let access_token = "token";
-        let base64_data = "data";
         let request = TokenRevokeRequest { access_token };
 
         let r = request.call_sync()?;
-
         println!("{:#?}", r);
 
         Ok(())
