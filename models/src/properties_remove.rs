@@ -14,8 +14,8 @@ type Field<'a> = (&'a str, &'a str);
 type TemplateID<'a> = &'a str;
 
 /// Removes all manually added contacts. You'll still keep contacts who are on your team or who you imported. New contacts will be added when you share.
-/// Docs: https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
-pub struct PropertiesAddRequest<'a> {
+/// Docs: https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-remove
+pub struct PropertiesRemoveRequest<'a> {
     access_token: &'a str,
     path: &'a str,
     property_groups: Vec<(Vec<Field<'a>>, TemplateID<'a>)>,
@@ -23,9 +23,9 @@ pub struct PropertiesAddRequest<'a> {
 
 /// No return values
 #[derive(Deserialize, Debug)]
-pub struct PropertiesAddResponse {}
+pub struct PropertiesRemoveResponse {}
 
-impl Utils for PropertiesAddRequest<'_> {
+impl Utils for PropertiesRemoveRequest<'_> {
     /// Function that tries to generate Serialize object from request data
     fn parameters(&self) -> impl serde::Serialize + Deserialize {
         #[derive(Serialize, Deserialize, Debug)]
@@ -67,11 +67,13 @@ impl Utils for PropertiesAddRequest<'_> {
 }
 
 /// Implementation of Service trait that provides functions related to async and sync queries
-impl Service<PropertiesAddResponse, BoxFuture<'_, Result<PropertiesAddResponse>>>
-    for PropertiesAddRequest<'_>
+impl Service<PropertiesRemoveResponse, BoxFuture<'_, Result<PropertiesRemoveResponse>>>
+    for PropertiesRemoveRequest<'_>
 {
-    fn call(&self) -> Result<Pin<Box<dyn Future<Output = Result<PropertiesAddResponse>> + Send>>> {
-        let endpoint = Endpoint::PropertiesAddPost.get_endpoint_url();
+    fn call(
+        &self,
+    ) -> Result<Pin<Box<dyn Future<Output = Result<PropertiesRemoveResponse>> + Send>>> {
+        let endpoint = Endpoint::PropertiesRemovePost.get_endpoint_url();
 
         let response = AsyncClient
             .post(endpoint)
@@ -91,17 +93,17 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<PropertiesAddResponse>>
                 .error_for_status()
                 .map_err(|err| ApiError::DropBoxError(err.into()))?;
 
-            let response: PropertiesAddResponse = response
+            let response: PropertiesRemoveResponse = response
                 .json()
                 .await
                 .map_err(|err| ApiError::ParsingError(err.into()))?;
 
-            Result::<PropertiesAddResponse>::Ok(response)
+            Result::<PropertiesRemoveResponse>::Ok(response)
         };
         Ok(Box::pin(block))
     }
-    fn call_sync(&self) -> Result<PropertiesAddResponse> {
-        let endpoint = Endpoint::PropertiesAddPost.get_endpoint_url();
+    fn call_sync(&self) -> Result<PropertiesRemoveResponse> {
+        let endpoint = Endpoint::PropertiesRemovePost.get_endpoint_url();
 
         let response = SyncClient
             .post(endpoint)
@@ -116,7 +118,7 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<PropertiesAddResponse>>
 
         match response.error_for_status() {
             Ok(response) => {
-                let response: PropertiesAddResponse = response
+                let response: PropertiesRemoveResponse = response
                     .json()
                     .map_err(|err| ApiError::ParsingError(err.into()))?;
                 Ok(response)
@@ -138,7 +140,7 @@ mod tests {
 
     use crate::utils::Utils;
 
-    use super::{Field, PropertiesAddRequest, PropertiesAddResponse, TemplateID};
+    use super::{Field, PropertiesRemoveRequest, PropertiesRemoveResponse, TemplateID};
     // #[tokio::test]
     // pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
     //     let access_token = "token";
@@ -176,7 +178,7 @@ mod tests {
         let f = vec![("name", "val")];
         p_gs.push((f, "id"));
 
-        let request = PropertiesAddRequest {
+        let request = PropertiesRemoveRequest {
             access_token: "123",
             path: "123",
             property_groups: p_gs,

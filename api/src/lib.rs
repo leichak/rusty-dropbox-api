@@ -23,19 +23,6 @@ pub enum ApiError {
     DropBoxError(anyhow::Error),
 }
 
-// /// Enum that stores optional input to
-// pub enum CallType<'a, O: Sized, E: Sized, F: ?Sized> {
-//     Sync(Option<Result<O, E>>),
-//     Async(Option<Result<&'a mut F, E>>),
-// }
-
-// /// Trait bundling async and sync requests
-// /// It has call that takes CallType and returns Call type that stores Result
-// /// The Result can store Output or can store Error
-// pub trait Api<O: Sized, E: Sized, F: ?Sized> {
-//     fn call(&self, call_type: CallType<O, E, F>) -> CallType<O, E, F>;
-// }
-
 /// Trait for both sync and async calls
 /// Async call will return future that needs to be awaited using own executor
 /// Sync will block and return result
