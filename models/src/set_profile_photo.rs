@@ -103,8 +103,12 @@ mod tests {
     use api::{get_mut_or_init, Service, SyncClient, MOCK_SERVER};
     use tokio;
 
-    use super::super::{mockito, TEST_TOKEN};
-    use super::{Headers, SetProfilePhotoRequest, SetProfilePhotoResponse};
+    use super::{SetProfilePhotoRequest, SetProfilePhotoResponse};
+    use api::Headers;
+
+    use api::mockito;
+    use api::TEST_TOKEN;
+
     #[tokio::test]
     pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
         let access_token = "1234";
@@ -132,7 +136,7 @@ mod tests {
 
             let mut server = get_mut_or_init();
             server
-                .mock("GET", "/set_profile_photo/")
+                .mock("POST", "/2/account/set_profile_photo/")
                 .with_status(200)
                 .with_header(
                     Headers::ContentTypeAppJson.get_str().0,

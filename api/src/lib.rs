@@ -16,7 +16,6 @@ lazy_static! {
 pub static MOCK_SERVER: OnceLock<Mutex<Server>> = OnceLock::new();
 
 /// Auth test token
-#[cfg(test)]
 pub static TEST_TOKEN: &'static str = "123456";
 
 /// Function that inits default or get mutex to test server
@@ -173,18 +172,16 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> String {
         Endpoint::UsersGetSpaceUsagePost => "https://api.dropboxapi.com/2/users/get_space_usage",
     };
 
-    let mock_url;
-    if cfg!(test) {
-        mock_url = test_url(url);
-        url = &mock_url;
-    }
+    #[cfg(feature = "test-utils")]
+    let binding = test_url(url);
+    url = &binding;
 
     url.to_string()
 }
 
 /// Just for testing purpose, it will replace original end-point with mock server url
 fn test_url(url: &str) -> String {
-    let idx = url.find("com").expect("should have com") + 4;
+    let idx = url.find("com").expect("should have com") + 3;
     let url = &url[idx..];
     let server_url = get_mut_or_init().url();
     let url = format!("{}{}", server_url, url);

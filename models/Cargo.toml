@@ -4,10 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-api = { path = "../api" }
+api = { path = "../api", version = "0.1.1", features = ["test-utils"] }
 serde = { version = "1.0.204", features = ["derive"] }
 
 
 [dev-dependencies]
+api = { path = "../api", version = "0.1.1", features = ["test-utils"] }
 tokio = { version = "1.38.0", features = ["full"] }
 anyhow = "1.0.86"
