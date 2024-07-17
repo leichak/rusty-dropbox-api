@@ -1,12 +1,20 @@
-use lazy_static::lazy_static;
+pub use lazy_static::lazy_static;
+use mockito::ServerOpts;
 
+/// Clients and Mock server, provides end-points for testing purpose
 lazy_static! {
     pub static ref SyncClient: reqwest::blocking::Client = reqwest::blocking::Client::new();
     pub static ref AsyncClient: reqwest::Client = reqwest::Client::new();
+    pub static ref MOCK_SERVER: mockito::Server = mockito::Server::new_with_opts(ServerOpts {
+        host: "1.2.3.4",
+        port: 1234,
+        assert_on_drop: false
+    });
 }
 
 pub use {
-    anyhow, anyhow::Result, async_trait, futures::future::BoxFuture, reqwest, serde_json, tokio,
+    anyhow, anyhow::Result, async_trait, futures::future::BoxFuture, mockito, reqwest, serde_json,
+    tokio,
 };
 
 /// Enum describing set of errors that can occur possibly
@@ -75,8 +83,8 @@ pub enum Endpoint {
 impl Endpoint {
     /// Function returning appropriate endpoints
     /// to do files, sharing
-    pub fn get_endpoint_url(&self) -> &'static str {
-        match &self {
+    pub fn get_endpoint_url(&self) -> String {
+        let url = match &self {
             Endpoint::AppPost => "https://api.dropboxapi.com/2/check/app",
             Endpoint::CountPost => "https://api.dropboxapi.com/2/file_requests/count",
             Endpoint::CreatePost => "https://api.dropboxapi.com/2/file_requests/create",
@@ -154,7 +162,21 @@ impl Endpoint {
             Endpoint::UsersGetSpaceUsagePost => {
                 "https://api.dropboxapi.com/2/users/get_space_usage"
             }
-        }
+        };
+
+        #[cfg(test)]
+        let url = Self::test_url(url);
+
+        url.to_string()
+    }
+
+    /// Just for testing purpose, it will replace original end-point with mock server url
+    #[cfg(test)]
+    fn test_url(url: &str) -> String {
+        let idx = url.find("com").expect("should have com") + 4;
+        let url = &url[idx..];
+        let url = format!("{}{}", MOCK_SERVER.url(), url);
+        url
     }
 }
 

@@ -95,6 +95,7 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
 #[cfg(test)]
 mod tests {
 
+    use super::Endpoint;
     use anyhow::Result;
     use api::{Service, SyncClient};
     use tokio;
@@ -151,7 +152,7 @@ mod tests {
             .json(&payload)
             .build()?;
 
-        println!("{:#?} {}", request.body().unwrap(), body);
+        println!("{:#?} {:#?}", request.body().unwrap(), body);
 
         Ok(())
     }

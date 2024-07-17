@@ -131,16 +131,6 @@ impl Service<TemplatesAddForUserResponse, BoxFuture<'_, Result<TemplatesAddForUs
 #[cfg(test)]
 mod tests {
 
-    use anyhow::Result;
-    use api::{
-        serde_json::{json, to_string},
-        Service, SyncClient,
-    };
-    use tokio;
-
-    use crate::utils::Utils;
-
-    use super::{Field, TemplateID, TemplatesAddForUserResponse, TemplatesRemoveForUserRequest};
     // #[tokio::test]
     // pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
     //     let access_token = "token";

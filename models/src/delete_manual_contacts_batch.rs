@@ -89,7 +89,7 @@ impl
 mod tests {
 
     use anyhow::Result;
-    use api::{Service, SyncClient};
+    use api::{Service};
     use tokio;
 
     use super::{DeleteManualContactsBatchRequest, DeleteManualContactsBatchResponse};

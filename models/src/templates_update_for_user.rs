@@ -134,15 +134,14 @@ mod tests {
 
     use anyhow::Result;
     use api::{
-        serde_json::{json, to_string},
-        Service, SyncClient,
+        serde_json::{json},
     };
-    use tokio;
+    
 
     use crate::utils::Utils;
 
     use super::{
-        Field, TemplateID, TemplatesUpdatetForUserRequest, TemplatesUpdatetForUserResponse,
+        Field, TemplateID, TemplatesUpdatetForUserRequest,
     };
     // #[tokio::test]
     // pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
@@ -177,7 +176,7 @@ mod tests {
 
     #[test]
     pub fn test_properties_generation() -> Result<()> {
-        let mut p_gs: Vec<((Vec<Field>, TemplateID))> = vec![];
+        let mut p_gs: Vec<(Vec<Field>, TemplateID)> = vec![];
         let f = vec![("name", "val")];
         p_gs.push((f, "id"));
 

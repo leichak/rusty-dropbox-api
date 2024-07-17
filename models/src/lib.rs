@@ -28,7 +28,6 @@ mod get_metadata;
 mod get_preview;
 mod get_shared_link_file;
 mod get_shared_link_metadata;
-
 mod get_space_usage;
 mod get_temporary_link;
 mod get_temporary_upload_link;
@@ -83,6 +82,9 @@ mod token_revoke;
 mod transfer_folder;
 mod upload_session_finish_batch_check;
 mod user;
+
+#[cfg(test)]
+use api::MOCK_SERVER;
 
 pub use set_profile_photo::{SetProfilePhotoRequest, SetProfilePhotoResponse};
 

@@ -69,7 +69,7 @@ impl Service<DeleteManualContactsResponse, BoxFuture<'_, Result<DeleteManualCont
 mod tests {
 
     use anyhow::Result;
-    use api::{Service, SyncClient};
+    use api::{Service};
     use tokio;
 
     use super::{DeleteManualContactsRequest, DeleteManualContactsResponse};
