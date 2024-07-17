@@ -3,7 +3,7 @@ use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, 
 
 use serde::Deserialize;
 
-use std::{collections::HashMap, future::Future, hash::Hash, pin::Pin};
+use std::{collections::HashMap, future::Future, pin::Pin};
 
 use crate::utils::{self, Utils};
 

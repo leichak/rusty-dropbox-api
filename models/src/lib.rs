@@ -1,6 +1,6 @@
 mod app;
 mod check_job_status;
-mod check_remove_mamber_job_status;
+mod check_remove_member_job_status;
 mod check_share_jobs_status;
 mod copy;
 mod copy_batch;
