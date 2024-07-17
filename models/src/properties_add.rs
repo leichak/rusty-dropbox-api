@@ -49,7 +49,7 @@ impl Utils for PropertiesAddRequest<'_> {
         let mut p_gps = vec![];
         for (nv_vec, id) in self.property_groups.iter() {
             let f: Vec<Field> = nv_vec
-                .into_iter()
+                .iter()
                 .map(|(n, v)| Field { name: n, value: v })
                 .collect();
             let p_g = PropertyGroup {

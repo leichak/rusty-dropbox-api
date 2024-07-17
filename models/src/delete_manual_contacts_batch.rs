@@ -3,7 +3,7 @@ use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, 
 
 use serde::Deserialize;
 
-use std::{collections::HashMap, future::Future, pin::Pin};
+use std::{future::Future, pin::Pin};
 
 /// Removes all manually added contacts. You'll still keep contacts who are on your team or who you imported. New contacts will be added when you share.
 pub struct DeleteManualContactsBatchRequest<'a> {

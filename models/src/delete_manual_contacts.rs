@@ -1,11 +1,10 @@
 use anyhow::Result;
-use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, SyncClient};
+use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Service, SyncClient};
 
 use serde::Deserialize;
 
-use std::{collections::HashMap, future::Future, pin::Pin};
+use std::{future::Future, pin::Pin};
 
-use crate::utils::Utils;
 
 /// Removes manually added contacts from the given list.
 pub struct DeleteManualContactsRequest<'a> {
