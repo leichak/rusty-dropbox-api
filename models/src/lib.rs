@@ -84,9 +84,12 @@ mod upload_session_finish_batch_check;
 mod user;
 
 #[cfg(test)]
-use api::MOCK_SERVER;
+use api::{mockito, MOCK_SERVER};
 
 pub use set_profile_photo::{SetProfilePhotoRequest, SetProfilePhotoResponse};
+
+#[cfg(test)]
+static TEST_TOKEN: &'static str = "123456";
 
 mod utils {
     use serde::{Deserialize, Serialize};

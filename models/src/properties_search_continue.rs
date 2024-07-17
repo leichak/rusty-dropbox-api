@@ -1,5 +1,8 @@
 use anyhow::Result;
-use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, SyncClient};
+use api::{
+    anyhow, get_endpoint_url, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service,
+    SyncClient,
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -77,7 +80,7 @@ impl
         &self,
     ) -> Result<Pin<Box<dyn Future<Output = Result<PropertiesSearchContinueResponse>> + Send>>>
     {
-        let endpoint = Endpoint::PropertiesSearchContinuePost.get_endpoint_url();
+        let endpoint = get_endpoint_url(Endpoint::PropertiesSearchContinuePost);
 
         let response = AsyncClient
             .post(endpoint)
@@ -107,7 +110,7 @@ impl
         Ok(Box::pin(block))
     }
     fn call_sync(&self) -> Result<PropertiesSearchContinueResponse> {
-        let endpoint = Endpoint::PropertiesSearchContinuePost.get_endpoint_url();
+        let endpoint = get_endpoint_url(Endpoint::PropertiesSearchContinuePost);
 
         let response = SyncClient
             .post(endpoint)
@@ -136,16 +139,11 @@ impl
 mod tests {
 
     use anyhow::Result;
-    use api::{
-        serde_json::{json},
-    };
-    
+    use api::serde_json::json;
 
     use crate::utils::Utils;
 
-    use super::{
-        Field, PropertiesSearchContinueRequest, TemplateID,
-    };
+    use super::{Field, PropertiesSearchContinueRequest, TemplateID};
     // #[tokio::test]
     // pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
     //     let access_token = "token";

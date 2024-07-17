@@ -1,5 +1,8 @@
 use anyhow::Result;
-use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, SyncClient};
+use api::{
+    anyhow, get_endpoint_url, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service,
+    SyncClient,
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -38,7 +41,8 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
     fn call(
         &self,
     ) -> Result<Pin<Box<dyn Future<Output = Result<SetProfilePhotoResponse>> + Send>>> {
-        let endpoint = Endpoint::SetProfilePhotoPost.get_endpoint_url();
+        let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost);
+
         let response = AsyncClient
             .post(endpoint)
             .bearer_auth(self.access_token)
@@ -67,7 +71,7 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
         Ok(Box::pin(block))
     }
     fn call_sync(&self) -> Result<SetProfilePhotoResponse> {
-        let endpoint = Endpoint::SetProfilePhotoPost.get_endpoint_url();
+        let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost);
 
         let response = SyncClient
             .post(endpoint)
@@ -95,15 +99,15 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
 #[cfg(test)]
 mod tests {
 
-    use super::Endpoint;
     use anyhow::Result;
-    use api::{Service, SyncClient};
+    use api::{get_mut_or_init, Service, SyncClient, MOCK_SERVER};
     use tokio;
 
-    use super::{SetProfilePhotoRequest, SetProfilePhotoResponse};
+    use super::super::{mockito, TEST_TOKEN};
+    use super::{Headers, SetProfilePhotoRequest, SetProfilePhotoResponse};
     #[tokio::test]
     pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
-        let access_token = "token";
+        let access_token = "1234";
         let base64_data = "data";
         let request = SetProfilePhotoRequest {
             access_token,
@@ -118,16 +122,40 @@ mod tests {
 
     #[test]
     pub fn test_sync() -> Result<(), Box<dyn std::error::Error>> {
-        let access_token = "token";
-        let base64_data = "data";
+        {
+            let body = r##"{
+                "photo": {
+                    ".tag": "base64_data",
+                    "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
+                }
+            }"##;
+
+            let mut server = get_mut_or_init();
+            server
+                .mock("GET", "/set_profile_photo/")
+                .with_status(200)
+                .with_header(
+                    Headers::ContentTypeAppJson.get_str().0,
+                    Headers::ContentTypeAppJson.get_str().1,
+                )
+                .with_header(
+                    Headers::Authorization.get_str().0,
+                    Headers::Authorization.get_str().1,
+                )
+                .match_body(body)
+                .create();
+        }
+
+        let base64_data =
+            "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
         let request = SetProfilePhotoRequest {
-            access_token,
+            access_token: &TEST_TOKEN,
             base64_data,
         };
 
         let r = request.call_sync()?;
 
-        println!("{:#?}", r);
+        println!("{:?}", r);
 
         Ok(())
     }

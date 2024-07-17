@@ -1,21 +1,37 @@
 pub use lazy_static::lazy_static;
-use mockito::ServerOpts;
+use std::sync::{Mutex, MutexGuard, OnceLock};
 
-/// Clients and Mock server, provides end-points for testing purpose
+pub use {
+    anyhow, anyhow::Result, async_trait, futures::future::BoxFuture, mockito, mockito::Server,
+    reqwest, serde_json, tokio,
+};
+
+// Clients
 lazy_static! {
     pub static ref SyncClient: reqwest::blocking::Client = reqwest::blocking::Client::new();
     pub static ref AsyncClient: reqwest::Client = reqwest::Client::new();
-    pub static ref MOCK_SERVER: mockito::Server = mockito::Server::new_with_opts(ServerOpts {
-        host: "1.2.3.4",
-        port: 1234,
-        assert_on_drop: false
-    });
 }
 
-pub use {
-    anyhow, anyhow::Result, async_trait, futures::future::BoxFuture, mockito, reqwest, serde_json,
-    tokio,
-};
+/// Test server
+pub static MOCK_SERVER: OnceLock<Mutex<Server>> = OnceLock::new();
+
+/// Auth test token
+#[cfg(test)]
+pub static TEST_TOKEN: &'static str = "123456";
+
+/// Function that inits default or get mutex to test server
+pub fn get_mut_or_init() -> MutexGuard<'static, Server> {
+    MOCK_SERVER
+        .get_or_init(|| {
+            Mutex::new(mockito::Server::new_with_opts(mockito::ServerOpts {
+                host: "0.0.0.0",
+                port: 4321,
+                assert_on_drop: false,
+            }))
+        })
+        .lock()
+        .expect("Failed")
+}
 
 /// Enum describing set of errors that can occur possibly
 /// Thiserror macro to derive std::error::Error trait
@@ -80,114 +96,111 @@ pub enum Endpoint {
     UsersGetSpaceUsagePost,
 }
 
-impl Endpoint {
-    /// Function returning appropriate endpoints
-    /// to do files, sharing
-    pub fn get_endpoint_url(&self) -> String {
-        let url = match &self {
-            Endpoint::AppPost => "https://api.dropboxapi.com/2/check/app",
-            Endpoint::CountPost => "https://api.dropboxapi.com/2/file_requests/count",
-            Endpoint::CreatePost => "https://api.dropboxapi.com/2/file_requests/create",
-            Endpoint::DeleteAllClosedPost => "https://api.dropboxapi.com/2/delete_all_closed",
-            Endpoint::DeleteManualContactsBatchPost => {
-                "https://api.dropboxapi.com/2/contacts/delete_manual_contacts_batch"
-            }
-            Endpoint::DeleteManualContactsPost => {
-                "https://api.dropboxapi.com/2/contacts/delete_manual_contacts"
-            }
-            Endpoint::DeletePost => "https://api.dropboxapi.com/2/delete",
-            Endpoint::FilesDownloadPost => "https://content.dropboxapi.com/2/files/download",
-            Endpoint::FilesUploadPost => "https://content.dropboxapi.com/2/files/upload",
-            Endpoint::FilesUploadSessionAppendV2Post => {
-                "https://content.dropboxapi.com/2/files/upload_session/append_v2"
-            }
-            Endpoint::FilesUploadSessionFinishPost => {
-                "https://content.dropboxapi.com/2/files/upload_session/finish"
-            }
-            Endpoint::FilesUploadSessionStartPost => {
-                "https://content.dropboxapi.com/2/files/upload_session/start"
-            }
-            Endpoint::GetPost => "https://api.dropboxapi.com/2/get",
-            Endpoint::ListContinuePost => "https://api.dropboxapi.com/2/list/continue",
-            Endpoint::ListPost => "https://api.dropboxapi.com/2/list",
-            Endpoint::PropertiesAddPost => {
-                "https://api.dropboxapi.com/2/file_properties/properties/add"
-            }
-            Endpoint::PropertiesOverwritePost => {
-                "https://api.dropboxapi.com/2/file_properties/properties/overwrite"
-            }
-            Endpoint::PropertiesRemovePost => {
-                "https://api.dropboxapi.com/2/file_properties/properties/remove"
-            }
-            Endpoint::PropertiesSearchContinuePost => {
-                "https://api.dropboxapi.com/2/file_properties/properties/search/continue"
-            }
-            Endpoint::PropertiesSearchPost => {
-                "https://api.dropboxapi.com/2/file_properties/properties/search"
-            }
-            Endpoint::PropertiesUpdatePost => {
-                "https://api.dropboxapi.com/2/file_properties/properties/update"
-            }
-            Endpoint::SetProfilePhotoPost => {
-                "https://api.dropboxapi.com/2/account/set_profile_photo"
-            }
-            Endpoint::TemplatesAddForUserPost => {
-                "https://api.dropboxapi.com/2/file_properties/templates/add_for_user"
-            }
-            Endpoint::TemplatesGetForUserPost => {
-                "https://api.dropboxapi.com/2/file_properties/templates/get_for_user"
-            }
-            Endpoint::TemplatesListForUserPost => {
-                "https://api.dropboxapi.com/2/file_properties/templates/list_for_user"
-            }
-            Endpoint::TemplatesRemoveForUserPost => {
-                "https://api.dropboxapi.com/2/file_properties/templates/remove_for_user"
-            }
-            Endpoint::TemplatesUpdateForUserPost => {
-                "https://api.dropboxapi.com/2/file_properties/templates/update_for_user"
-            }
-            Endpoint::TokenRevokePost => "https://api.dropboxapi.com/2/auth/token/revoke",
-            Endpoint::UpdatePost => "https://api.dropboxapi.com/2/update",
-            Endpoint::UserPost => "https://api.dropboxapi.com/2/check/user",
-            Endpoint::UsersFeaturesGetValuesPost => {
-                "https://api.dropboxapi.com/2/users/features/get_values"
-            }
-            Endpoint::UsersGetAccountBatchPost => {
-                "https://api.dropboxapi.com/2/users/get_account_batch"
-            }
-            Endpoint::UsersGetAccountPost => "https://api.dropboxapi.com/2/users/get_account",
-            Endpoint::UsersGetCurrentAccountPost => {
-                "https://api.dropboxapi.com/2/users/get_current_account"
-            }
-            Endpoint::UsersGetSpaceUsagePost => {
-                "https://api.dropboxapi.com/2/users/get_space_usage"
-            }
-        };
+pub fn get_endpoint_url(endpoint: Endpoint) -> String {
+    let mut url = match endpoint {
+        Endpoint::AppPost => "https://api.dropboxapi.com/2/check/app",
+        Endpoint::CountPost => "https://api.dropboxapi.com/2/file_requests/count",
+        Endpoint::CreatePost => "https://api.dropboxapi.com/2/file_requests/create",
+        Endpoint::DeleteAllClosedPost => "https://api.dropboxapi.com/2/delete_all_closed",
+        Endpoint::DeleteManualContactsBatchPost => {
+            "https://api.dropboxapi.com/2/contacts/delete_manual_contacts_batch"
+        }
+        Endpoint::DeleteManualContactsPost => {
+            "https://api.dropboxapi.com/2/contacts/delete_manual_contacts"
+        }
+        Endpoint::DeletePost => "https://api.dropboxapi.com/2/delete",
+        Endpoint::FilesDownloadPost => "https://content.dropboxapi.com/2/files/download",
+        Endpoint::FilesUploadPost => "https://content.dropboxapi.com/2/files/upload",
+        Endpoint::FilesUploadSessionAppendV2Post => {
+            "https://content.dropboxapi.com/2/files/upload_session/append_v2"
+        }
+        Endpoint::FilesUploadSessionFinishPost => {
+            "https://content.dropboxapi.com/2/files/upload_session/finish"
+        }
+        Endpoint::FilesUploadSessionStartPost => {
+            "https://content.dropboxapi.com/2/files/upload_session/start"
+        }
+        Endpoint::GetPost => "https://api.dropboxapi.com/2/get",
+        Endpoint::ListContinuePost => "https://api.dropboxapi.com/2/list/continue",
+        Endpoint::ListPost => "https://api.dropboxapi.com/2/list",
+        Endpoint::PropertiesAddPost => {
+            "https://api.dropboxapi.com/2/file_properties/properties/add"
+        }
+        Endpoint::PropertiesOverwritePost => {
+            "https://api.dropboxapi.com/2/file_properties/properties/overwrite"
+        }
+        Endpoint::PropertiesRemovePost => {
+            "https://api.dropboxapi.com/2/file_properties/properties/remove"
+        }
+        Endpoint::PropertiesSearchContinuePost => {
+            "https://api.dropboxapi.com/2/file_properties/properties/search/continue"
+        }
+        Endpoint::PropertiesSearchPost => {
+            "https://api.dropboxapi.com/2/file_properties/properties/search"
+        }
+        Endpoint::PropertiesUpdatePost => {
+            "https://api.dropboxapi.com/2/file_properties/properties/update"
+        }
+        Endpoint::SetProfilePhotoPost => "https://api.dropboxapi.com/2/account/set_profile_photo",
+        Endpoint::TemplatesAddForUserPost => {
+            "https://api.dropboxapi.com/2/file_properties/templates/add_for_user"
+        }
+        Endpoint::TemplatesGetForUserPost => {
+            "https://api.dropboxapi.com/2/file_properties/templates/get_for_user"
+        }
+        Endpoint::TemplatesListForUserPost => {
+            "https://api.dropboxapi.com/2/file_properties/templates/list_for_user"
+        }
+        Endpoint::TemplatesRemoveForUserPost => {
+            "https://api.dropboxapi.com/2/file_properties/templates/remove_for_user"
+        }
+        Endpoint::TemplatesUpdateForUserPost => {
+            "https://api.dropboxapi.com/2/file_properties/templates/update_for_user"
+        }
+        Endpoint::TokenRevokePost => "https://api.dropboxapi.com/2/auth/token/revoke",
+        Endpoint::UpdatePost => "https://api.dropboxapi.com/2/update",
+        Endpoint::UserPost => "https://api.dropboxapi.com/2/check/user",
+        Endpoint::UsersFeaturesGetValuesPost => {
+            "https://api.dropboxapi.com/2/users/features/get_values"
+        }
+        Endpoint::UsersGetAccountBatchPost => {
+            "https://api.dropboxapi.com/2/users/get_account_batch"
+        }
+        Endpoint::UsersGetAccountPost => "https://api.dropboxapi.com/2/users/get_account",
+        Endpoint::UsersGetCurrentAccountPost => {
+            "https://api.dropboxapi.com/2/users/get_current_account"
+        }
+        Endpoint::UsersGetSpaceUsagePost => "https://api.dropboxapi.com/2/users/get_space_usage",
+    };
 
-        #[cfg(test)]
-        let url = Self::test_url(url);
-
-        url.to_string()
+    let mock_url;
+    if cfg!(test) {
+        mock_url = test_url(url);
+        url = &mock_url;
     }
 
-    /// Just for testing purpose, it will replace original end-point with mock server url
-    #[cfg(test)]
-    fn test_url(url: &str) -> String {
-        let idx = url.find("com").expect("should have com") + 4;
-        let url = &url[idx..];
-        let url = format!("{}{}", MOCK_SERVER.url(), url);
-        url
-    }
+    url.to_string()
+}
+
+/// Just for testing purpose, it will replace original end-point with mock server url
+fn test_url(url: &str) -> String {
+    let idx = url.find("com").expect("should have com") + 4;
+    let url = &url[idx..];
+    let server_url = get_mut_or_init().url();
+    let url = format!("{}{}", server_url, url);
+    url
 }
 
 pub enum Headers {
     ContentTypeAppJson,
+    Authorization,
 }
 
 impl Headers {
     pub fn get_str(&self) -> (&str, &str) {
         match self {
             Headers::ContentTypeAppJson => ("Content-type", "application/json"),
+            Headers::Authorization => ("Authorization", "Bearer 123456"),
         }
     }
 }

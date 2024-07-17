@@ -1,5 +1,8 @@
 use anyhow::Result;
-use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, SyncClient};
+use api::{
+    anyhow, get_endpoint_url, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service,
+    SyncClient,
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -73,7 +76,7 @@ impl Service<PropertiesOverwriteResponse, BoxFuture<'_, Result<PropertiesOverwri
     fn call(
         &self,
     ) -> Result<Pin<Box<dyn Future<Output = Result<PropertiesOverwriteResponse>> + Send>>> {
-        let endpoint = Endpoint::PropertiesOverwritePost.get_endpoint_url();
+        let endpoint = get_endpoint_url(Endpoint::PropertiesOverwritePost);
 
         let response = AsyncClient
             .post(endpoint)
@@ -103,7 +106,7 @@ impl Service<PropertiesOverwriteResponse, BoxFuture<'_, Result<PropertiesOverwri
         Ok(Box::pin(block))
     }
     fn call_sync(&self) -> Result<PropertiesOverwriteResponse> {
-        let endpoint = Endpoint::PropertiesOverwritePost.get_endpoint_url();
+        let endpoint = get_endpoint_url(Endpoint::PropertiesOverwritePost);
 
         let response = SyncClient
             .post(endpoint)
@@ -132,10 +135,7 @@ impl Service<PropertiesOverwriteResponse, BoxFuture<'_, Result<PropertiesOverwri
 mod tests {
 
     use anyhow::Result;
-    use api::{
-        serde_json::{json},
-    };
-    
+    use api::serde_json::json;
 
     use crate::utils::Utils;
 

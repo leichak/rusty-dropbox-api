@@ -1,5 +1,8 @@
 use anyhow::Result;
-use api::{anyhow, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, SyncClient};
+use api::{
+    anyhow, get_endpoint_url, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service,
+    SyncClient,
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -71,7 +74,7 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<PropertiesAddResponse>>
     for PropertiesAddRequest<'_>
 {
     fn call(&self) -> Result<Pin<Box<dyn Future<Output = Result<PropertiesAddResponse>> + Send>>> {
-        let endpoint = Endpoint::PropertiesAddPost.get_endpoint_url();
+        let endpoint = get_endpoint_url(Endpoint::PropertiesAddPost);
 
         let response = AsyncClient
             .post(endpoint)
@@ -101,7 +104,7 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<PropertiesAddResponse>>
         Ok(Box::pin(block))
     }
     fn call_sync(&self) -> Result<PropertiesAddResponse> {
-        let endpoint = Endpoint::PropertiesAddPost.get_endpoint_url();
+        let endpoint = get_endpoint_url(Endpoint::PropertiesAddPost);
 
         let response = SyncClient
             .post(endpoint)
@@ -130,10 +133,7 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<PropertiesAddResponse>>
 mod tests {
 
     use anyhow::Result;
-    use api::{
-        serde_json::{json},
-    };
-    
+    use api::serde_json::json;
 
     use crate::utils::Utils;
 
