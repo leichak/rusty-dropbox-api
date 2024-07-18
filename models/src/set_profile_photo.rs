@@ -27,8 +27,8 @@ impl utils::Utils for SetProfilePhotoRequest<'_> {
     fn parameters(&self) -> impl Serialize + Deserialize {
         let mut parameters: HashMap<&str, HashMap<&str, &str>> = HashMap::new();
         let mut nested: HashMap<&str, &str> = HashMap::new();
-        nested.insert(".tag", "base64_data");
         nested.insert("base64_data", self.base64_data);
+        nested.insert(".tag", "base64_data");
         parameters.insert("photo", nested);
         parameters
     }
@@ -70,6 +70,7 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
         };
         Ok(Box::pin(block))
     }
+
     fn call_sync(&self) -> Result<SetProfilePhotoResponse> {
         let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost);
 
@@ -100,7 +101,8 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
 mod tests {
 
     use anyhow::Result;
-    use api::{get_mut_or_init, Service, SyncClient, MOCK_SERVER};
+
+    use api::{get_mut_or_init, Service, SyncClient};
     use tokio;
 
     use super::{SetProfilePhotoRequest, SetProfilePhotoResponse};
@@ -119,24 +121,28 @@ mod tests {
         };
 
         let f = request.call()?;
-        let r = async { Result::<SetProfilePhotoResponse>::Ok(tokio::spawn(f).await??) }.await?;
+        let r = tokio::spawn(f).await??;
         println!("{:#?}", r);
         Ok(())
     }
 
     #[test]
-    pub fn test_sync() -> Result<(), Box<dyn std::error::Error>> {
+    pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
         {
             let body = r##"{
                 "photo": {
-                    ".tag": "base64_data",
-                    "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
-                }
+                ".tag": "base64_data",
+                "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
+                        }
             }"##;
+
+            let response = r##"{
+    "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
+}"##;
 
             let mut server = get_mut_or_init();
             server
-                .mock("POST", "/2/account/set_profile_photo/")
+                .mock("POST", "/2/account/set_profile_photo")
                 .with_status(200)
                 .with_header(
                     Headers::ContentTypeAppJson.get_str().0,
@@ -146,7 +152,8 @@ mod tests {
                     Headers::Authorization.get_str().0,
                     Headers::Authorization.get_str().1,
                 )
-                .match_body(body)
+                .match_body(mockito::Matcher::JsonString(body.to_string()))
+                .with_body(response)
                 .create();
         }
 
@@ -157,34 +164,7 @@ mod tests {
             base64_data,
         };
 
-        let r = request.call_sync()?;
-
-        println!("{:?}", r);
-
-        Ok(())
-    }
-
-    #[test]
-    pub fn test_json_from_nested_hash_map() -> Result<()> {
-        let body = r##"{\"photo\":{\".tag\":\"base64_data\",\"base64_data\":\"SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=\"}}"##;
-        let mut nested = std::collections::HashMap::new();
-        let mut payload: std::collections::HashMap<&str, std::collections::HashMap<&str, &str>> =
-            std::collections::HashMap::new();
-        nested.insert(".tag", "base64_data");
-        nested.insert(
-            "base64_data",
-            "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=",
-        );
-        payload.insert("photo", nested);
-
-        let request = SyncClient
-            .post("https://endpoint.com/get")
-            .bearer_auth("token")
-            .header("Content-Type", "application/json")
-            .json(&payload)
-            .build()?;
-
-        println!("{:#?} {:#?}", request.body().unwrap(), body);
+        let _ = request.call_sync()?;
 
         Ok(())
     }
