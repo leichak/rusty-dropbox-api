@@ -84,7 +84,7 @@ mod upload_session_finish_batch_check;
 mod user;
 
 #[cfg(test)]
-use api::{mockito, MOCK_SERVER};
+use api::{mockito, MOCK_SERVER_ASYNC, MOCK_SERVER_SYNC};
 
 pub use set_profile_photo::{SetProfilePhotoRequest, SetProfilePhotoResponse};
 

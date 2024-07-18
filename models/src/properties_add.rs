@@ -1,10 +1,12 @@
 use anyhow::Result;
 use api::{
-    anyhow, get_endpoint_url, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service,
-    SyncClient,
+    anyhow, get_endpoint_url, reqwest,
+    reqwest::{Request, Response},
+    ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service, SyncClient,
 };
 
 use serde::{Deserialize, Serialize};
+use serde_json;
 
 use std::{future::Future, pin::Pin};
 
@@ -26,7 +28,7 @@ pub struct PropertiesAddRequest<'a> {
 
 /// No return values
 #[derive(Deserialize, Debug)]
-pub struct PropertiesAddResponse {}
+pub struct PropertiesAddResponse();
 
 impl Utils for PropertiesAddRequest<'_> {
     /// Function that tries to generate Serialize object from request data
@@ -70,11 +72,16 @@ impl Utils for PropertiesAddRequest<'_> {
 }
 
 /// Implementation of Service trait that provides functions related to async and sync queries
-impl Service<PropertiesAddResponse, BoxFuture<'_, Result<PropertiesAddResponse>>>
+impl Service<PropertiesAddResponse, BoxFuture<'_, Result<Option<PropertiesAddResponse>>>>
     for PropertiesAddRequest<'_>
 {
-    fn call(&self) -> Result<Pin<Box<dyn Future<Output = Result<PropertiesAddResponse>> + Send>>> {
-        let endpoint = get_endpoint_url(Endpoint::PropertiesAddPost);
+    fn call(
+        &self,
+    ) -> Result<Pin<Box<dyn Future<Output = Result<Option<PropertiesAddResponse>>> + Send>>> {
+        let mut endpoint = get_endpoint_url(Endpoint::PropertiesAddPost).0;
+        if let Some(url) = get_endpoint_url(Endpoint::PropertiesAddPost).1 {
+            endpoint = url;
+        }
 
         let response = AsyncClient
             .post(endpoint)
@@ -94,17 +101,24 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<PropertiesAddResponse>>
                 .error_for_status()
                 .map_err(|err| ApiError::DropBoxError(err.into()))?;
 
-            let response: PropertiesAddResponse = response
-                .json()
+            let text = response
+                .text()
                 .await
                 .map_err(|err| ApiError::ParsingError(err.into()))?;
 
-            Result::<PropertiesAddResponse>::Ok(response)
+            if text.is_empty() {
+                return Ok(None);
+            }
+
+            let response: PropertiesAddResponse =
+                serde_json::from_str(&text).map_err(|err| ApiError::ParsingError(err.into()))?;
+
+            Result::<Option<PropertiesAddResponse>>::Ok(Some(response))
         };
         Ok(Box::pin(block))
     }
     fn call_sync(&self) -> Result<PropertiesAddResponse> {
-        let endpoint = get_endpoint_url(Endpoint::PropertiesAddPost);
+        let endpoint = get_endpoint_url(Endpoint::PropertiesAddPost).0;
 
         let response = SyncClient
             .post(endpoint)
@@ -133,58 +147,108 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<PropertiesAddResponse>>
 mod tests {
 
     use anyhow::Result;
-    use api::serde_json::json;
 
-    use crate::utils::Utils;
+    use api::{get_mut_or_init, get_mut_or_init_async, Service, SyncClient};
+    use tokio;
 
-    use super::{Field, PropertiesAddRequest, TemplateID};
-    // #[tokio::test]
-    // pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
-    //     let access_token = "token";
-    //     let base64_data = "data";
-    //     let request = SetProfilePhotoRequest {
-    //         access_token,
-    //         base64_data,
-    //     };
+    use crate::TEST_TOKEN;
 
-    //     let f = request.call()?;
-    //     let r = async { Result::<SetProfilePhotoResponse>::Ok(tokio::spawn(f).await??) }.await?;
-    //     println!("{:#?}", r);
-    //     Ok(())
-    // }
+    use super::PropertiesAddRequest;
+    use api::Headers;
 
-    // #[test]
-    // pub fn test_sync() -> Result<(), Box<dyn std::error::Error>> {
-    //     let access_token = "token";
-    //     let base64_data = "data";
-    //     let request = SetProfilePhotoRequest {
-    //         access_token,
-    //         base64_data,
-    //     };
+    use api::mockito;
 
-    //     let r = request.call_sync()?;
+    #[tokio::test]
+    pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
+        {
+            let body = r##"{
+                                "path": "/my_awesome/word.docx",
+                                "property_groups": [
+                                    {
+                                        "fields": [
+                                            {
+                                                "name": "Security Policy",
+                                                "value": "Confidential"
+                                            }
+                                        ],
+                                        "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+                                    }
+                                ]
+                            }"##;
 
-    //     println!("{:#?}", r);
+            let mut server = get_mut_or_init_async().await;
+            server
+                .mock("POST", "/2/file_properties/properties/add")
+                .with_status(200)
+                .with_header(
+                    Headers::ContentTypeAppJson.get_str().0,
+                    Headers::ContentTypeAppJson.get_str().1,
+                )
+                .with_header(
+                    Headers::Authorization.get_str().0,
+                    Headers::Authorization.get_str().1,
+                )
+                .match_body(mockito::Matcher::JsonString(body.to_string()))
+                .create_async()
+                .await;
+        }
 
-    //     Ok(())
-    // }
-
-    #[test]
-    pub fn test_properties_generation() -> Result<()> {
-        let mut p_gs: Vec<(Vec<Field>, TemplateID)> = vec![];
-        let f = vec![("name", "val")];
-        p_gs.push((f, "id"));
-
+        let path = "/my_awesome/word.docx";
+        let property_groups = vec![(
+            vec![("Security Policy", "Confidential")],
+            "ptid:1a5n2i6d3OYEAAAAAAAAAYa",
+        )];
         let request = PropertiesAddRequest {
-            access_token: "123",
-            path: "123",
-            property_groups: p_gs,
+            access_token: &TEST_TOKEN,
+            path,
+            property_groups: property_groups,
         };
 
-        let params = request.parameters();
-        let params = json!(params);
-        println!("{:?}", params.to_string());
+        let _ = request.call()?.await?;
 
         Ok(())
     }
+
+    //     #[test]
+    //     pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
+    //         {
+    //             let body = r##"{
+    //                 "photo": {
+    //                 ".tag": "base64_data",
+    //                 "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
+    //                         }
+    //             }"##;
+
+    //             let response = r##"{
+    //     "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
+    // }"##;
+
+    //             let mut server = get_mut_or_init();
+    //             server
+    //                 .mock("POST", "/2/account/set_profile_photo")
+    //                 .with_status(200)
+    //                 .with_header(
+    //                     Headers::ContentTypeAppJson.get_str().0,
+    //                     Headers::ContentTypeAppJson.get_str().1,
+    //                 )
+    //                 .with_header(
+    //                     Headers::Authorization.get_str().0,
+    //                     Headers::Authorization.get_str().1,
+    //                 )
+    //                 .match_body(mockito::Matcher::JsonString(body.to_string()))
+    //                 .with_body(response)
+    //                 .create();
+    //         }
+
+    //         let base64_data =
+    //             "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
+    //         let request = SetProfilePhotoRequest {
+    //             access_token: &TEST_TOKEN,
+    //             base64_data,
+    //         };
+
+    //         let _ = request.call_sync()?;
+
+    //         Ok(())
+    //     }
 }

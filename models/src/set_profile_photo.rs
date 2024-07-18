@@ -41,7 +41,10 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
     fn call(
         &self,
     ) -> Result<Pin<Box<dyn Future<Output = Result<SetProfilePhotoResponse>> + Send>>> {
-        let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost);
+        let mut endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
+        if let Some(url) = get_endpoint_url(Endpoint::SetProfilePhotoPost).1 {
+            endpoint = url;
+        }
 
         let response = AsyncClient
             .post(endpoint)
@@ -72,7 +75,7 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
     }
 
     fn call_sync(&self) -> Result<SetProfilePhotoResponse> {
-        let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost);
+        let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
 
         let response = SyncClient
             .post(endpoint)
@@ -102,27 +105,58 @@ mod tests {
 
     use anyhow::Result;
 
-    use api::{get_mut_or_init, Service, SyncClient};
+    use api::{get_mut_or_init, get_mut_or_init_async, Service, SyncClient};
     use tokio;
+
+    use crate::TEST_TOKEN;
 
     use super::{SetProfilePhotoRequest, SetProfilePhotoResponse};
     use api::Headers;
 
     use api::mockito;
-    use api::TEST_TOKEN;
 
     #[tokio::test]
     pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
-        let access_token = "1234";
-        let base64_data = "data";
+        {
+            let body = r##"{
+                "photo": {
+                ".tag": "base64_data",
+                "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
+                        }
+            }"##;
+
+            let response = r##"{
+    "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
+}"##;
+
+            let mut server = get_mut_or_init_async().await;
+            server
+                .mock("POST", "/2/account/set_profile_photo")
+                .with_status(200)
+                .with_header(
+                    Headers::ContentTypeAppJson.get_str().0,
+                    Headers::ContentTypeAppJson.get_str().1,
+                )
+                .with_header(
+                    Headers::Authorization.get_str().0,
+                    Headers::Authorization.get_str().1,
+                )
+                .match_body(mockito::Matcher::JsonString(body.to_string()))
+                .with_body(response)
+                .create_async()
+                .await;
+        }
+
+        let base64_data =
+            "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
         let request = SetProfilePhotoRequest {
-            access_token,
+            access_token: &TEST_TOKEN,
             base64_data,
         };
 
         let f = request.call()?;
-        let r = tokio::spawn(f).await??;
-        println!("{:#?}", r);
+        let _ = f.await?;
+
         Ok(())
     }
 

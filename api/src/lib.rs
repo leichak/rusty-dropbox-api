@@ -12,22 +12,49 @@ lazy_static! {
     pub static ref AsyncClient: reqwest::Client = reqwest::Client::new();
 }
 
-/// Test server
-pub static MOCK_SERVER: OnceLock<Mutex<Server>> = OnceLock::new();
-
 /// Auth test token
+#[cfg(feature = "test-utils")]
 pub static TEST_TOKEN: &'static str = "123456";
 
-/// Function that inits default or get mutex to test server
+/// Test servers urls and ports
+const MOCK_SERVER_SYNC_URL: &str = "0.0.0.0";
+const MOCK_SERVER_SYNC_PORT: u16 = 49999;
+const MOCK_SERVER_ASYNC_URL: &str = "127.0.0.1";
+const MOCK_SERVER_ASYNC_PORT: u16 = 50001;
+
+/// Test servers
+#[cfg(feature = "test-utils")]
+pub static MOCK_SERVER_SYNC: OnceLock<Mutex<Server>> = OnceLock::new();
+#[cfg(feature = "test-utils")]
+pub static MOCK_SERVER_ASYNC: OnceLock<Mutex<Server>> = OnceLock::new();
+
+/// Sync function that inits default or get mutex to test server
+#[cfg(feature = "test-utils")]
 pub fn get_mut_or_init() -> MutexGuard<'static, Server> {
-    MOCK_SERVER
+    MOCK_SERVER_SYNC
         .get_or_init(|| {
             Mutex::new(mockito::Server::new_with_opts(mockito::ServerOpts {
-                host: "0.0.0.0",
-                port: 4321,
+                host: MOCK_SERVER_SYNC_URL,
+                port: MOCK_SERVER_SYNC_PORT,
                 assert_on_drop: false,
             }))
         })
+        .lock()
+        .expect("Failed")
+}
+
+#[cfg(feature = "test-utils")]
+pub async fn get_mut_or_init_async() -> MutexGuard<'static, Server> {
+    let server = Mutex::new(
+        mockito::Server::new_with_opts_async(mockito::ServerOpts {
+            host: MOCK_SERVER_ASYNC_URL,
+            port: MOCK_SERVER_ASYNC_PORT,
+            assert_on_drop: false,
+        })
+        .await,
+    );
+    MOCK_SERVER_ASYNC
+        .get_or_init(|| server)
         .lock()
         .expect("Failed")
 }
@@ -95,8 +122,8 @@ pub enum Endpoint {
     UsersGetSpaceUsagePost,
 }
 
-pub fn get_endpoint_url(endpoint: Endpoint) -> String {
-    let mut url = match endpoint {
+pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>) {
+    let url = match endpoint {
         Endpoint::AppPost => "https://api.dropboxapi.com/2/check/app",
         Endpoint::CountPost => "https://api.dropboxapi.com/2/file_requests/count",
         Endpoint::CreatePost => "https://api.dropboxapi.com/2/file_requests/create",
@@ -172,20 +199,26 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> String {
         Endpoint::UsersGetSpaceUsagePost => "https://api.dropboxapi.com/2/users/get_space_usage",
     };
 
+    let binding: (String, Option<String>) = (url.to_string(), None);
     #[cfg(feature = "test-utils")]
     let binding = test_url(url);
-    url = &binding;
 
-    url.to_string()
+    binding
 }
 
-/// Just for testing purpose, it will replace original end-point with mock server url
-fn test_url(url: &str) -> String {
+/// For testing purpose, it will replace original end-point with mock server url
+fn test_url(url: &str) -> (String, Option<String>) {
     let idx = url.find("com").expect("should have com") + 3;
     let url = &url[idx..];
-    let server_url = get_mut_or_init().url();
-    let url = format!("{}{}", server_url, url);
-    url
+    let url_sync = format!(
+        "http://{}:{}{}",
+        MOCK_SERVER_SYNC_URL, MOCK_SERVER_SYNC_PORT, url
+    );
+    let url_async = format!(
+        "http://{}:{}{}",
+        MOCK_SERVER_ASYNC_URL, MOCK_SERVER_ASYNC_PORT, url
+    );
+    (url_sync, Some(url_async))
 }
 
 pub enum Headers {

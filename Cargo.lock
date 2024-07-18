@@ -677,6 +677,7 @@ dependencies = [
  "anyhow",
  "api",
  "serde",
+ "serde_json",
  "tokio",
 ]
 
