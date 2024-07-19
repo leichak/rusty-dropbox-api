@@ -18,9 +18,9 @@ pub static TEST_TOKEN: &'static str = "123456";
 
 /// Test servers urls and ports
 const MOCK_SERVER_SYNC_URL: &str = "0.0.0.0";
-const MOCK_SERVER_SYNC_PORT: u16 = 49999;
-const MOCK_SERVER_ASYNC_URL: &str = "127.0.0.1";
-const MOCK_SERVER_ASYNC_PORT: u16 = 50001;
+const MOCK_SERVER_SYNC_PORT: u16 = 1234;
+const MOCK_SERVER_ASYNC_URL: &str = "0.0.0.0";
+const MOCK_SERVER_ASYNC_PORT: u16 = 123;
 
 /// Test servers
 #[cfg(feature = "test-utils")]
@@ -40,11 +40,15 @@ pub fn get_mut_or_init() -> MutexGuard<'static, Server> {
             }))
         })
         .lock()
-        .expect("Failed")
+        .expect("Failed to lock")
 }
 
 #[cfg(feature = "test-utils")]
 pub async fn get_mut_or_init_async() -> MutexGuard<'static, Server> {
+    if let Some(server) = MOCK_SERVER_ASYNC.get() {
+        return server.lock().expect("Failed to lock");
+    }
+
     let server = Mutex::new(
         mockito::Server::new_with_opts_async(mockito::ServerOpts {
             host: MOCK_SERVER_ASYNC_URL,
@@ -53,10 +57,11 @@ pub async fn get_mut_or_init_async() -> MutexGuard<'static, Server> {
         })
         .await,
     );
+
     MOCK_SERVER_ASYNC
         .get_or_init(|| server)
         .lock()
-        .expect("Failed")
+        .expect("Failed to lock")
 }
 
 /// Enum describing set of errors that can occur possibly
@@ -77,7 +82,7 @@ pub enum ApiError {
 /// Async call will return future that needs to be awaited using own executor
 /// Sync will block and return result
 pub trait Service<O: Sized, F: Sized> {
-    fn call_sync(&self) -> Result<O>;
+    fn call_sync(&self) -> Result<Option<O>>;
     fn call(&self) -> Result<F>;
 }
 

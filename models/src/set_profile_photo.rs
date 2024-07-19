@@ -35,12 +35,12 @@ impl utils::Utils for SetProfilePhotoRequest<'_> {
 }
 
 /// Implementation of Service trait that provides functions related to async and sync queries
-impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoResponse>>>
+impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<Option<SetProfilePhotoResponse>>>>
     for SetProfilePhotoRequest<'_>
 {
     fn call(
         &self,
-    ) -> Result<Pin<Box<dyn Future<Output = Result<SetProfilePhotoResponse>> + Send>>> {
+    ) -> Result<Pin<Box<dyn Future<Output = Result<Option<SetProfilePhotoResponse>>> + Send>>> {
         let mut endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
         if let Some(url) = get_endpoint_url(Endpoint::SetProfilePhotoPost).1 {
             endpoint = url;
@@ -64,17 +64,24 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
                 .error_for_status()
                 .map_err(|err| ApiError::DropBoxError(err.into()))?;
 
-            let response: SetProfilePhotoResponse = response
-                .json()
+            let text = response
+                .text()
                 .await
                 .map_err(|err| ApiError::ParsingError(err.into()))?;
 
-            Result::<SetProfilePhotoResponse>::Ok(response)
+            if text.is_empty() {
+                return Ok(None);
+            }
+
+            let response: SetProfilePhotoResponse =
+                serde_json::from_str(&text).map_err(|err| ApiError::ParsingError(err.into()))?;
+
+            Result::<Option<SetProfilePhotoResponse>>::Ok(Some(response))
         };
         Ok(Box::pin(block))
     }
 
-    fn call_sync(&self) -> Result<SetProfilePhotoResponse> {
+    fn call_sync(&self) -> Result<Option<SetProfilePhotoResponse>> {
         let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
 
         let response = SyncClient
@@ -90,10 +97,17 @@ impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<SetProfilePhotoRespon
 
         match response.error_for_status() {
             Ok(response) => {
-                let response: SetProfilePhotoResponse = response
-                    .json()
+                let text = response
+                    .text()
                     .map_err(|err| ApiError::ParsingError(err.into()))?;
-                Ok(response)
+
+                if text.is_empty() {
+                    return Ok(None);
+                }
+
+                let response: SetProfilePhotoResponse = serde_json::from_str(&text)
+                    .map_err(|err| ApiError::ParsingError(err.into()))?;
+                Ok(Some(response))
             }
             Err(err) => Err(ApiError::DropBoxError(err.into()).into()),
         }
@@ -117,6 +131,7 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
+        let mock;
         {
             let body = r##"{
                 "photo": {
@@ -126,11 +141,10 @@ mod tests {
             }"##;
 
             let response = r##"{
-    "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
-}"##;
-
+            "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
+            }"##;
             let mut server = get_mut_or_init_async().await;
-            server
+            mock = server
                 .mock("POST", "/2/account/set_profile_photo")
                 .with_status(200)
                 .with_header(
@@ -157,11 +171,14 @@ mod tests {
         let f = request.call()?;
         let _ = f.await?;
 
+        mock.assert();
+
         Ok(())
     }
 
     #[test]
     pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
+        let mock;
         {
             let body = r##"{
                 "photo": {
@@ -171,11 +188,11 @@ mod tests {
             }"##;
 
             let response = r##"{
-    "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
-}"##;
+                "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
+            }"##;
 
             let mut server = get_mut_or_init();
-            server
+            mock = server
                 .mock("POST", "/2/account/set_profile_photo")
                 .with_status(200)
                 .with_header(
@@ -199,6 +216,7 @@ mod tests {
         };
 
         let _ = request.call_sync()?;
+        mock.assert();
 
         Ok(())
     }

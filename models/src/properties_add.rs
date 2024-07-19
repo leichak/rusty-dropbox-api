@@ -117,7 +117,7 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<Option<PropertiesAddRes
         };
         Ok(Box::pin(block))
     }
-    fn call_sync(&self) -> Result<PropertiesAddResponse> {
+    fn call_sync(&self) -> Result<Option<PropertiesAddResponse>> {
         let endpoint = get_endpoint_url(Endpoint::PropertiesAddPost).0;
 
         let response = SyncClient
@@ -133,10 +133,17 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<Option<PropertiesAddRes
 
         match response.error_for_status() {
             Ok(response) => {
-                let response: PropertiesAddResponse = response
-                    .json()
+                let text = response
+                    .text()
                     .map_err(|err| ApiError::ParsingError(err.into()))?;
-                Ok(response)
+
+                if text.is_empty() {
+                    return Ok(None);
+                }
+
+                let response: PropertiesAddResponse = serde_json::from_str(&text)
+                    .map_err(|err| ApiError::ParsingError(err.into()))?;
+                Ok(Some(response))
             }
             Err(err) => Err(ApiError::DropBoxError(err.into()).into()),
         }
@@ -147,19 +154,17 @@ impl Service<PropertiesAddResponse, BoxFuture<'_, Result<Option<PropertiesAddRes
 mod tests {
 
     use anyhow::Result;
-
-    use api::{get_mut_or_init, get_mut_or_init_async, Service, SyncClient};
+    use api::{get_mut_or_init, get_mut_or_init_async, Service};
     use tokio;
 
     use crate::TEST_TOKEN;
 
     use super::PropertiesAddRequest;
-    use api::Headers;
-
-    use api::mockito;
+    use api::{mockito, Headers};
 
     #[tokio::test]
     pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
+        let mock;
         {
             let body = r##"{
                                 "path": "/my_awesome/word.docx",
@@ -177,7 +182,7 @@ mod tests {
                             }"##;
 
             let mut server = get_mut_or_init_async().await;
-            server
+            mock = server
                 .mock("POST", "/2/file_properties/properties/add")
                 .with_status(200)
                 .with_header(
@@ -203,52 +208,60 @@ mod tests {
             path,
             property_groups: property_groups,
         };
-
         let _ = request.call()?.await?;
+        mock.assert();
 
         Ok(())
     }
 
-    //     #[test]
-    //     pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
-    //         {
-    //             let body = r##"{
-    //                 "photo": {
-    //                 ".tag": "base64_data",
-    //                 "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
-    //                         }
-    //             }"##;
+    #[test]
+    pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
+        let mock;
+        {
+            let body = r##"{
+                                "path": "/my_awesome/word.docx",
+                                "property_groups": [
+                                    {
+                                        "fields": [
+                                            {
+                                                "name": "Security Policy",
+                                                "value": "Confidential"
+                                            }
+                                        ],
+                                        "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+                                    }
+                                ]
+                            }"##;
 
-    //             let response = r##"{
-    //     "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
-    // }"##;
+            let mut server = get_mut_or_init();
+            mock = server
+                .mock("POST", "/2/file_properties/properties/add")
+                .with_status(200)
+                .with_header(
+                    Headers::ContentTypeAppJson.get_str().0,
+                    Headers::ContentTypeAppJson.get_str().1,
+                )
+                .with_header(
+                    Headers::Authorization.get_str().0,
+                    Headers::Authorization.get_str().1,
+                )
+                .match_body(mockito::Matcher::JsonString(body.to_string()))
+                .create();
+        }
 
-    //             let mut server = get_mut_or_init();
-    //             server
-    //                 .mock("POST", "/2/account/set_profile_photo")
-    //                 .with_status(200)
-    //                 .with_header(
-    //                     Headers::ContentTypeAppJson.get_str().0,
-    //                     Headers::ContentTypeAppJson.get_str().1,
-    //                 )
-    //                 .with_header(
-    //                     Headers::Authorization.get_str().0,
-    //                     Headers::Authorization.get_str().1,
-    //                 )
-    //                 .match_body(mockito::Matcher::JsonString(body.to_string()))
-    //                 .with_body(response)
-    //                 .create();
-    //         }
+        let path = "/my_awesome/word.docx";
+        let property_groups = vec![(
+            vec![("Security Policy", "Confidential")],
+            "ptid:1a5n2i6d3OYEAAAAAAAAAYa",
+        )];
+        let request = PropertiesAddRequest {
+            access_token: &TEST_TOKEN,
+            path,
+            property_groups: property_groups,
+        };
+        let _ = request.call_sync()?;
+        mock.assert();
 
-    //         let base64_data =
-    //             "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
-    //         let request = SetProfilePhotoRequest {
-    //             access_token: &TEST_TOKEN,
-    //             base64_data,
-    //         };
-
-    //         let _ = request.call_sync()?;
-
-    //         Ok(())
-    //     }
+        Ok(())
+    }
 }
