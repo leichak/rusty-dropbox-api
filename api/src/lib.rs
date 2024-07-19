@@ -45,21 +45,18 @@ pub fn get_mut_or_init() -> MutexGuard<'static, Server> {
 
 #[cfg(feature = "test-utils")]
 pub async fn get_mut_or_init_async() -> MutexGuard<'static, Server> {
-    if let Some(server) = MOCK_SERVER_ASYNC.get() {
-        return server.lock().expect("Failed to lock");
-    }
-
-    let server = Mutex::new(
-        mockito::Server::new_with_opts_async(mockito::ServerOpts {
-            host: MOCK_SERVER_ASYNC_URL,
-            port: MOCK_SERVER_ASYNC_PORT,
-            assert_on_drop: false,
-        })
-        .await,
-    );
-
     MOCK_SERVER_ASYNC
-        .get_or_init(|| server)
+        .get_or_init(|| {
+            let server = futures::executor::block_on(mockito::Server::new_with_opts_async(
+                mockito::ServerOpts {
+                    host: MOCK_SERVER_ASYNC_URL,
+                    port: MOCK_SERVER_ASYNC_PORT,
+                    assert_on_drop: false,
+                },
+            ));
+
+            Mutex::new(server)
+        })
         .lock()
         .expect("Failed to lock")
 }
