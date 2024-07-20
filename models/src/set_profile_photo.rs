@@ -143,6 +143,7 @@ mod tests {
             let response = r##"{
             "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
             }"##;
+
             let mut server = get_mut_or_init_async().await;
             mock = server
                 .mock("POST", "/2/account/set_profile_photo")
