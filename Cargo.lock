@@ -48,6 +48,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "api_derive"
+version = "0.0.0"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "assert-json-diff"
 version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -676,6 +684,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "api",
+ "api_derive",
  "serde",
  "serde_json",
  "tokio",

@@ -8,3 +8,19 @@ pub fn service_macro_derive(input: TokenStream) -> TokenStream {
 
     impl_service_macro(&ast)
 }
+
+fn impl_service_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl Service for #name {
+            fn sync() {
+                println!("Hello, Macro! My name is {}!", stringify!(#name));
+            }
+
+            fn async() {
+                println!("Hello, Macro! My name is {}!", stringify!(#name));
+            }
+        }
+    };
+    gen.into()
+}
