@@ -1,7 +1,7 @@
 use anyhow::Result;
 use api::{
-    anyhow, get_endpoint_url, ApiError, AsyncClient, BoxFuture, Endpoint, Headers, Service,
-    SyncClient,
+    anyhow, get_endpoint_url, implement_service, ApiError, AsyncClient, BoxFuture, Endpoint,
+    Headers, Service, SyncClient,
 };
 
 use serde::{Deserialize, Serialize};
@@ -34,85 +34,87 @@ impl utils::Utils for SetProfilePhotoRequest<'_> {
     }
 }
 
+implement_service!(SetProfilePhotoRequest<'_>, SetProfilePhotoResponse);
+
 /// Implementation of Service trait that provides functions related to async and sync queries
-impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<Option<SetProfilePhotoResponse>>>>
-    for SetProfilePhotoRequest<'_>
-{
-    fn call(
-        &self,
-    ) -> Result<Pin<Box<dyn Future<Output = Result<Option<SetProfilePhotoResponse>>> + Send>>> {
-        let mut endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
-        if let Some(url) = get_endpoint_url(Endpoint::SetProfilePhotoPost).1 {
-            endpoint = url;
-        }
+// impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<Option<SetProfilePhotoResponse>>>>
+//     for SetProfilePhotoRequest<'_>
+// {
+// fn call(
+//     &self,
+// ) -> Result<Pin<Box<dyn Future<Output = Result<Option<SetProfilePhotoResponse>>> + Send>>> {
+//     let mut endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
+//     if let Some(url) = get_endpoint_url(Endpoint::SetProfilePhotoPost).1 {
+//         endpoint = url;
+//     }
 
-        let response = AsyncClient
-            .post(endpoint)
-            .bearer_auth(self.access_token)
-            .header(
-                Headers::ContentTypeAppJson.get_str().0,
-                Headers::ContentTypeAppJson.get_str().1,
-            )
-            .json(&self.parameters())
-            .send();
-        let block = async {
-            let response = response
-                .await
-                .map_err(|err| ApiError::RequestError(err.into()))?;
+//     let response = AsyncClient
+//         .post(endpoint)
+//         .bearer_auth(self.access_token)
+//         .header(
+//             Headers::ContentTypeAppJson.get_str().0,
+//             Headers::ContentTypeAppJson.get_str().1,
+//         )
+//         .json(&self.parameters())
+//         .send();
+//     let block = async {
+//         let response = response
+//             .await
+//             .map_err(|err| ApiError::RequestError(err.into()))?;
 
-            let response = response
-                .error_for_status()
-                .map_err(|err| ApiError::DropBoxError(err.into()))?;
+//         let response = response
+//             .error_for_status()
+//             .map_err(|err| ApiError::DropBoxError(err.into()))?;
 
-            let text = response
-                .text()
-                .await
-                .map_err(|err| ApiError::ParsingError(err.into()))?;
+//         let text = response
+//             .text()
+//             .await
+//             .map_err(|err| ApiError::ParsingError(err.into()))?;
 
-            if text.is_empty() {
-                return Ok(None);
-            }
+//         if text.is_empty() {
+//             return Ok(None);
+//         }
 
-            let response: SetProfilePhotoResponse =
-                serde_json::from_str(&text).map_err(|err| ApiError::ParsingError(err.into()))?;
+//         let response: SetProfilePhotoResponse =
+//             serde_json::from_str(&text).map_err(|err| ApiError::ParsingError(err.into()))?;
 
-            Result::<Option<SetProfilePhotoResponse>>::Ok(Some(response))
-        };
-        Ok(Box::pin(block))
-    }
+//         Result::<Option<SetProfilePhotoResponse>>::Ok(Some(response))
+//     };
+//     Ok(Box::pin(block))
+//  }
 
-    fn call_sync(&self) -> Result<Option<SetProfilePhotoResponse>> {
-        let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
+// fn call_sync(&self) -> Result<Option<SetProfilePhotoResponse>> {
+//     let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
 
-        let response = SyncClient
-            .post(endpoint)
-            .bearer_auth(self.access_token)
-            .header(
-                Headers::ContentTypeAppJson.get_str().0,
-                Headers::ContentTypeAppJson.get_str().1,
-            )
-            .json(&self.parameters())
-            .send()
-            .map_err(|err| ApiError::RequestError(err.into()))?;
+//     let response = SyncClient
+//         .post(endpoint)
+//         .bearer_auth(self.access_token)
+//         .header(
+//             Headers::ContentTypeAppJson.get_str().0,
+//             Headers::ContentTypeAppJson.get_str().1,
+//         )
+//         .json(&self.parameters())
+//         .send()
+//         .map_err(|err| ApiError::RequestError(err.into()))?;
 
-        match response.error_for_status() {
-            Ok(response) => {
-                let text = response
-                    .text()
-                    .map_err(|err| ApiError::ParsingError(err.into()))?;
+//     match response.error_for_status() {
+//         Ok(response) => {
+//             let text = response
+//                 .text()
+//                 .map_err(|err| ApiError::ParsingError(err.into()))?;
 
-                if text.is_empty() {
-                    return Ok(None);
-                }
+//             if text.is_empty() {
+//                 return Ok(None);
+//             }
 
-                let response: SetProfilePhotoResponse = serde_json::from_str(&text)
-                    .map_err(|err| ApiError::ParsingError(err.into()))?;
-                Ok(Some(response))
-            }
-            Err(err) => Err(ApiError::DropBoxError(err.into()).into()),
-        }
-    }
-}
+//             let response: SetProfilePhotoResponse = serde_json::from_str(&text)
+//                 .map_err(|err| ApiError::ParsingError(err.into()))?;
+//             Ok(Some(response))
+//         }
+//         Err(err) => Err(ApiError::DropBoxError(err.into()).into()),
+//     }
+// }
+//}
 
 #[cfg(test)]
 mod tests {

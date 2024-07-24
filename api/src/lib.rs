@@ -83,6 +83,87 @@ pub trait Service<O: Sized, F: Sized> {
     fn call(&self) -> Result<F>;
 }
 
+/// Macro implementing Service trait
+#[macro_export]
+macro_rules! implement_service {
+    ($req:ty, $resp:ty) => {
+        impl Service<$resp, BoxFuture<'_, Result<Option<$resp>>>> for $req {
+            fn call_sync(&self) -> Result<Option<$resp>> {
+                let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
+
+                let response = SyncClient
+                    .post(endpoint)
+                    .bearer_auth(self.access_token)
+                    .header(
+                        Headers::ContentTypeAppJson.get_str().0,
+                        Headers::ContentTypeAppJson.get_str().1,
+                    )
+                    .json(&self.parameters())
+                    .send()
+                    .map_err(|err| ApiError::RequestError(err.into()))?;
+
+                match response.error_for_status() {
+                    Ok(response) => {
+                        let text = response
+                            .text()
+                            .map_err(|err| ApiError::ParsingError(err.into()))?;
+
+                        if text.is_empty() {
+                            return Ok(None);
+                        }
+
+                        let response: $resp = serde_json::from_str(&text)
+                            .map_err(|err| ApiError::ParsingError(err.into()))?;
+                        Ok(Some(response))
+                    }
+                    Err(err) => Err(ApiError::DropBoxError(err.into()).into()),
+                }
+            }
+
+            fn call(&self) -> Result<Pin<Box<dyn Future<Output = Result<Option<$resp>>> + Send>>> {
+                let mut endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
+                if let Some(url) = get_endpoint_url(Endpoint::SetProfilePhotoPost).1 {
+                    endpoint = url;
+                }
+
+                let response = AsyncClient
+                    .post(endpoint)
+                    .bearer_auth(self.access_token)
+                    .header(
+                        Headers::ContentTypeAppJson.get_str().0,
+                        Headers::ContentTypeAppJson.get_str().1,
+                    )
+                    .json(&self.parameters())
+                    .send();
+                let block = async {
+                    let response = response
+                        .await
+                        .map_err(|err| ApiError::RequestError(err.into()))?;
+
+                    let response = response
+                        .error_for_status()
+                        .map_err(|err| ApiError::DropBoxError(err.into()))?;
+
+                    let text = response
+                        .text()
+                        .await
+                        .map_err(|err| ApiError::ParsingError(err.into()))?;
+
+                    if text.is_empty() {
+                        return Ok(None);
+                    }
+
+                    let response: $resp = serde_json::from_str(&text)
+                        .map_err(|err| ApiError::ParsingError(err.into()))?;
+
+                    Result::<Option<$resp>>::Ok(Some(response))
+                };
+                Ok(Box::pin(block))
+            }
+        }
+    };
+}
+
 /// Enum representing api available endpoints
 /// It is passed to fhe function
 #[derive(Debug)]
