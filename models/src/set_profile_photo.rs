@@ -34,7 +34,12 @@ impl utils::Utils for SetProfilePhotoRequest<'_> {
     }
 }
 
-implement_service!(SetProfilePhotoRequest<'_>, SetProfilePhotoResponse);
+implement_service!(
+    SetProfilePhotoRequest<'_>,
+    SetProfilePhotoResponse,
+    Endpoint::SetProfilePhotoPost,
+    vec![Headers::ContentTypeAppJson]
+);
 
 /// Implementation of Service trait that provides functions related to async and sync queries
 // impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<Option<SetProfilePhotoResponse>>>>

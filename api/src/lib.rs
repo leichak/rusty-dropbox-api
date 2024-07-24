@@ -86,18 +86,20 @@ pub trait Service<O: Sized, F: Sized> {
 /// Macro implementing Service trait
 #[macro_export]
 macro_rules! implement_service {
-    ($req:ty, $resp:ty) => {
+    ($req:ty, $resp:ty, $endpoints:expr, $headers:expr) => {
         impl Service<$resp, BoxFuture<'_, Result<Option<$resp>>>> for $req {
             fn call_sync(&self) -> Result<Option<$resp>> {
-                let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
+                let endpoint = get_endpoint_url($endpoints).0;
 
-                let response = SyncClient
-                    .post(endpoint)
-                    .bearer_auth(self.access_token)
-                    .header(
-                        Headers::ContentTypeAppJson.get_str().0,
-                        Headers::ContentTypeAppJson.get_str().1,
-                    )
+                let headers: Vec<Headers> = $headers;
+
+                let mut response = SyncClient.post(endpoint).bearer_auth(self.access_token);
+
+                for h in &headers {
+                    response = response.header(h.get_str().0, h.get_str().1);
+                }
+
+                let response = response
                     .json(&self.parameters())
                     .send()
                     .map_err(|err| ApiError::RequestError(err.into()))?;
@@ -121,20 +123,21 @@ macro_rules! implement_service {
             }
 
             fn call(&self) -> Result<Pin<Box<dyn Future<Output = Result<Option<$resp>>> + Send>>> {
-                let mut endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
-                if let Some(url) = get_endpoint_url(Endpoint::SetProfilePhotoPost).1 {
+                let mut endpoint = get_endpoint_url($endpoints).0;
+                if let Some(url) = get_endpoint_url($endpoints).1 {
                     endpoint = url;
                 }
 
-                let response = AsyncClient
-                    .post(endpoint)
-                    .bearer_auth(self.access_token)
-                    .header(
-                        Headers::ContentTypeAppJson.get_str().0,
-                        Headers::ContentTypeAppJson.get_str().1,
-                    )
-                    .json(&self.parameters())
-                    .send();
+                let headers: Vec<Headers> = $headers;
+
+                let mut response = AsyncClient.post(endpoint).bearer_auth(self.access_token);
+
+                for h in &headers {
+                    response = response.header(h.get_str().0, h.get_str().1);
+                }
+
+                let response = response.json(&self.parameters()).send();
+
                 let block = async {
                     let response = response
                         .await
