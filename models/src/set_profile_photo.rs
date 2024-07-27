@@ -11,6 +11,7 @@ use std::{collections::HashMap, future::Future, pin::Pin};
 use crate::utils::{self, Utils};
 
 /// Sets a user's profile photo.
+/// https://www.dropbox.com/developers/documentation/http/documentation#account-set_profile_photo
 pub struct SetProfilePhotoRequest<'a> {
     access_token: &'a str,
     base64_data: &'a str,
@@ -22,15 +23,15 @@ pub struct SetProfilePhotoResponse {
     profile_photo_url: String,
 }
 
-/// Implementation of trait for parameters payload
+/// Implementation of trait for payload
 impl utils::Utils for SetProfilePhotoRequest<'_> {
-    fn parameters(&self) -> impl Serialize + Deserialize {
-        let mut parameters: HashMap<&str, HashMap<&str, &str>> = HashMap::new();
-        let mut nested: HashMap<&str, &str> = HashMap::new();
-        nested.insert("base64_data", self.base64_data);
-        nested.insert(".tag", "base64_data");
-        parameters.insert("photo", nested);
-        parameters
+    fn payload(&self) -> Option<impl Serialize + Deserialize> {
+        let mut payload: HashMap<&str, HashMap<&str, &str>> = HashMap::new();
+        let mut payload_nested: HashMap<&str, &str> = HashMap::new();
+        payload_nested.insert("base64_data", self.base64_data);
+        payload_nested.insert(".tag", "base64_data");
+        payload.insert("photo", payload_nested);
+        Some(payload)
     }
 }
 
@@ -41,100 +42,15 @@ implement_service!(
     vec![Headers::ContentTypeAppJson]
 );
 
-/// Implementation of Service trait that provides functions related to async and sync queries
-// impl Service<SetProfilePhotoResponse, BoxFuture<'_, Result<Option<SetProfilePhotoResponse>>>>
-//     for SetProfilePhotoRequest<'_>
-// {
-// fn call(
-//     &self,
-// ) -> Result<Pin<Box<dyn Future<Output = Result<Option<SetProfilePhotoResponse>>> + Send>>> {
-//     let mut endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
-//     if let Some(url) = get_endpoint_url(Endpoint::SetProfilePhotoPost).1 {
-//         endpoint = url;
-//     }
-
-//     let response = AsyncClient
-//         .post(endpoint)
-//         .bearer_auth(self.access_token)
-//         .header(
-//             Headers::ContentTypeAppJson.get_str().0,
-//             Headers::ContentTypeAppJson.get_str().1,
-//         )
-//         .json(&self.parameters())
-//         .send();
-//     let block = async {
-//         let response = response
-//             .await
-//             .map_err(|err| ApiError::RequestError(err.into()))?;
-
-//         let response = response
-//             .error_for_status()
-//             .map_err(|err| ApiError::DropBoxError(err.into()))?;
-
-//         let text = response
-//             .text()
-//             .await
-//             .map_err(|err| ApiError::ParsingError(err.into()))?;
-
-//         if text.is_empty() {
-//             return Ok(None);
-//         }
-
-//         let response: SetProfilePhotoResponse =
-//             serde_json::from_str(&text).map_err(|err| ApiError::ParsingError(err.into()))?;
-
-//         Result::<Option<SetProfilePhotoResponse>>::Ok(Some(response))
-//     };
-//     Ok(Box::pin(block))
-//  }
-
-// fn call_sync(&self) -> Result<Option<SetProfilePhotoResponse>> {
-//     let endpoint = get_endpoint_url(Endpoint::SetProfilePhotoPost).0;
-
-//     let response = SyncClient
-//         .post(endpoint)
-//         .bearer_auth(self.access_token)
-//         .header(
-//             Headers::ContentTypeAppJson.get_str().0,
-//             Headers::ContentTypeAppJson.get_str().1,
-//         )
-//         .json(&self.parameters())
-//         .send()
-//         .map_err(|err| ApiError::RequestError(err.into()))?;
-
-//     match response.error_for_status() {
-//         Ok(response) => {
-//             let text = response
-//                 .text()
-//                 .map_err(|err| ApiError::ParsingError(err.into()))?;
-
-//             if text.is_empty() {
-//                 return Ok(None);
-//             }
-
-//             let response: SetProfilePhotoResponse = serde_json::from_str(&text)
-//                 .map_err(|err| ApiError::ParsingError(err.into()))?;
-//             Ok(Some(response))
-//         }
-//         Err(err) => Err(ApiError::DropBoxError(err.into()).into()),
-//     }
-// }
-//}
-
 #[cfg(test)]
 mod tests {
-
-    use anyhow::Result;
-
-    use api::{get_mut_or_init, get_mut_or_init_async, Service, SyncClient};
-    use tokio;
-
     use crate::TEST_TOKEN;
 
-    use super::{SetProfilePhotoRequest, SetProfilePhotoResponse};
-    use api::Headers;
+    use super::SetProfilePhotoRequest;
 
-    use api::mockito;
+    use anyhow::Result;
+    use api::{get_mut_or_init, get_mut_or_init_async, mockito, Headers, Service};
+    use tokio;
 
     #[tokio::test]
     pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {

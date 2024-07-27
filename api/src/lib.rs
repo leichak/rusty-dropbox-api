@@ -61,7 +61,7 @@ pub async fn get_mut_or_init_async() -> MutexGuard<'static, Server> {
         .expect("Failed to lock")
 }
 
-/// Enum describing set of errors that can occur possibly
+/// Enum describing set of errors that can occur
 /// Thiserror macro to derive std::error::Error trait
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
@@ -99,8 +99,11 @@ macro_rules! implement_service {
                     response = response.header(h.get_str().0, h.get_str().1);
                 }
 
+                if let Some(payload) = &self.payload() {
+                    response = response.json(payload);
+                }
+
                 let response = response
-                    .json(&self.parameters())
                     .send()
                     .map_err(|err| ApiError::RequestError(err.into()))?;
 
@@ -136,7 +139,11 @@ macro_rules! implement_service {
                     response = response.header(h.get_str().0, h.get_str().1);
                 }
 
-                let response = response.json(&self.parameters()).send();
+                if let Some(payload) = &self.payload() {
+                    response = response.json(payload);
+                }
+
+                let response = response.send();
 
                 let block = async {
                     let response = response
@@ -171,13 +178,14 @@ macro_rules! implement_service {
 /// It is passed to fhe function
 #[derive(Debug)]
 pub enum Endpoint {
-    AppPost,
+    CheckAppPost,
     CountPost,
     CreatePost,
     DeleteAllClosedPost,
-    DeleteManualContactsBatchPost,
-    DeleteManualContactsPost,
+    ContactsDeleteManualContactsBatchPost,
+    ContactsDeleteManualContactsPost,
     DeletePost,
+    AddFolderMemberPost,
     FilesDownloadPost,
     FilesUploadPost,
     FilesUploadSessionAppendV2Post,
@@ -186,21 +194,21 @@ pub enum Endpoint {
     GetPost,
     ListContinuePost,
     ListPost,
-    PropertiesAddPost,
-    PropertiesOverwritePost,
-    PropertiesRemovePost,
-    PropertiesSearchContinuePost,
-    PropertiesSearchPost,
-    PropertiesUpdatePost,
+    FilePropertiesPropertiesAddPost,
+    FilePropertiesPropertiesOverwritePost,
+    FilePropertiesPropertiesRemovePost,
+    FilePropertiesPropertiesSearchContinuePost,
+    FilePropertiesPropertiesSearchPost,
+    FilePropertiesPropertiesUpdatePost,
     SetProfilePhotoPost,
-    TemplatesAddForUserPost,
-    TemplatesGetForUserPost,
-    TemplatesListForUserPost,
-    TemplatesRemoveForUserPost,
-    TemplatesUpdateForUserPost,
+    FilePropertiesTemplatesAddForUserPost,
+    FilePropertiesTemplatesGetForUserPost,
+    FilePropertiesTemplatesListForUserPost,
+    FilePropertiesTemplatesRemoveForUserPost,
+    FilePropertiesTemplatesUpdateForUserPost,
     TokenRevokePost,
     UpdatePost,
-    UserPost,
+    CheckUserPost,
     UsersFeaturesGetValuesPost,
     UsersGetAccountBatchPost,
     UsersGetAccountPost,
@@ -210,14 +218,15 @@ pub enum Endpoint {
 
 pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>) {
     let url = match endpoint {
-        Endpoint::AppPost => "https://api.dropboxapi.com/2/check/app",
+        Endpoint::AddFolderMemberPost => "https://api.dropboxapi.com/2/sharing/add_folder_member",
+        Endpoint::CheckAppPost => "https://api.dropboxapi.com/2/check/app",
         Endpoint::CountPost => "https://api.dropboxapi.com/2/file_requests/count",
         Endpoint::CreatePost => "https://api.dropboxapi.com/2/file_requests/create",
         Endpoint::DeleteAllClosedPost => "https://api.dropboxapi.com/2/delete_all_closed",
-        Endpoint::DeleteManualContactsBatchPost => {
+        Endpoint::ContactsDeleteManualContactsBatchPost => {
             "https://api.dropboxapi.com/2/contacts/delete_manual_contacts_batch"
         }
-        Endpoint::DeleteManualContactsPost => {
+        Endpoint::ContactsDeleteManualContactsPost => {
             "https://api.dropboxapi.com/2/contacts/delete_manual_contacts"
         }
         Endpoint::DeletePost => "https://api.dropboxapi.com/2/delete",
@@ -235,43 +244,43 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>) {
         Endpoint::GetPost => "https://api.dropboxapi.com/2/get",
         Endpoint::ListContinuePost => "https://api.dropboxapi.com/2/list/continue",
         Endpoint::ListPost => "https://api.dropboxapi.com/2/list",
-        Endpoint::PropertiesAddPost => {
+        Endpoint::FilePropertiesPropertiesAddPost => {
             "https://api.dropboxapi.com/2/file_properties/properties/add"
         }
-        Endpoint::PropertiesOverwritePost => {
+        Endpoint::FilePropertiesPropertiesOverwritePost => {
             "https://api.dropboxapi.com/2/file_properties/properties/overwrite"
         }
-        Endpoint::PropertiesRemovePost => {
+        Endpoint::FilePropertiesPropertiesRemovePost => {
             "https://api.dropboxapi.com/2/file_properties/properties/remove"
         }
-        Endpoint::PropertiesSearchContinuePost => {
+        Endpoint::FilePropertiesPropertiesSearchContinuePost => {
             "https://api.dropboxapi.com/2/file_properties/properties/search/continue"
         }
-        Endpoint::PropertiesSearchPost => {
+        Endpoint::FilePropertiesPropertiesSearchPost => {
             "https://api.dropboxapi.com/2/file_properties/properties/search"
         }
-        Endpoint::PropertiesUpdatePost => {
+        Endpoint::FilePropertiesPropertiesUpdatePost => {
             "https://api.dropboxapi.com/2/file_properties/properties/update"
         }
         Endpoint::SetProfilePhotoPost => "https://api.dropboxapi.com/2/account/set_profile_photo",
-        Endpoint::TemplatesAddForUserPost => {
+        Endpoint::FilePropertiesTemplatesAddForUserPost => {
             "https://api.dropboxapi.com/2/file_properties/templates/add_for_user"
         }
-        Endpoint::TemplatesGetForUserPost => {
+        Endpoint::FilePropertiesTemplatesGetForUserPost => {
             "https://api.dropboxapi.com/2/file_properties/templates/get_for_user"
         }
-        Endpoint::TemplatesListForUserPost => {
+        Endpoint::FilePropertiesTemplatesListForUserPost => {
             "https://api.dropboxapi.com/2/file_properties/templates/list_for_user"
         }
-        Endpoint::TemplatesRemoveForUserPost => {
+        Endpoint::FilePropertiesTemplatesRemoveForUserPost => {
             "https://api.dropboxapi.com/2/file_properties/templates/remove_for_user"
         }
-        Endpoint::TemplatesUpdateForUserPost => {
+        Endpoint::FilePropertiesTemplatesUpdateForUserPost => {
             "https://api.dropboxapi.com/2/file_properties/templates/update_for_user"
         }
         Endpoint::TokenRevokePost => "https://api.dropboxapi.com/2/auth/token/revoke",
         Endpoint::UpdatePost => "https://api.dropboxapi.com/2/update",
-        Endpoint::UserPost => "https://api.dropboxapi.com/2/check/user",
+        Endpoint::CheckUserPost => "https://api.dropboxapi.com/2/check/user",
         Endpoint::UsersFeaturesGetValuesPost => {
             "https://api.dropboxapi.com/2/users/features/get_values"
         }
@@ -307,6 +316,7 @@ fn test_url(url: &str) -> (String, Option<String>) {
     (url_sync, Some(url_async))
 }
 
+/// Enum representing necessary headers for requests
 pub enum Headers {
     ContentTypeAppJson,
     Authorization,

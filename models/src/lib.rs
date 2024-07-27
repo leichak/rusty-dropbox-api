@@ -1,9 +1,9 @@
+mod add_folder_member;
 mod app;
 mod check_job_status;
 mod check_remove_member_job_status;
 mod check_share_jobs_status;
 mod copy;
-mod copy_batch;
 mod copy_batch_check;
 mod copy_reference_get;
 mod copy_reference_save;
@@ -16,6 +16,7 @@ mod create_shared_link_with_settings;
 mod delete_all_closed;
 mod delete_manual_contacts;
 mod delete_manual_contacts_batch;
+mod file_properties;
 mod get;
 mod get_account;
 mod get_account_batch;
@@ -55,12 +56,7 @@ mod list_shared_links;
 mod lock_file_batch;
 mod modify_shared_link_settings;
 mod move_batch_check;
-mod properties_add;
-mod properties_overwrite;
-mod properties_remove;
-mod properties_search;
-mod properties_search_continue;
-mod properties_update;
+
 mod relinquish_file_membership;
 mod relinquish_folder_membership;
 mod remove_file_member_2;
@@ -73,20 +69,19 @@ mod set_profile_photo;
 mod tags_add;
 mod tags_get;
 mod tags_remove;
-mod templates_add_for_user;
-mod templates_get_for_user;
-mod templates_list_for_user;
-mod templates_remove_for_user;
-mod templates_update_for_user;
+
 mod token_revoke;
 mod transfer_folder;
 mod upload_session_finish_batch_check;
 mod user;
 
-#[cfg(test)]
-use api::{mockito, MOCK_SERVER_ASYNC, MOCK_SERVER_SYNC};
+// #[cfg(test)]
+// use api::{mockito, MOCK_SERVER_ASYNC, MOCK_SERVER_SYNC};
 
 pub use set_profile_photo::{SetProfilePhotoRequest, SetProfilePhotoResponse};
+
+#[macro_use]
+extern crate strum_macros;
 
 #[cfg(test)]
 static TEST_TOKEN: &'static str = "123456";
@@ -95,6 +90,6 @@ mod utils {
     use serde::{Deserialize, Serialize};
 
     pub trait Utils {
-        fn parameters(&self) -> impl Serialize + Deserialize;
+        fn payload(&self) -> Option<impl Serialize + Deserialize>;
     }
 }
