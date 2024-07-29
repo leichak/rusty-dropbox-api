@@ -6,9 +6,9 @@ use api::{
 
 use super::PathWithPropertyGroups;
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
-use std::{collections::HashMap, future::Future, pin::Pin};
+use std::{future::Future, pin::Pin};
 
 use crate::utils::{self, Utils};
 
@@ -17,7 +17,7 @@ use crate::utils::{self, Utils};
 #[derive(Debug)]
 pub struct PropertiesAddRequest<'a> {
     access_token: &'a str,
-    path_with_property_groups: PathWithPropertyGroups,
+    payload: Option<PathWithPropertyGroups>,
 }
 
 /// Response struct for adding properties of file
@@ -25,9 +25,13 @@ pub struct PropertiesAddRequest<'a> {
 pub struct PropertiesAddResponse;
 
 /// Implementation of trait for payload
-impl utils::Utils for PropertiesAddRequest<'_> {
-    fn payload(&self) -> Option<impl Serialize + Deserialize> {
-        Some(self.payload)
+impl utils::Utils<'_> for PropertiesAddRequest<'_> {
+    type A = PathWithPropertyGroups;
+    fn payload(&self) -> Option<&Self::A> {
+        if self.payload.is_some() {
+            return Some(self.payload.as_ref().unwrap());
+        }
+        None
     }
 }
 

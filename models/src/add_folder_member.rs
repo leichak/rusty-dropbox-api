@@ -14,7 +14,7 @@ use crate::{
 };
 
 /// Member identification type enum
-#[derive(Debug, PartialEq, AsRefStr)]
+#[derive(Debug, PartialEq)]
 #[allow(non_camel_case_types)]
 pub enum MemberIdentificationType<'a> {
     dropbox_id(&'a str),
@@ -22,7 +22,7 @@ pub enum MemberIdentificationType<'a> {
 }
 
 /// Member access type enum
-#[derive(Debug, PartialEq, AsRefStr)]
+#[derive(Debug, PartialEq)]
 #[allow(non_camel_case_types)]
 pub enum MemberAccessLevel {
     owner,

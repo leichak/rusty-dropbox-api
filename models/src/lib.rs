@@ -89,7 +89,12 @@ static TEST_TOKEN: &'static str = "123456";
 mod utils {
     use serde::{Deserialize, Serialize};
 
-    pub trait Utils {
-        fn payload(&self) -> Option<impl Serialize + Deserialize>;
+    pub trait Utils<'a> {
+        type T: Serialize + Deserialize<'a>;
+        fn payload(&self) -> Option<&Self::T>;
     }
 }
+
+/*
+I want to return reference to type that is Deserialize + Serialize
+*/

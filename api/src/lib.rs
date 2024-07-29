@@ -83,6 +83,106 @@ pub trait Service<O: Sized, F: Sized> {
     fn call(&self) -> Result<F>;
 }
 
+/// Macro implementing tests
+#[macro_export]
+macro_rules! implement_tests {
+    ($endpoints:expr, headers:expr) => {
+
+    #[tokio::test]
+    pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
+        let mock;
+        {
+            let body = r##"{
+                "photo": {
+                ".tag": "base64_data",
+                "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
+                        }
+            }"##;
+
+            let response = r##"{
+            "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
+            }"##;
+
+            let mut server = get_mut_or_init_async().await;
+            mock = server
+                .mock("POST", "/2/account/set_profile_photo")
+                .with_status(200)
+                .with_header(
+                    Headers::ContentTypeAppJson.get_str().0,
+                    Headers::ContentTypeAppJson.get_str().1,
+                )
+                .with_header(
+                    Headers::Authorization.get_str().0,
+                    Headers::Authorization.get_str().1,
+                )
+                .match_body(mockito::Matcher::JsonString(body.to_string()))
+                .with_body(response)
+                .create_async()
+                .await;
+        }
+
+        let base64_data =
+            "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
+        let request = SetProfilePhotoRequest {
+            access_token: &TEST_TOKEN,
+            base64_data,
+        };
+
+        let f = request.call()?;
+        let _ = f.await?;
+
+        mock.assert();
+
+        Ok(())
+    }
+
+    #[test]
+    pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
+        let mock;
+        {
+            let body = r##"{
+                "photo": {
+                ".tag": "base64_data",
+                "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
+                        }
+            }"##;
+
+            let response = r##"{
+                "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
+            }"##;
+
+            let mut server = get_mut_or_init();
+            mock = server
+                .mock("POST", "/2/account/set_profile_photo")
+                .with_status(200)
+                .with_header(
+                    Headers::ContentTypeAppJson.get_str().0,
+                    Headers::ContentTypeAppJson.get_str().1,
+                )
+                .with_header(
+                    Headers::Authorization.get_str().0,
+                    Headers::Authorization.get_str().1,
+                )
+                .match_body(mockito::Matcher::JsonString(body.to_string()))
+                .with_body(response)
+                .create();
+        }
+
+        let base64_data =
+            "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
+        let request = SetProfilePhotoRequest {
+            access_token: &TEST_TOKEN,
+            base64_data,
+        };
+
+        let _ = request.call_sync()?;
+        mock.assert();
+
+        Ok(())
+    }
+    }
+}
+
 /// Macro implementing Service trait
 #[macro_export]
 macro_rules! implement_service {
@@ -99,7 +199,7 @@ macro_rules! implement_service {
                     response = response.header(h.get_str().0, h.get_str().1);
                 }
 
-                if let Some(payload) = &self.payload() {
+                if let Some(payload) = self.payload() {
                     response = response.json(payload);
                 }
 
@@ -299,6 +399,274 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>) {
     let binding = test_url(url);
 
     binding
+}
+
+pub fn get_endpoint_test_body_response(
+    endpoint: Endpoint,
+) -> (Option<&'static str>, Option<&'static str>) {
+    match endpoint {
+        Endpoint::CheckAppPost => todo!(),
+        Endpoint::CountPost => todo!(),
+        Endpoint::CreatePost => todo!(),
+        Endpoint::DeleteAllClosedPost => todo!(),
+        Endpoint::ContactsDeleteManualContactsBatchPost => todo!(),
+        Endpoint::ContactsDeleteManualContactsPost => todo!(),
+        Endpoint::DeletePost => todo!(),
+        Endpoint::AddFolderMemberPost => todo!(),
+        Endpoint::FilesDownloadPost => todo!(),
+        Endpoint::FilesUploadPost => todo!(),
+        Endpoint::FilesUploadSessionAppendV2Post => todo!(),
+        Endpoint::FilesUploadSessionFinishPost => todo!(),
+        Endpoint::FilesUploadSessionStartPost => todo!(),
+        Endpoint::GetPost => todo!(),
+        Endpoint::ListContinuePost => todo!(),
+        Endpoint::ListPost => todo!(),
+        Endpoint::FilePropertiesPropertiesAddPost => (
+            Some(
+                r##"{
+            "path": "/my_awesome/word.docx",
+            "property_groups": [
+                {
+                    "fields": [
+                        {
+                            "name": "Security Policy",
+                            "value": "Confidential"
+                        }
+                    ],
+                    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+                }
+            ]
+        }"##,
+            ),
+            None,
+        ),
+        Endpoint::FilePropertiesPropertiesOverwritePost => (
+            Some(
+                r##"{
+    "path": "/my_awesome/word.docx",
+    "property_groups": [
+        {
+            "fields": [
+                {
+                    "name": "Security Policy",
+                    "value": "Confidential"
+                }
+            ],
+            "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+        }
+    ]
+}"##,
+            ),
+            None,
+        ),
+        Endpoint::FilePropertiesPropertiesRemovePost => (
+            Some(
+                r##"{
+    "path": "/my_awesome/word.docx",
+    "property_template_ids": [
+        "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+    ]
+}"##,
+            ),
+            None,
+        ),
+        Endpoint::FilePropertiesPropertiesSearchContinuePost => (
+            Some(
+                r##"{
+    "cursor": "ZtkX9_EHj3x7PMkVuFIhwKYXEpwpLwyxp9vMKomUhllil9q7eWiAu"
+}
+"##,
+            ),
+            Some(
+                r##"{
+    "matches": [
+        {
+            "id": "id:a4ayc_80_OEAAAAAAAAAXz",
+            "is_deleted": false,
+            "path": "/my_awesome/word.docx",
+            "property_groups": [
+                {
+                    "fields": [
+                        {
+                            "name": "Security Policy",
+                            "value": "Confidential"
+                        }
+                    ],
+                    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+                }
+            ]
+        }
+    ]
+}"##,
+            ),
+        ),
+        Endpoint::FilePropertiesPropertiesSearchPost => (
+            Some(
+                r##"{
+    "queries": [
+        {
+            "logical_operator": "or_operator",
+            "mode": {
+                ".tag": "field_name",
+                "field_name": "Security"
+            },
+            "query": "Confidential"
+        }
+    ],
+    "template_filter": "filter_none"
+}"##,
+            ),
+            Some(
+                r##"{
+    "matches": [
+        {
+            "id": "id:a4ayc_80_OEAAAAAAAAAXz",
+            "is_deleted": false,
+            "path": "/my_awesome/word.docx",
+            "property_groups": [
+                {
+                    "fields": [
+                        {
+                            "name": "Security Policy",
+                            "value": "Confidential"
+                        }
+                    ],
+                    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+                }
+            ]
+        }
+    ]
+}"##,
+            ),
+        ),
+        Endpoint::FilePropertiesPropertiesUpdatePost => (
+            Some(
+                r##"{
+            "path": "/my_awesome/word.docx",
+            "property_groups": [
+                {
+                    "fields": [
+                        {
+                            "name": "Security Policy",
+                            "value": "Confidential"
+                        }
+                    ],
+                    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+                }
+            ]
+        }"##,
+            ),
+            None,
+        ),
+        Endpoint::SetProfilePhotoPost => todo!(),
+        Endpoint::FilePropertiesTemplatesAddForUserPost => (
+            Some(
+                r##"{
+    "description": "These properties describe how confidential this file or folder is.",
+    "fields": [
+        {
+            "description": "This is the security policy of the file or folder described.\nPolicies can be Confidential, Public or Internal.",
+            "name": "Security Policy",
+            "type": "string"
+        }
+    ],
+    "name": "Security"
+}"##,
+            ),
+            Some(
+                r##"{
+    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+}"##,
+            ),
+        ),
+        Endpoint::FilePropertiesTemplatesGetForUserPost => (
+            Some(
+                r##"{
+    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+}"##,
+            ),
+            Some(
+                r##"{
+    "description": "These properties describe how confidential this file or folder is.",
+    "fields": [
+        {
+            "description": "This is the security policy of the file or folder described.\nPolicies can be Confidential, Public or Internal.",
+            "name": "Security Policy",
+            "type": {
+                ".tag": "string"
+            }
+        }
+    ],
+    "name": "Security"
+}"##,
+            ),
+        ),
+        Endpoint::FilePropertiesTemplatesListForUserPost => (
+            None,
+            Some(
+                r##"{
+    "template_ids": [
+        "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+    ]
+}"##,
+            ),
+        ),
+        Endpoint::FilePropertiesTemplatesRemoveForUserPost => (
+            Some(
+                r##"{
+    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+}"##,
+            ),
+            None,
+        ),
+        Endpoint::FilePropertiesTemplatesUpdateForUserPost => (
+            Some(
+                r##"{
+            "path": "/my_awesome/word.docx",
+            "property_groups": [
+                {
+                    "fields": [
+                        {
+                            "name": "Security Policy",
+                            "value": "Confidential"
+                        }
+                    ],
+                    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+                }
+            ]
+        }"##,
+            ),
+            None,
+        ),
+        Endpoint::FilePropertiesPropertiesUpdatePost => (
+            Some(
+                r##"{
+    "path": "/my_awesome/word.docx",
+    "update_property_groups": [
+        {
+            "add_or_update_fields": [
+                {
+                    "name": "Security Policy",
+                    "value": "Confidential"
+                }
+            ],
+            "remove_fields": [],
+            "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+        }
+    ]
+}"##,
+            ),
+            None,
+        ),
+        Endpoint::TokenRevokePost => todo!(),
+        Endpoint::UpdatePost => todo!(),
+        Endpoint::CheckUserPost => todo!(),
+        Endpoint::UsersFeaturesGetValuesPost => todo!(),
+        Endpoint::UsersGetAccountBatchPost => todo!(),
+        Endpoint::UsersGetAccountPost => todo!(),
+        Endpoint::UsersGetCurrentAccountPost => todo!(),
+        Endpoint::UsersGetSpaceUsagePost => todo!(),
+    }
 }
 
 /// For testing purpose, it will replace original end-point with mock server url

@@ -12,56 +12,56 @@ mod templates_update_for_user;
 
 use serde::{Deserialize, Serialize};
 
-// pub structfor the first JSON
+// pub struct for the first JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structField {
+pub struct Field {
     name: String,
     value: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structPropertyGroup {
+pub struct PropertyGroup {
     fields: Vec<Field>,
     template_id: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structPathWithPropertyGroups {
+pub struct PathWithPropertyGroups {
     path: String,
     property_groups: Vec<PropertyGroup>,
 }
 
-// pub structfor the second JSON
+// pub struct for the second JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structPathWithTemplateIds {
+pub struct PathWithTemplateIds {
     path: String,
     property_template_ids: Vec<String>,
 }
 
-// pub structfor the third JSON
+// pub struct for the third JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structMode {
+pub struct Mode {
     #[serde(rename = ".tag")]
     tag: String,
     field_name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structQuery {
+pub struct Query {
     logical_operator: String,
     mode: Mode,
     query: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structQueriesWithTemplateFilter {
+pub struct QueriesWithTemplateFilter {
     queries: Vec<Query>,
     template_filter: String,
 }
 
-// pub structfor the fourth JSON
+// pub struct for the fourth JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structMatch {
+pub struct Match {
     id: String,
     is_deleted: bool,
     path: String,
@@ -69,42 +69,42 @@ pub structMatch {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structMatchesWithPropertyGroups {
+pub struct MatchesWithPropertyGroups {
     matches: Vec<Match>,
 }
 
-// pub structfor the fifth JSON
+// pub struct for the fifth JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structCursor {
+pub struct Cursor {
     cursor: String,
 }
 
-// pub structfor the sixth JSON
+// pub struct for the sixth JSON
 // Same as MatchesWithPropertyGroups
 
-// pub structfor the seventh JSON
+// pub struct for the seventh JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structAddOrUpdateField {
+pub struct AddOrUpdateField {
     name: String,
     value: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structUpdatePropertyGroup {
+pub struct UpdatePropertyGroup {
     add_or_update_fields: Vec<AddOrUpdateField>,
     remove_fields: Vec<String>,
     template_id: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structPathWithUpdatePropertyGroups {
+pub struct PathWithUpdatePropertyGroups {
     path: String,
     update_property_groups: Vec<UpdatePropertyGroup>,
 }
 
-// pub structfor the eighth JSON
+// pub struct for the eighth JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structFieldDescription {
+pub struct FieldDescription {
     description: String,
     name: String,
     #[serde(rename = "type")]
@@ -112,21 +112,21 @@ pub structFieldDescription {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structPropertyTemplate {
+pub struct PropertyTemplate {
     description: String,
     fields: Vec<FieldDescription>,
     name: String,
 }
 
-// pub structfor the ninth JSON
+// pub struct for the ninth JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structTaggedFieldType {
+pub struct TaggedFieldType {
     #[serde(rename = ".tag")]
     tag: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structFieldWithTaggedType {
+pub struct FieldWithTaggedType {
     description: String,
     name: String,
     #[serde(rename = "type")]
@@ -134,21 +134,21 @@ pub structFieldWithTaggedType {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structPropertyTemplateWithTaggedType {
+pub struct PropertyTemplateWithTaggedType {
     description: String,
     fields: Vec<FieldWithTaggedType>,
     name: String,
 }
 
-// pub structfor the tenth JSON
+// pub struct for the tenth JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structTemplateIds {
+pub struct TemplateIds {
     template_ids: Vec<String>,
 }
 
-// pub structfor the eleventh JSON
+// pub struct for the eleventh JSON
 #[derive(Serialize, Deserialize, Debug)]
-pub structAddField {
+pub struct AddField {
     description: String,
     name: String,
     #[serde(rename = "type")]
@@ -156,7 +156,7 @@ pub structAddField {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub structAddFieldsToTemplate {
+pub struct AddFieldsToTemplate {
     add_fields: Vec<AddField>,
     description: String,
     name: String,
