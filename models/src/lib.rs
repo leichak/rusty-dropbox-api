@@ -78,26 +78,3 @@ mod user;
 #[cfg(test)]
 static TEST_TOKEN: &'static str = "123456";
 
-mod utils {
-    use serde::{Deserialize, Serialize};
-
-    pub trait Utils<'a> {
-        type T: Serialize + Deserialize<'a>;
-        fn payload(&self) -> Option<&Self::T>;
-    }
-}
-
-#[macro_export]
-macro_rules! implement_utils {
-    ($req_type:ty, $payload_type:ty) => {
-        impl utils::Utils<'_> for $req_type {
-            type T = $payload_type;
-            fn payload(&self) -> Option<&Self::T> {
-                if self.payload.is_some() {
-                    return Some(self.payload.as_ref().unwrap());
-                }
-                None
-            }
-        }
-    };
-}

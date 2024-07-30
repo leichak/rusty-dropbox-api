@@ -18,7 +18,9 @@ pub struct PropertiesAddRequest<'a> {
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
-pub struct PropertiesAddResponse;
+pub struct PropertiesAddResponse {
+    payload: (),
+}
 
 // Impl utils trait
 implement_utils!(PropertiesAddRequest<'_>, PathWithPropertyGroups);
@@ -46,7 +48,7 @@ mod tests {
 
     implement_tests!(
         Endpoint::FilePropertiesPropertiesAddPost,
-        vec![Headers::ContentTypeAppJson],
+        vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
         PropertiesAddRequest,
         PathWithPropertyGroups
     );

@@ -146,6 +146,12 @@ pub struct TemplateIds {
     template_ids: Vec<String>,
 }
 
+// pub struct for the tenth JSON
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TemplateId {
+    template_id: String,
+}
+
 // pub struct for the eleventh JSON
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AddField {

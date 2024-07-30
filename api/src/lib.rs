@@ -18,9 +18,9 @@ pub static TEST_TOKEN: &'static str = "123456";
 
 /// Test servers urls and ports
 const MOCK_SERVER_SYNC_URL: &str = "0.0.0.0";
-const MOCK_SERVER_SYNC_PORT: u16 = 1222;
+const MOCK_SERVER_SYNC_PORT: u16 = 1221;
 const MOCK_SERVER_ASYNC_URL: &str = "0.0.0.0";
-const MOCK_SERVER_ASYNC_PORT: u16 = 1223;
+const MOCK_SERVER_ASYNC_PORT: u16 = 1220;
 
 /// Test servers
 #[cfg(feature = "test-utils")]
@@ -84,15 +84,15 @@ pub trait Service<O: Sized, F: Sized> {
 /// Macro implementing tests
 #[macro_export]
 macro_rules! implement_tests {
-    ($endpoints:expr, $headers:expr, $req:ident, $payload:ty) => {
+    ($endpoint:expr, $headers:expr, $req:ident, $payload:ty) => {
         #[tokio::test]
         pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
-            let (body, response) = get_endpoint_test_body_response($endpoints);
+            let (body, response) = get_endpoint_test_body_response($endpoint);
 
             let mut mock;
             {
                 let mut server = get_mut_or_init_async().await;
-                let (_, url) = get_endpoint_url($endpoints);
+                let (_, url) = get_endpoint_url($endpoint);
 
                 mock = server.mock("POST", url.unwrap().as_str()).with_status(200);
 
@@ -132,12 +132,12 @@ macro_rules! implement_tests {
 
         #[test]
         pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
-            let (body, response) = get_endpoint_test_body_response($endpoints);
+            let (body, response) = get_endpoint_test_body_response($endpoint);
 
             let mut mock;
             {
                 let mut server = get_mut_or_init();
-                let (_, url) = get_endpoint_url($endpoints);
+                let (_, url) = get_endpoint_url($endpoint);
 
                 mock = server.mock("POST", url.unwrap().as_str()).with_status(200);
 
@@ -680,14 +680,14 @@ fn test_url(url: &str) -> (String, Option<String>) {
 /// Enum representing necessary headers for requests
 pub enum Headers {
     ContentTypeAppJson,
-    Authorization,
+    TestAuthorization,
 }
 
 impl Headers {
     pub fn get_str(&self) -> (&str, &str) {
         match self {
             Headers::ContentTypeAppJson => ("Content-type", "application/json"),
-            Headers::Authorization => ("Authorization", "Bearer 123456"),
+            Headers::TestAuthorization => ("Authorization", "Bearer 123456"),
         }
     }
 }
