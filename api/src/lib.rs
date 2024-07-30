@@ -178,7 +178,7 @@ macro_rules! implement_tests {
 /// Macro implementing Service trait
 #[macro_export]
 macro_rules! implement_service {
-    ($req:ty, $resp:ty, $endpoints:expr, $headers:expr) => {
+    ($req:ty, $resp:ty, $resp_payload:ty, $endpoints:expr, $headers:expr) => {
         impl Service<$resp, BoxFuture<'_, Result<Option<$resp>>>> for $req {
             fn call_sync(&self) -> Result<Option<$resp>> {
                 let endpoint = get_endpoint_url($endpoints).0;
@@ -209,8 +209,9 @@ macro_rules! implement_service {
                             return Ok(None);
                         }
 
-                        let response: $resp = serde_json::from_str(&text)
+                        let response: $resp_payload = serde_json::from_str(&text)
                             .map_err(|err| ApiError::ParsingError(err.into()))?;
+                        let response = $resp { payload: response };
                         Ok(Some(response))
                     }
                     Err(err) => Err(ApiError::DropBoxError(err.into()).into()),
@@ -255,8 +256,9 @@ macro_rules! implement_service {
                         return Ok(None);
                     }
 
-                    let response: $resp = serde_json::from_str(&text)
+                    let response: $resp_payload = serde_json::from_str(&text)
                         .map_err(|err| ApiError::ParsingError(err.into()))?;
+                    let response = $resp { payload: response };
 
                     Result::<Option<$resp>>::Ok(Some(response))
                 };

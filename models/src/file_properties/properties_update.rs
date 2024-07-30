@@ -1,4 +1,4 @@
-use super::PathWithPropertyGroups;
+use super::PathWithUpdatePropertyGroups;
 
 use anyhow::Result;
 use api::{
@@ -13,7 +13,7 @@ use std::{future::Future, pin::Pin};
 #[derive(Debug)]
 pub struct PropertiesUpdateRequest<'a> {
     access_token: &'a str,
-    payload: Option<PathWithPropertyGroups>,
+    payload: Option<PathWithUpdatePropertyGroups>,
 }
 
 /// Response struct for adding properties
@@ -23,12 +23,13 @@ pub struct PropertiesUpdateResponse {
 }
 
 // Impl utils trait
-implement_utils!(PropertiesUpdateRequest<'_>, PathWithPropertyGroups);
+implement_utils!(PropertiesUpdateRequest<'_>, PathWithUpdatePropertyGroups);
 
 // Impl service trait
 implement_service!(
     PropertiesUpdateRequest<'_>,
     PropertiesUpdateResponse,
+    (),
     Endpoint::FilePropertiesPropertiesUpdatePost,
     vec![Headers::ContentTypeAppJson]
 );
@@ -37,7 +38,7 @@ implement_service!(
 mod tests {
     use crate::TEST_TOKEN;
 
-    use super::{PathWithPropertyGroups, PropertiesUpdateRequest};
+    use super::{PathWithUpdatePropertyGroups, PropertiesUpdateRequest};
 
     use anyhow::Result;
     use api::{
@@ -50,6 +51,6 @@ mod tests {
         Endpoint::FilePropertiesPropertiesUpdatePost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
         PropertiesUpdateRequest,
-        PathWithPropertyGroups
+        PathWithUpdatePropertyGroups
     );
 }

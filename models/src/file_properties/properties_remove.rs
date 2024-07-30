@@ -29,6 +29,7 @@ implement_utils!(PropertiesRemoveRequest<'_>, PathWithTemplateIds);
 implement_service!(
     PropertiesRemoveRequest<'_>,
     PropertiesRemoveResponse,
+    PathWithTemplateIds,
     Endpoint::FilePropertiesPropertiesRemovePost,
     vec![Headers::ContentTypeAppJson]
 );

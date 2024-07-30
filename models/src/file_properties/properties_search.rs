@@ -29,6 +29,7 @@ implement_utils!(PropertiesSearchRequest<'_>, QueriesWithTemplateFilter);
 implement_service!(
     PropertiesSearchRequest<'_>,
     PropertiesSearchResponse,
+    MatchesWithPropertyGroups,
     Endpoint::FilePropertiesPropertiesSearchPost,
     vec![Headers::ContentTypeAppJson]
 );

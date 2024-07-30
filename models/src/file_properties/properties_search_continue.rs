@@ -29,6 +29,7 @@ implement_utils!(PropertiesSearchContinueRequest<'_>, Cursor);
 implement_service!(
     PropertiesSearchContinueRequest<'_>,
     PropertiesSearchContinueResponse,
+    MatchesWithPropertyGroups,
     Endpoint::FilePropertiesPropertiesSearchContinuePost,
     vec![Headers::ContentTypeAppJson]
 );
