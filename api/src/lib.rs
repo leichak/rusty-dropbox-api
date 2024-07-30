@@ -18,9 +18,9 @@ pub static TEST_TOKEN: &'static str = "123456";
 
 /// Test servers urls and ports
 const MOCK_SERVER_SYNC_URL: &str = "0.0.0.0";
-const MOCK_SERVER_SYNC_PORT: u16 = 1234;
+const MOCK_SERVER_SYNC_PORT: u16 = 1222;
 const MOCK_SERVER_ASYNC_URL: &str = "0.0.0.0";
-const MOCK_SERVER_ASYNC_PORT: u16 = 123;
+const MOCK_SERVER_ASYNC_PORT: u16 = 1223;
 
 /// Test servers
 #[cfg(feature = "test-utils")]
@@ -76,8 +76,6 @@ pub enum ApiError {
 }
 
 /// Trait for both sync and async calls
-/// Async call will return future that needs to be awaited using own executor
-/// Sync will block and return result
 pub trait Service<O: Sized, F: Sized> {
     fn call_sync(&self) -> Result<Option<O>>;
     fn call(&self) -> Result<F>;
@@ -86,102 +84,95 @@ pub trait Service<O: Sized, F: Sized> {
 /// Macro implementing tests
 #[macro_export]
 macro_rules! implement_tests {
-    ($endpoints:expr, headers:expr) => {
+    ($endpoints:expr, $headers:expr, $req:ident, $payload:ty) => {
+        #[tokio::test]
+        pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
+            let (body, response) = get_endpoint_test_body_response($endpoints);
 
-    #[tokio::test]
-    pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
-        let mock;
-        {
-            let body = r##"{
-                "photo": {
-                ".tag": "base64_data",
-                "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
-                        }
-            }"##;
-            // let (body , response) = get_endpoint_test_body_response(endpoints);
+            let mut mock;
+            {
+                let mut server = get_mut_or_init_async().await;
+                let (_, url) = get_endpoint_url($endpoints);
 
-            let response = r##"{
-            "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
-            }"##;
+                mock = server.mock("POST", url.unwrap().as_str()).with_status(200);
 
-            let mut server = get_mut_or_init_async().await;
-            mock = server
-                .mock("POST", "/2/account/set_profile_photo")
-                .with_status(200)
-                .with_header(
-                    Headers::ContentTypeAppJson.get_str().0,
-                    Headers::ContentTypeAppJson.get_str().1,
-                )
-                .with_header(
-                    Headers::Authorization.get_str().0,
-                    Headers::Authorization.get_str().1,
-                )
-                .match_body(mockito::Matcher::JsonString(body.to_string()))
-                .with_body(response)
-                .create_async()
-                .await;
+                let headers: Vec<Headers> = $headers;
+
+                for h in &headers {
+                    mock = mock.with_header(h.get_str().0, h.get_str().1);
+                }
+                if let Some(body) = &body {
+                    mock = mock.match_body(mockito::Matcher::JsonString(body.to_string()));
+                }
+                if let Some(response) = &response {
+                    mock = mock.with_body(response);
+                }
+                mock = mock.create_async().await;
+            }
+
+            let payload: Option<$payload>;
+            if let Some(body) = body {
+                payload = Some(serde_json::from_str(&body).expect("failed to deserialise"));
+            } else {
+                payload = None;
+            }
+
+            let request = $req {
+                access_token: &TEST_TOKEN,
+                payload,
+            };
+
+            let f = request.call()?;
+            let _ = f.await?;
+
+            mock.assert();
+
+            Ok(())
         }
 
-        let base64_data =
-            "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
-        let request = SetProfilePhotoRequest {
-            access_token: &TEST_TOKEN,
-            base64_data,
-        };
+        #[test]
+        pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
+            let (body, response) = get_endpoint_test_body_response($endpoints);
 
-        let f = request.call()?;
-        let _ = f.await?;
+            let mut mock;
+            {
+                let mut server = get_mut_or_init();
+                let (_, url) = get_endpoint_url($endpoints);
 
-        mock.assert();
+                mock = server.mock("POST", url.unwrap().as_str()).with_status(200);
 
-        Ok(())
-    }
+                let headers: Vec<Headers> = $headers;
 
-    #[test]
-    pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
-        let mock;
-        {
-            let body = r##"{
-                "photo": {
-                ".tag": "base64_data",
-                "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
-                        }
-            }"##;
+                for h in &headers {
+                    mock = mock.with_header(h.get_str().0, h.get_str().1);
+                }
+                if let Some(body) = &body {
+                    mock = mock.match_body(mockito::Matcher::JsonString(body.to_string()));
+                }
+                if let Some(response) = &response {
+                    mock = mock.with_body(response);
+                }
+                mock = mock.create();
+            }
 
-            let response = r##"{
-                "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
-            }"##;
+            let payload: Option<$payload>;
+            if let Some(body) = body {
+                payload = Some(serde_json::from_str(&body).expect("failed to deserialise"));
+            } else {
+                payload = None;
+            }
 
-            let mut server = get_mut_or_init();
-            mock = server
-                .mock("POST", "/2/account/set_profile_photo")
-                .with_status(200)
-                .with_header(
-                    Headers::ContentTypeAppJson.get_str().0,
-                    Headers::ContentTypeAppJson.get_str().1,
-                )
-                .with_header(
-                    Headers::Authorization.get_str().0,
-                    Headers::Authorization.get_str().1,
-                )
-                .match_body(mockito::Matcher::JsonString(body.to_string()))
-                .with_body(response)
-                .create();
+            let request = $req {
+                access_token: &TEST_TOKEN,
+                payload,
+            };
+
+            let _ = request.call_sync()?;
+            mock.assert();
+
+            Ok(())
         }
-
-        let base64_data =
-            "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
-        let request = SetProfilePhotoRequest {
-            access_token: &TEST_TOKEN,
-            base64_data,
-        };
-
-        let _ = request.call_sync()?;
-        mock.assert();
-
-        Ok(())
-    }
-    }
+    };
 }
 
 /// Macro implementing Service trait

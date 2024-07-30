@@ -8,7 +8,7 @@ use api::{
 use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
-/// Add properties for file request
+/// Add properties struct for file request
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
 #[derive(Debug)]
 pub struct PropertiesAddRequest<'a> {
@@ -16,15 +16,38 @@ pub struct PropertiesAddRequest<'a> {
     payload: Option<PathWithPropertyGroups>,
 }
 
-/// Response struct for adding properties of file
+/// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 pub struct PropertiesAddResponse;
 
+// Impl utils trait
 implement_utils!(PropertiesAddRequest<'_>, PathWithPropertyGroups);
 
+// Impl service trait
 implement_service!(
     PropertiesAddRequest<'_>,
     PropertiesAddResponse,
     Endpoint::FilePropertiesPropertiesAddPost,
     vec![Headers::ContentTypeAppJson]
 );
+
+#[cfg(test)]
+mod tests {
+    use crate::TEST_TOKEN;
+
+    use super::{PathWithPropertyGroups, PropertiesAddRequest};
+
+    use anyhow::Result;
+    use api::{
+        get_endpoint_test_body_response, get_endpoint_url, get_mut_or_init, get_mut_or_init_async,
+        implement_tests, mockito, Endpoint, Headers, Service,
+    };
+    use tokio;
+
+    implement_tests!(
+        Endpoint::FilePropertiesPropertiesAddPost,
+        vec![Headers::ContentTypeAppJson],
+        PropertiesAddRequest,
+        PathWithPropertyGroups
+    );
+}
