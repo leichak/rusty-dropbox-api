@@ -98,6 +98,7 @@ macro_rules! implement_tests {
                 "base64_data": "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
                         }
             }"##;
+            // let (body , response) = get_endpoint_test_body_response(endpoints);
 
             let response = r##"{
             "profile_photo_url": "https://dl-web.dropbox.com/account_photo/get/dbaphid%3AAAHWGmIXV3sUuOmBfTz0wPsiqHUpBWvv3ZA?vers=1556069330102&size=128x128"
@@ -401,6 +402,7 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>) {
     binding
 }
 
+#[cfg(feature = "test-utils")]
 pub fn get_endpoint_test_body_response(
     endpoint: Endpoint,
 ) -> (Option<&'static str>, Option<&'static str>) {
@@ -697,4 +699,26 @@ impl Headers {
             Headers::Authorization => ("Authorization", "Bearer 123456"),
         }
     }
+}
+
+#[macro_export]
+macro_rules! implement_utils {
+    ($req_type:ty, $payload_type:ty) => {
+        impl Utils<'_> for $req_type {
+            type T = $payload_type;
+            fn payload(&self) -> Option<&Self::T> {
+                if self.payload.is_some() {
+                    return Some(self.payload.as_ref().unwrap());
+                }
+                None
+            }
+        }
+    };
+}
+
+use serde::{Deserialize, Serialize};
+
+pub trait Utils<'a> {
+    type T: Serialize + Deserialize<'a>;
+    fn payload(&self) -> Option<&Self::T>;
 }

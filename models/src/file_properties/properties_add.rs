@@ -1,16 +1,12 @@
-use anyhow::Result;
-use api::{
-    anyhow, get_endpoint_url, implement_service, ApiError, AsyncClient, BoxFuture, Endpoint,
-    Headers, Service, SyncClient,
-};
-
 use super::PathWithPropertyGroups;
 
+use anyhow::Result;
+use api::{
+    anyhow, get_endpoint_url, implement_service, implement_utils, ApiError, AsyncClient, BoxFuture,
+    Endpoint, Headers, Service, SyncClient, Utils,
+};
 use serde::Deserialize;
-
 use std::{future::Future, pin::Pin};
-
-use crate::utils::{self, Utils};
 
 /// Add properties for file request
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
@@ -24,16 +20,7 @@ pub struct PropertiesAddRequest<'a> {
 #[derive(Deserialize, Debug)]
 pub struct PropertiesAddResponse;
 
-/// Implementation of trait for payload
-impl utils::Utils<'_> for PropertiesAddRequest<'_> {
-    type A = PathWithPropertyGroups;
-    fn payload(&self) -> Option<&Self::A> {
-        if self.payload.is_some() {
-            return Some(self.payload.as_ref().unwrap());
-        }
-        None
-    }
-}
+implement_utils!(PropertiesAddRequest<'_>, PathWithPropertyGroups);
 
 implement_service!(
     PropertiesAddRequest<'_>,

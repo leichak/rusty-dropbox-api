@@ -42,6 +42,7 @@ dependencies = [
  "lazy_static",
  "mockito",
  "reqwest",
+ "serde",
  "serde_json",
  "thiserror",
  "tokio",

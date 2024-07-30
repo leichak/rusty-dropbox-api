@@ -13,7 +13,7 @@ lazy_static = "1.5.0"
 futures = "0.3.30"
 tokio = "1.38.0"
 mockito = "1.4.0"
-
+serde = { version = "1.0.204", features = ["derive"] }
 
 [features]
 test-utils = []

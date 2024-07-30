@@ -75,14 +75,6 @@ mod transfer_folder;
 mod upload_session_finish_batch_check;
 mod user;
 
-// #[cfg(test)]
-// use api::{mockito, MOCK_SERVER_ASYNC, MOCK_SERVER_SYNC};
-
-pub use set_profile_photo::{SetProfilePhotoRequest, SetProfilePhotoResponse};
-
-#[macro_use]
-extern crate strum_macros;
-
 #[cfg(test)]
 static TEST_TOKEN: &'static str = "123456";
 
@@ -95,6 +87,17 @@ mod utils {
     }
 }
 
-/*
-I want to return reference to type that is Deserialize + Serialize
-*/
+#[macro_export]
+macro_rules! implement_utils {
+    ($req_type:ty, $payload_type:ty) => {
+        impl utils::Utils<'_> for $req_type {
+            type T = $payload_type;
+            fn payload(&self) -> Option<&Self::T> {
+                if self.payload.is_some() {
+                    return Some(self.payload.as_ref().unwrap());
+                }
+                None
+            }
+        }
+    };
+}
