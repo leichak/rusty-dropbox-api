@@ -1,43 +1,41 @@
 // use anyhow::Result;
 // use api::{
-//     anyhow, get_endpoint_url, implement_service, ApiError, AsyncClient, BoxFuture, Endpoint,
-//     Headers, Service, SyncClient,
+//     anyhow, get_endpoint_url, implement_service, implement_utils, ApiError, AsyncClient, BoxFuture,
+//     Endpoint, Headers, Service, SyncClient, Utils,
 // };
-
 // use serde::{Deserialize, Serialize};
 
 // use std::{collections::HashMap, future::Future, pin::Pin};
-
-// use crate::utils::{self, Utils};
 
 // /// Sets a user's profile photo.
 // /// https://www.dropbox.com/developers/documentation/http/documentation#account-set_profile_photo
 // pub struct SetProfilePhotoRequest<'a> {
 //     access_token: &'a str,
-//     base64_data: &'a str,
+//     payload: Option<Base64Data>,
+// }
+
+// #[derive(Deserialize, Debug, Serialize)]
+// pub struct Base64Data {
+//     base64_data: String,
 // }
 
 // /// Response struct for setting profile photo response
 // #[derive(Deserialize, Debug)]
 // pub struct SetProfilePhotoResponse {
+//     payload: Url,
+// }
+
+// #[derive(Deserialize, Debug, Serialize)]
+// pub struct Url {
 //     profile_photo_url: String,
 // }
 
-// /// Implementation of trait for payload
-// impl utils::Utils for SetProfilePhotoRequest<'_> {
-//     fn payload(&self) -> Option<impl Serialize + Deserialize> {
-//         let mut payload: HashMap<&str, HashMap<&str, &str>> = HashMap::new();
-//         let mut payload_nested: HashMap<&str, &str> = HashMap::new();
-//         payload_nested.insert("base64_data", self.base64_data);
-//         payload_nested.insert(".tag", "base64_data");
-//         payload.insert("photo", payload_nested);
-//         Some(payload)
-//     }
-// }
+// implement_utils!(SetProfilePhotoRequest<'_>, Base64Data);
 
 // implement_service!(
 //     SetProfilePhotoRequest<'_>,
 //     SetProfilePhotoResponse,
+//     Url,
 //     Endpoint::SetProfilePhotoPost,
 //     vec![Headers::ContentTypeAppJson]
 // );
@@ -46,7 +44,7 @@
 // mod tests {
 //     use crate::TEST_TOKEN;
 
-//     use super::SetProfilePhotoRequest;
+//     use super::{Base64Data, SetProfilePhotoRequest};
 
 //     use anyhow::Result;
 //     use api::{get_mut_or_init, get_mut_or_init_async, mockito, Headers, Service};
@@ -76,8 +74,8 @@
 //                     Headers::ContentTypeAppJson.get_str().1,
 //                 )
 //                 .with_header(
-//                     Headers::Authorization.get_str().0,
-//                     Headers::Authorization.get_str().1,
+//                     Headers::TestAuthorization.get_str().0,
+//                     Headers::TestAuthorization.get_str().1,
 //                 )
 //                 .match_body(mockito::Matcher::JsonString(body.to_string()))
 //                 .with_body(response)
@@ -86,10 +84,11 @@
 //         }
 
 //         let base64_data =
-//             "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
+//             "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
+//                 .to_string();
 //         let request = SetProfilePhotoRequest {
 //             access_token: &TEST_TOKEN,
-//             base64_data,
+//             payload: Some(Base64Data { base64_data }),
 //         };
 
 //         let f = request.call()?;
@@ -124,8 +123,8 @@
 //                     Headers::ContentTypeAppJson.get_str().1,
 //                 )
 //                 .with_header(
-//                     Headers::Authorization.get_str().0,
-//                     Headers::Authorization.get_str().1,
+//                     Headers::TestAuthorization.get_str().0,
+//                     Headers::TestAuthorization.get_str().1,
 //                 )
 //                 .match_body(mockito::Matcher::JsonString(body.to_string()))
 //                 .with_body(response)
@@ -133,10 +132,11 @@
 //         }
 
 //         let base64_data =
-//             "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4=";
+//             "SW1hZ2UgZGF0YSBpbiBiYXNlNjQtZW5jb2RlZCBieXRlcy4gTm90IGEgdmFsaWQgZXhhbXBsZS4="
+//                 .to_string();
 //         let request = SetProfilePhotoRequest {
 //             access_token: &TEST_TOKEN,
-//             base64_data,
+//             payload: Some(Base64Data { base64_data }),
 //         };
 
 //         let _ = request.call_sync()?;

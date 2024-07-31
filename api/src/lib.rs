@@ -18,9 +18,9 @@ pub static TEST_TOKEN: &'static str = "123456";
 
 /// Test servers urls and ports
 const MOCK_SERVER_SYNC_URL: &str = "0.0.0.0";
-const MOCK_SERVER_SYNC_PORT: u16 = 1221;
+const MOCK_SERVER_SYNC_PORT: u16 = 8002;
 const MOCK_SERVER_ASYNC_URL: &str = "0.0.0.0";
-const MOCK_SERVER_ASYNC_PORT: u16 = 1220;
+const MOCK_SERVER_ASYNC_PORT: u16 = 1420;
 
 /// Test servers
 #[cfg(feature = "test-utils")]
@@ -36,7 +36,7 @@ pub fn get_mut_or_init() -> MutexGuard<'static, Server> {
             Mutex::new(mockito::Server::new_with_opts(mockito::ServerOpts {
                 host: MOCK_SERVER_SYNC_URL,
                 port: MOCK_SERVER_SYNC_PORT,
-                assert_on_drop: false,
+                ..Default::default()
             }))
         })
         .lock()
@@ -51,7 +51,7 @@ pub async fn get_mut_or_init_async() -> MutexGuard<'static, Server> {
                 mockito::ServerOpts {
                     host: MOCK_SERVER_ASYNC_URL,
                     port: MOCK_SERVER_ASYNC_PORT,
-                    assert_on_drop: false,
+                    ..Default::default()
                 },
             ));
 
@@ -92,9 +92,10 @@ macro_rules! implement_tests {
             let mut mock;
             {
                 let mut server = get_mut_or_init_async().await;
-                let (_, url) = get_endpoint_url($endpoint);
+                let url = get_endpoint_url($endpoint).2.unwrap();
+                println!("url {}", url);
 
-                mock = server.mock("POST", url.unwrap().as_str()).with_status(200);
+                mock = server.mock("POST", url.as_str()).with_status(200);
 
                 let headers: Vec<Headers> = $headers;
 
@@ -137,7 +138,7 @@ macro_rules! implement_tests {
             let mut mock;
             {
                 let mut server = get_mut_or_init();
-                let (_, url) = get_endpoint_url($endpoint);
+                let url = get_endpoint_url($endpoint).2;
 
                 mock = server.mock("POST", url.unwrap().as_str()).with_status(200);
 
@@ -194,6 +195,8 @@ macro_rules! implement_service {
                 if let Some(payload) = self.payload() {
                     response = response.json(payload);
                 }
+
+                println!("{:#?}", response);
 
                 let response = response
                     .send()
@@ -310,7 +313,7 @@ pub enum Endpoint {
     UsersGetSpaceUsagePost,
 }
 
-pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>) {
+pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<String>) {
     let url = match endpoint {
         Endpoint::AddFolderMemberPost => "https://api.dropboxapi.com/2/sharing/add_folder_member",
         Endpoint::CheckAppPost => "https://api.dropboxapi.com/2/check/app",
@@ -388,7 +391,7 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>) {
         Endpoint::UsersGetSpaceUsagePost => "https://api.dropboxapi.com/2/users/get_space_usage",
     };
 
-    let binding: (String, Option<String>) = (url.to_string(), None);
+    let binding: (String, Option<String>, Option<String>) = (url.to_string(), None, None);
     #[cfg(feature = "test-utils")]
     let binding = test_url(url);
 
@@ -665,7 +668,7 @@ pub fn get_endpoint_test_body_response(
 }
 
 /// For testing purpose, it will replace original end-point with mock server url
-fn test_url(url: &str) -> (String, Option<String>) {
+fn test_url(url: &str) -> (String, Option<String>, Option<String>) {
     let idx = url.find("com").expect("should have com") + 3;
     let url = &url[idx..];
     let url_sync = format!(
@@ -676,7 +679,7 @@ fn test_url(url: &str) -> (String, Option<String>) {
         "http://{}:{}{}",
         MOCK_SERVER_ASYNC_URL, MOCK_SERVER_ASYNC_PORT, url
     );
-    (url_sync, Some(url_async))
+    (url_sync, Some(url_async), Some(url.to_string()))
 }
 
 /// Enum representing necessary headers for requests

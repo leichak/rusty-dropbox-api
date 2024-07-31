@@ -1,4 +1,4 @@
-use super::{PathWithPropertyGroups, TemplateId};
+use super::{PropertyTemplate, TemplateId};
 
 use anyhow::Result;
 use api::{
@@ -8,24 +8,24 @@ use api::{
 use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
+type Request<'a> = TemplatesAddForUserRequest<'a>;
+type Response = TemplatesAddForUserResponse;
+type RequestPayload = PropertyTemplate;
+type ResponsePayload = TemplateId;
+
 /// Add properties struct for file request
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-templates-add_for_user
 #[derive(Debug)]
 pub struct TemplatesAddForUserRequest<'a> {
     access_token: &'a str,
-    payload: Option<PathWithPropertyGroups>,
+    payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 pub struct TemplatesAddForUserResponse {
-    payload: TemplateId,
+    payload: ResponsePayload,
 }
-
-type Request<'a> = TemplatesAddForUserRequest<'a>;
-type Response = TemplatesAddForUserResponse;
-type RequestPayload = PathWithPropertyGroups;
-type ResponsePayload = TemplateId;
 
 // Impl utils trait
 implement_utils!(Request<'_>, RequestPayload);

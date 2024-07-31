@@ -77,4 +77,3 @@ mod user;
 
 #[cfg(test)]
 static TEST_TOKEN: &'static str = "123456";
-
