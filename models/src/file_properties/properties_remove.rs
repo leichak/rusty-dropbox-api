@@ -22,15 +22,20 @@ pub struct PropertiesRemoveResponse {
     payload: (),
 }
 
+type Request<'a> = PropertiesRemoveRequest<'a>;
+type Response = PropertiesRemoveResponse;
+type RequestPayload = PathWithTemplateIds;
+type ResponsePayload = ();
+
 // Impl utils trait
-implement_utils!(PropertiesRemoveRequest<'_>, PathWithTemplateIds);
+implement_utils!(Request<'_>, RequestPayload);
 
 // Impl service trait
 implement_service!(
-    PropertiesRemoveRequest<'_>,
-    PropertiesRemoveResponse,
-    PathWithTemplateIds,
-    Endpoint::FilePropertiesPropertiesRemovePost,
+    Request<'_>,
+    Response,
+    ResponsePayload,
+    Endpoint::FilePropertiesPropertiesOverwritePost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -38,19 +43,21 @@ implement_service!(
 mod tests {
     use crate::TEST_TOKEN;
 
-    use super::{PathWithTemplateIds, PropertiesRemoveRequest};
+    use super::{Request, RequestPayload};
 
     use anyhow::Result;
     use api::{
         get_endpoint_test_body_response, get_endpoint_url, get_mut_or_init, get_mut_or_init_async,
-        implement_tests, mockito, Endpoint, Headers, Service,
+        implement_tests,
+        mockito::{self},
+        Endpoint, Headers, Service,
     };
     use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesPropertiesRemovePost,
+        Endpoint::FilePropertiesPropertiesOverwritePost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
-        PropertiesRemoveRequest,
-        PathWithTemplateIds
+        Request,
+        RequestPayload
     );
 }

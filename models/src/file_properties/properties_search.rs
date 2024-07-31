@@ -22,15 +22,20 @@ pub struct PropertiesSearchResponse {
     payload: MatchesWithPropertyGroups,
 }
 
+type Request<'a> = PropertiesSearchRequest<'a>;
+type Response = PropertiesSearchResponse;
+type RequestPayload = QueriesWithTemplateFilter;
+type ResponsePayload = MatchesWithPropertyGroups;
+
 // Impl utils trait
-implement_utils!(PropertiesSearchRequest<'_>, QueriesWithTemplateFilter);
+implement_utils!(Request<'_>, RequestPayload);
 
 // Impl service trait
 implement_service!(
-    PropertiesSearchRequest<'_>,
-    PropertiesSearchResponse,
-    MatchesWithPropertyGroups,
-    Endpoint::FilePropertiesPropertiesSearchPost,
+    Request<'_>,
+    Response,
+    ResponsePayload,
+    Endpoint::FilePropertiesPropertiesOverwritePost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -38,19 +43,21 @@ implement_service!(
 mod tests {
     use crate::TEST_TOKEN;
 
-    use super::{PropertiesSearchRequest, QueriesWithTemplateFilter};
+    use super::{Request, RequestPayload};
 
     use anyhow::Result;
     use api::{
         get_endpoint_test_body_response, get_endpoint_url, get_mut_or_init, get_mut_or_init_async,
-        implement_tests, mockito, Endpoint, Headers, Service,
+        implement_tests,
+        mockito::{self},
+        Endpoint, Headers, Service,
     };
     use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesPropertiesSearchPost,
+        Endpoint::FilePropertiesPropertiesOverwritePost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
-        PropertiesSearchRequest,
-        QueriesWithTemplateFilter
+        Request,
+        RequestPayload
     );
 }

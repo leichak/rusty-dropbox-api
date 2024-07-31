@@ -178,7 +178,7 @@ macro_rules! implement_tests {
 /// Macro implementing Service trait
 #[macro_export]
 macro_rules! implement_service {
-    ($req:ty, $resp:ty, $resp_payload:ty, $endpoints:expr, $headers:expr) => {
+    ($req:ty, $resp:ident, $resp_payload:ty, $endpoints:expr, $headers:expr) => {
         impl Service<$resp, BoxFuture<'_, Result<Option<$resp>>>> for $req {
             fn call_sync(&self) -> Result<Option<$resp>> {
                 let endpoint = get_endpoint_url($endpoints).0;

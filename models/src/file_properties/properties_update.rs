@@ -22,15 +22,20 @@ pub struct PropertiesUpdateResponse {
     payload: (),
 }
 
+type Request<'a> = PropertiesUpdateRequest<'a>;
+type Response = PropertiesUpdateResponse;
+type RequestPayload = PathWithUpdatePropertyGroups;
+type ResponsePayload = ();
+
 // Impl utils trait
-implement_utils!(PropertiesUpdateRequest<'_>, PathWithUpdatePropertyGroups);
+implement_utils!(Request<'_>, RequestPayload);
 
 // Impl service trait
 implement_service!(
-    PropertiesUpdateRequest<'_>,
-    PropertiesUpdateResponse,
-    (),
-    Endpoint::FilePropertiesPropertiesUpdatePost,
+    Request<'_>,
+    Response,
+    ResponsePayload,
+    Endpoint::FilePropertiesPropertiesOverwritePost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -38,19 +43,21 @@ implement_service!(
 mod tests {
     use crate::TEST_TOKEN;
 
-    use super::{PathWithUpdatePropertyGroups, PropertiesUpdateRequest};
+    use super::{Request, RequestPayload};
 
     use anyhow::Result;
     use api::{
         get_endpoint_test_body_response, get_endpoint_url, get_mut_or_init, get_mut_or_init_async,
-        implement_tests, mockito, Endpoint, Headers, Service,
+        implement_tests,
+        mockito::{self},
+        Endpoint, Headers, Service,
     };
     use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesPropertiesUpdatePost,
+        Endpoint::FilePropertiesPropertiesOverwritePost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
-        PropertiesUpdateRequest,
-        PathWithUpdatePropertyGroups
+        Request,
+        RequestPayload
     );
 }

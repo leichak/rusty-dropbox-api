@@ -22,14 +22,20 @@ pub struct TemplatesAddForUserResponse {
     payload: TemplateId,
 }
 
+type Request<'a> = TemplatesAddForUserRequest<'a>;
+type Response = TemplatesAddForUserResponse;
+type RequestPayload = PathWithPropertyGroups;
+type ResponsePayload = TemplateId;
+
 // Impl utils trait
-implement_utils!(TemplatesAddForUserRequest<'_>, PathWithPropertyGroups);
+implement_utils!(Request<'_>, RequestPayload);
 
 // Impl service trait
 implement_service!(
-    TemplatesAddForUserRequest<'_>,
-    TemplatesAddForUserResponse,
-    Endpoint::FilePropertiesTemplatesAddForUserPost,
+    Request<'_>,
+    Response,
+    ResponsePayload,
+    Endpoint::FilePropertiesPropertiesOverwritePost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -37,19 +43,21 @@ implement_service!(
 mod tests {
     use crate::TEST_TOKEN;
 
-    use super::{PathWithPropertyGroups, TemplatesAddForUserRequest};
+    use super::{Request, RequestPayload};
 
     use anyhow::Result;
     use api::{
         get_endpoint_test_body_response, get_endpoint_url, get_mut_or_init, get_mut_or_init_async,
-        implement_tests, mockito, Endpoint, Headers, Service,
+        implement_tests,
+        mockito::{self},
+        Endpoint, Headers, Service,
     };
     use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesTemplatesAddForUserPost,
+        Endpoint::FilePropertiesPropertiesOverwritePost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
-        TemplatesAddForUserRequest,
-        PathWithPropertyGroups
+        Request,
+        RequestPayload
     );
 }

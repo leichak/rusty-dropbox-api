@@ -22,14 +22,20 @@ pub struct TemplatesUpdateForUserResponse {
     payload: TemplateId,
 }
 
+type Request<'a> = TemplatesUpdateForUserRequest<'a>;
+type Response = TemplatesUpdateForUserResponse;
+type RequestPayload = AddFieldsToTemplate;
+type ResponsePayload = TemplateId;
+
 // Impl utils trait
-implement_utils!(TemplatesUpdateForUserRequest<'_>, AddFieldsToTemplate);
+implement_utils!(Request<'_>, RequestPayload);
 
 // Impl service trait
 implement_service!(
-    TemplatesUpdateForUserRequest<'_>,
-    TemplatesUpdateForUserResponse,
-    Endpoint::FilePropertiesTemplatesUpdateForUserPost,
+    Request<'_>,
+    Response,
+    ResponsePayload,
+    Endpoint::FilePropertiesPropertiesOverwritePost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -37,19 +43,21 @@ implement_service!(
 mod tests {
     use crate::TEST_TOKEN;
 
-    use super::{AddFieldsToTemplate, TemplatesUpdateForUserRequest};
+    use super::{Request, RequestPayload};
 
     use anyhow::Result;
     use api::{
         get_endpoint_test_body_response, get_endpoint_url, get_mut_or_init, get_mut_or_init_async,
-        implement_tests, mockito, Endpoint, Headers, Service,
+        implement_tests,
+        mockito::{self},
+        Endpoint, Headers, Service,
     };
     use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesTemplatesUpdateForUserPost,
+        Endpoint::FilePropertiesPropertiesOverwritePost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
-        TemplatesUpdateForUserRequest,
-        AddFieldsToTemplate
+        Request,
+        RequestPayload
     );
 }
