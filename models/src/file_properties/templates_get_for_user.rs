@@ -8,24 +8,25 @@ use api::{
 use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
+/// Type aliases for readability
+type Request<'a> = TemplatesGetForUserRequest<'a>;
+type Response = TemplatesGetForUserResponse;
+type RequestPayload = TemplateId;
+type ResponsePayload = PropertyTemplateWithTaggedType;
+
 /// Add properties struct for file request
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-templates-get_for_user
 #[derive(Debug)]
 pub struct TemplatesGetForUserRequest<'a> {
     access_token: &'a str,
-    payload: Option<TemplateId>,
+    payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 pub struct TemplatesGetForUserResponse {
-    payload: PropertyTemplateWithTaggedType,
+    payload: ResponsePayload,
 }
-
-type Request<'a> = TemplatesGetForUserRequest<'a>;
-type Response = TemplatesGetForUserResponse;
-type RequestPayload = TemplateId;
-type ResponsePayload = PropertyTemplateWithTaggedType;
 
 // Impl utils trait
 implement_utils!(Request<'_>, RequestPayload);

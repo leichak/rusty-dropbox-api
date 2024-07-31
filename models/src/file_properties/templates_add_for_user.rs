@@ -8,6 +8,7 @@ use api::{
 use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
+/// Type aliases for readability
 type Request<'a> = TemplatesAddForUserRequest<'a>;
 type Response = TemplatesAddForUserResponse;
 type RequestPayload = PropertyTemplate;

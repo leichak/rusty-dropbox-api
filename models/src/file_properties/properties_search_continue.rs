@@ -8,24 +8,25 @@ use api::{
 use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
+/// Type aliases for readability
+type Request<'a> = PropertiesSearchContinueRequest<'a>;
+type Response = PropertiesSearchContinueResponse;
+type RequestPayload = Cursor;
+type ResponsePayload = MatchesWithPropertyGroups;
+
 /// Add properties struct for file request
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-search-continue
 #[derive(Debug)]
 pub struct PropertiesSearchContinueRequest<'a> {
     access_token: &'a str,
-    payload: Option<Cursor>,
+    payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 pub struct PropertiesSearchContinueResponse {
-    payload: MatchesWithPropertyGroups,
+    payload: ResponsePayload,
 }
-
-type Request<'a> = PropertiesSearchContinueRequest<'a>;
-type Response = PropertiesSearchContinueResponse;
-type RequestPayload = Cursor;
-type ResponsePayload = MatchesWithPropertyGroups;
 
 // Impl utils trait
 implement_utils!(Request<'_>, RequestPayload);
