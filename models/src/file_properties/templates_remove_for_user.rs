@@ -1,4 +1,4 @@
-use super::TemplateIds;
+use super::TemplateId;
 
 use anyhow::Result;
 use api::{
@@ -11,8 +11,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = TemplatesRemoveForUserRequest<'a>;
 type Response = TemplatesRemoveForUserResponse;
-type RequestPayload = ();
-type ResponsePayload = TemplateIds;
+type RequestPayload = TemplateId;
+type ResponsePayload = ();
 
 /// Add properties struct for file request
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-templates-remove_for_user

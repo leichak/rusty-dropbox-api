@@ -540,19 +540,20 @@ pub fn get_endpoint_test_body_response(
         Endpoint::FilePropertiesPropertiesUpdatePost => (
             Some(
                 r##"{
-            "path": "/my_awesome/word.docx",
-            "property_groups": [
+    "path": "/my_awesome/word.docx",
+    "update_property_groups": [
+        {
+            "add_or_update_fields": [
                 {
-                    "fields": [
-                        {
-                            "name": "Security Policy",
-                            "value": "Confidential"
-                        }
-                    ],
-                    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+                    "name": "Security Policy",
+                    "value": "Confidential"
                 }
-            ]
-        }"##,
+            ],
+            "remove_fields": [],
+            "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+        }
+    ]
+}"##,
             ),
             None,
         ),
@@ -620,21 +621,23 @@ pub fn get_endpoint_test_body_response(
         Endpoint::FilePropertiesTemplatesUpdateForUserPost => (
             Some(
                 r##"{
-            "path": "/my_awesome/word.docx",
-            "property_groups": [
-                {
-                    "fields": [
-                        {
-                            "name": "Security Policy",
-                            "value": "Confidential"
-                        }
-                    ],
-                    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
-                }
-            ]
-        }"##,
+    "add_fields": [
+        {
+            "description": "This is the security policy of the file or folder described.\nPolicies can be Confidential, Public or Internal.",
+            "name": "Security Policy",
+            "type": "string"
+        }
+    ],
+    "description": "These properties will describe how confidential this file or folder is.",
+    "name": "New Security Template Name",
+    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+}"##,
             ),
-            None,
+            Some(
+                r##"{
+    "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
+}"##,
+            ),
         ),
         Endpoint::FilePropertiesPropertiesUpdatePost => (
             Some(
