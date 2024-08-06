@@ -36,7 +36,7 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilePropertiesPropertiesAddPost,
+    Endpoint::CheckUserPost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -56,7 +56,7 @@ mod tests {
     use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesPropertiesAddPost,
+        Endpoint::CheckUserPost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
         Request,
         RequestPayload

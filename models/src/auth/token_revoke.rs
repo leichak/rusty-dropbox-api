@@ -34,7 +34,7 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilePropertiesPropertiesAddPost,
+    Endpoint::AuthTokenRevokePost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -54,7 +54,7 @@ mod tests {
     };
 
     implement_tests!(
-        Endpoint::FilePropertiesPropertiesAddPost,
+        Endpoint::AuthTokenRevokePost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
         Request,
         RequestPayload
