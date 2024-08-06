@@ -1,39 +1,64 @@
-// use anyhow::Result;
-// use api::{
-//     anyhow, get_endpoint_url, implement_service, ApiError, AsyncClient, BoxFuture, Endpoint,
-//     Headers, Service, SyncClient,
-// };
+use super::{EchoArg, EchoResult};
 
-// use serde::{Deserialize, Serialize};
+use anyhow::Result;
+use api::{
+    anyhow, get_endpoint_url, implement_service, implement_utils, ApiError, AsyncClient, BoxFuture,
+    Endpoint, Headers, Service, SyncClient, Utils,
+};
+use serde::Deserialize;
+use std::{future::Future, pin::Pin};
 
-// use std::{collections::HashMap, future::Future, pin::Pin};
+/// Type aliases for readability
+type Request<'a> = CheckUserRequest<'a>;
+type Response = CheckUserResponse;
+type RequestPayload = EchoArg;
+type ResponsePayload = EchoResult;
 
-// use crate::utils::{self, Utils};
+/// Add properties struct for setting up a profile picture
+/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
+#[derive(Debug)]
+pub struct CheckUserRequest<'a> {
+    access_token: &'a str,
+    payload: Option<RequestPayload>,
+}
 
-// /// Check user request
-// /// https://api.dropboxapi.com/2/check/user
-// #[derive(Debug, PartialEq)]
-// pub struct CheckUserRequest<'a> {
-//     access_token: &'a str,
-//     query: &'a str,
-// }
+/// Response struct for adding properties
+#[derive(Deserialize, Debug)]
+pub struct CheckUserResponse {
+    payload: ResponsePayload,
+}
 
-// /// Response struct for check user
-// #[derive(Deserialize, Debug)]
-// pub struct CheckUserResponse {
-//     result: String,
-// }
+// Impl utils trait
+implement_utils!(Request<'_>, RequestPayload);
 
-// /// Implementation of trait for payload
-// impl utils::Utils for CheckUserRequest<'_> {
-//     fn payload(&self) -> Option<impl Serialize + Deserialize> {
-//         Some(HashMap::from([("query", self.query)]))
-//     }
-// }
+// Impl service trait
+implement_service!(
+    Request<'_>,
+    Response,
+    ResponsePayload,
+    Endpoint::FilePropertiesPropertiesAddPost,
+    vec![Headers::ContentTypeAppJson]
+);
 
-// implement_service!(
-//     CheckUserRequest<'_>,
-//     CheckUserResponse,
-//     Endpoint::CheckAppPost,
-//     vec![Headers::ContentTypeAppJson]
-// );
+#[cfg(test)]
+mod tests {
+    use crate::TEST_TOKEN;
+
+    use super::{Request, RequestPayload};
+    use anyhow::Result;
+
+    use api::{
+        get_endpoint_test_body_response, get_endpoint_url, get_mut_or_init, get_mut_or_init_async,
+        implement_tests,
+        mockito::{self},
+        Endpoint, Headers, Service,
+    };
+    use tokio;
+
+    implement_tests!(
+        Endpoint::FilePropertiesPropertiesAddPost,
+        vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
+        Request,
+        RequestPayload
+    );
+}
