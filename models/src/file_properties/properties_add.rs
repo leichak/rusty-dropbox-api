@@ -45,8 +45,8 @@ mod tests {
     use crate::TEST_TOKEN;
 
     use super::{Request, RequestPayload};
-
     use anyhow::Result;
+
     use api::{
         get_endpoint_test_body_response, get_endpoint_url, get_mut_or_init, get_mut_or_init_async,
         implement_tests,
