@@ -68,11 +68,11 @@ pub enum ApiError {
     #[error("Unknown")] // display trait
     Unknown,
     #[error("Reqwest error {0}")] // display trait
-    RequestError(anyhow::Error),
+    Request(anyhow::Error),
     #[error("Parsing error {0}")] // display trait
-    ParsingError(anyhow::Error),
+    Parsing(anyhow::Error),
     #[error("Dropbox error {0}")] // display trait
-    DropBoxError(anyhow::Error),
+    DropBox(anyhow::Error),
 }
 
 /// Trait for both sync and async calls
@@ -200,24 +200,24 @@ macro_rules! implement_service {
 
                 let response = response
                     .send()
-                    .map_err(|err| ApiError::RequestError(err.into()))?;
+                    .map_err(|err| ApiError::Request(err.into()))?;
 
                 match response.error_for_status() {
                     Ok(response) => {
                         let text = response
                             .text()
-                            .map_err(|err| ApiError::ParsingError(err.into()))?;
+                            .map_err(|err| ApiError::Parsing(err.into()))?;
 
                         if text.is_empty() {
                             return Ok(None);
                         }
 
                         let response: $resp_payload = serde_json::from_str(&text)
-                            .map_err(|err| ApiError::ParsingError(err.into()))?;
+                            .map_err(|err| ApiError::Parsing(err.into()))?;
                         let response = $resp { payload: response };
                         Ok(Some(response))
                     }
-                    Err(err) => Err(ApiError::DropBoxError(err.into()).into()),
+                    Err(err) => Err(ApiError::DropBox(err.into()).into()),
                 }
             }
 
@@ -244,23 +244,23 @@ macro_rules! implement_service {
                 let block = async {
                     let response = response
                         .await
-                        .map_err(|err| ApiError::RequestError(err.into()))?;
+                        .map_err(|err| ApiError::Request(err.into()))?;
 
                     let response = response
                         .error_for_status()
-                        .map_err(|err| ApiError::DropBoxError(err.into()))?;
+                        .map_err(|err| ApiError::DropBox(err.into()))?;
 
                     let text = response
                         .text()
                         .await
-                        .map_err(|err| ApiError::ParsingError(err.into()))?;
+                        .map_err(|err| ApiError::Parsing(err.into()))?;
 
                     if text.is_empty() {
                         return Ok(None);
                     }
 
-                    let response: $resp_payload = serde_json::from_str(&text)
-                        .map_err(|err| ApiError::ParsingError(err.into()))?;
+                    let response: $resp_payload =
+                        serde_json::from_str(&text).map_err(|err| ApiError::Parsing(err.into()))?;
                     let response = $resp { payload: response };
 
                     Result::<Option<$resp>>::Ok(Some(response))

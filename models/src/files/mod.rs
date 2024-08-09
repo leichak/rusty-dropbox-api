@@ -361,3 +361,53 @@ pub enum DeleteError {
     TooManyFiles,
     Other,
 }
+
+/// Struct representing the arguments to download a file.
+#[derive(Serialize, Deserialize, Debug)]
+struct DownloadArgs {
+    /// Path to the file to download, relative to the user's root folder.
+    path: String,
+    /// Optional field representing the unique identifier for the file revision.
+    rev: Option<String>,
+}
+
+/// Struct representing the result of downloading a file.
+#[derive(Serialize, Deserialize, Debug)]
+struct DownloadResult {
+    /// Metadata for the downloaded file.
+    metadata: FileMetadata,
+    /// Binary content of the downloaded file.
+    content: Vec<u8>,
+}
+
+/// Struct representing the arguments to download a folder as a zip file.
+#[derive(Serialize, Deserialize, Debug)]
+struct DownloadZipArgs {
+    /// Path to the folder to download, relative to the user's root folder.
+    path: String,
+}
+
+/// Struct representing the result of downloading a folder as a zip file.
+#[derive(Serialize, Deserialize, Debug)]
+struct DownloadZipResult {
+    /// The raw zip file data.
+    content: Vec<u8>,
+    /// Metadata for the downloaded folder.
+    metadata: Option<FolderMetadata>, // Folder metadata might be optional
+}
+
+/// Struct representing sharing information for a file.
+#[derive(Serialize, Deserialize, Debug)]
+struct SharingInfo {
+    shared_folder_id: Option<String>,
+    shared_folder_name: Option<String>,
+    permissions: Option<Permissions>,
+}
+
+/// Struct representing permissions related to the file.
+#[derive(Serialize, Deserialize, Debug)]
+struct Permissions {
+    can_edit: bool,
+    can_view: bool,
+    can_comment: bool,
+}
