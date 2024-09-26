@@ -276,7 +276,7 @@ macro_rules! implement_service {
 #[derive(Debug)]
 pub enum Endpoint {
     CheckAppPost,
-    CheckAppUser,
+    CheckUserPost,
     FileRequestsCountPost,
     FileRequestsCreatePost,
     FileRequestsDeleteAllClosedPost,
@@ -351,7 +351,6 @@ pub enum Endpoint {
     FilePropertiesTemplatesUpdateForUserPost,
     AuthTokenRevokePost,
     FileRequestsUpdatePost,
-    CheckUserPost,
     SharingAddFileMemberPost,
     SharingAddFolderMemberPost,
     SharingCheckJobStatusPost,
@@ -469,7 +468,7 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<S
             "https://api.dropboxapi.com/2/users/get_current_account"
         }
         Endpoint::UsersGetSpaceUsagePost => "https://api.dropboxapi.com/2/users/get_space_usage",
-        Endpoint::CheckAppUser => {
+        Endpoint::CheckUserPost => {
             "https://api.dropboxapi.com/2/check/app
 "
         }
@@ -979,7 +978,7 @@ pub fn get_endpoint_test_body_response(
 }"##,
             ),
         ),
-        Endpoint::CheckAppUser => (
+        Endpoint::CheckUserPost => (
             Some(
                 r##"{
     "query": "foo"
