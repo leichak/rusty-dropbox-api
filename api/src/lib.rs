@@ -92,10 +92,12 @@ macro_rules! implement_tests {
             let mut mock;
             {
                 let mut server = get_mut_or_init_async().await;
-                let url = get_endpoint_url($endpoint).2.unwrap();
-                println!("url {}", url);
 
-                mock = server.mock("POST", url.as_str()).with_status(200);
+                let url = get_endpoint_url($endpoint).2;
+
+                mock = server
+                    .mock("POST", &url.unwrap().as_str()[19..])
+                    .with_status(200);
 
                 let headers: Vec<Headers> = $headers;
 
@@ -138,9 +140,11 @@ macro_rules! implement_tests {
             let mut mock;
             {
                 let mut server = get_mut_or_init();
-                let url = get_endpoint_url($endpoint).2;
+                let url = get_endpoint_url($endpoint).1;
 
-                mock = server.mock("POST", url.unwrap().as_str()).with_status(200);
+                mock = server
+                    .mock("POST", &url.unwrap().as_str()[19..])
+                    .with_status(200);
 
                 let headers: Vec<Headers> = $headers;
 
@@ -182,7 +186,10 @@ macro_rules! implement_service {
     ($req:ty, $resp:ident, $resp_payload:ty, $endpoints:expr, $headers:expr) => {
         impl Service<$resp, BoxFuture<'_, Result<Option<$resp>>>> for $req {
             fn call_sync(&self) -> Result<Option<$resp>> {
-                let endpoint = get_endpoint_url($endpoints).0;
+                let mut endpoint = get_endpoint_url($endpoints).0;
+                if let Some(url) = get_endpoint_url($endpoints).1 {
+                    endpoint = url;
+                }
 
                 let headers: Vec<Headers> = $headers;
 
@@ -195,8 +202,6 @@ macro_rules! implement_service {
                 if let Some(payload) = self.payload() {
                     response = response.json(payload);
                 }
-
-                println!("{:#?}", response);
 
                 let response = response
                     .send()
@@ -223,7 +228,7 @@ macro_rules! implement_service {
 
             fn call(&self) -> Result<Pin<Box<dyn Future<Output = Result<Option<$resp>>> + Send>>> {
                 let mut endpoint = get_endpoint_url($endpoints).0;
-                if let Some(url) = get_endpoint_url($endpoints).1 {
+                if let Some(url) = get_endpoint_url($endpoints).2 {
                     endpoint = url;
                 }
 
@@ -715,8 +720,7 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<S
             "https://api.dropboxapi.com/2/sharing/update_folder_member"
         }
         Endpoint::SharingUpdateFolderPolicyPost => {
-            "https://api.dropboxapi.com/2/sharing/update_folder_policy
-"
+            "https://api.dropboxapi.com/2/sharing/update_folder_policy"
         }
     };
 
@@ -5531,16 +5535,20 @@ pub fn get_endpoint_test_body_response(
 /// For testing purpose, it will replace original end-point with mock server url
 fn test_url(url: &str) -> (String, Option<String>, Option<String>) {
     let idx = url.find("com").expect("should have com") + 3;
-    let url = &url[idx..];
-    let url_sync = format!(
+
+    let url_test_sync = format!(
         "http://{}:{}{}",
-        MOCK_SERVER_SYNC_URL, MOCK_SERVER_SYNC_PORT, url
+        MOCK_SERVER_SYNC_URL,
+        MOCK_SERVER_SYNC_PORT,
+        &url[idx..]
     );
-    let url_async = format!(
+    let url_test_async = format!(
         "http://{}:{}{}",
-        MOCK_SERVER_ASYNC_URL, MOCK_SERVER_ASYNC_PORT, url
+        MOCK_SERVER_ASYNC_URL,
+        MOCK_SERVER_ASYNC_PORT,
+        &url[idx..]
     );
-    (url_sync, Some(url_async), Some(url.to_string()))
+    (url.to_string(), Some(url_test_sync), Some(url_test_async))
 }
 
 /// Enum representing necessary headers for requests

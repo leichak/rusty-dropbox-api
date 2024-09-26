@@ -11,7 +11,11 @@ pub struct SetProfilePhotoArg {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum PhotoSourceArg {
-    Base64Data { base64_data: String },
+    Base64Data {
+        #[serde(rename = ".tag")]
+        tag: String,
+        base64_data: String,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
