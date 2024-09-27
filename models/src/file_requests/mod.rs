@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CountFileRequestsResult {
-    open_count: u32,
+    file_request_count: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
