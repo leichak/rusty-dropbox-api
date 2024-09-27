@@ -9,22 +9,22 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = SetProfilePhotoRequest<'a>;
-type Response = SetProfilePhotoResponse;
+type Request<'a> = DeleteFilesRequest<'a>;
+type Response = DeleteFilesResponse;
 type RequestPayload = DeleteFileRequestArgs;
 type ResponsePayload = DeleteFileRequestResult;
 
 /// Delete file
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-delete
 #[derive(Debug)]
-pub struct SetProfilePhotoRequest<'a> {
+pub struct DeleteFilesRequest<'a> {
     access_token: &'a str,
     payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
-pub struct SetProfilePhotoResponse {
+pub struct DeleteFilesResponse {
     payload: ResponsePayload,
 }
 
@@ -37,7 +37,7 @@ implement_service!(
     Response,
     ResponsePayload,
     Endpoint::FileRequestsDeletePost,
-    vec![Headers::TestAuthorization, Headers::ContentTypeAppJson]
+    vec![Headers::TestAuthorization]
 );
 
 #[cfg(test)]
@@ -57,7 +57,7 @@ mod tests {
 
     implement_tests!(
         Endpoint::FileRequestsDeletePost,
-        vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
+        vec![Headers::TestAuthorization],
         Request,
         RequestPayload
     );

@@ -9,22 +9,22 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = SetProfilePhotoRequest<'a>;
-type Response = SetProfilePhotoResponse;
+type Request<'a> = ListContinueRequest<'a>;
+type Response = ListContinueResponse;
 type RequestPayload = ListFileRequestsContinueArgs;
 type ResponsePayload = ListFileRequestsContinueResult;
 
 /// List continue files
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-list-continue
 #[derive(Debug)]
-pub struct SetProfilePhotoRequest<'a> {
+pub struct ListContinueRequest<'a> {
     access_token: &'a str,
     payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
-pub struct SetProfilePhotoResponse {
+pub struct ListContinueResponse {
     payload: ResponsePayload,
 }
 

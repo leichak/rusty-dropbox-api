@@ -28,18 +28,7 @@ pub struct CreateFileRequestArgs {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CreateFileRequestResult {
-    id: String,
-    url: String,
-    title: String,
-    created: DateTime<Utc>,
-    is_open: bool,
-    file_count: i64,
-    destination: String,
-    deadline: Option<FileRequestDeadline>,
-    description: Option<String>,
-    video_project_id: Option<String>,
-}
+pub struct CreateFileRequestResult(FileRequest);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Deadline {
@@ -83,15 +72,17 @@ enum GracePeriodUntagged {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteFileRequestArgs {
-    id: String,
+    ids: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DeleteFileRequestResult {}
+pub struct DeleteFileRequestResult {
+    file_requests: Vec<FileRequest>,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteAllClosedFileRequestsResult {
-    file_requests: Vec<DeletedFileRequest>,
+    file_requests: Vec<FileRequest>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -111,33 +102,35 @@ pub struct GetFileRequestArgs {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct GetFileRequestResult {
-    id: String,
-    url: String,
-    title: String,
-    destination: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    deadline: Option<FileRequestDeadline>,
-    open: bool,
-}
+pub struct GetFileRequestResult(FileRequest);
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ListFileRequestsArgs {}
+pub struct ListFileRequestsArgs {
+    limit: u64,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFileRequestsResult {
     file_requests: Vec<FileRequest>,
+    cursor: String,
+    has_more: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FileRequest {
     id: String,
+    url: String,
     title: String,
+    created: DateTime<Utc>,
+    is_open: bool,
+    file_count: i64,
     destination: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     deadline: Option<FileRequestDeadline>,
-    url: String,
-    open: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    video_project_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

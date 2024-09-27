@@ -9,22 +9,22 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = SetProfilePhotoRequest<'a>;
-type Response = SetProfilePhotoResponse;
+type Request<'a> =  DeleteAllClosedFilesRequest<'a>;
+type Response =  DeleteAllClosedFilesResponse;
 type RequestPayload = ();
 type ResponsePayload = DeleteAllClosedFileRequestsResult;
 
 /// Delete all closed
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-delete_all_closed
 #[derive(Debug)]
-pub struct SetProfilePhotoRequest<'a> {
+pub struct  DeleteAllClosedFilesRequest<'a> {
     access_token: &'a str,
     payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
-pub struct SetProfilePhotoResponse {
+pub struct  DeleteAllClosedFilesResponse {
     payload: ResponsePayload,
 }
 

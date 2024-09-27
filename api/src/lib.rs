@@ -137,6 +137,9 @@ macro_rules! implement_tests {
         pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
             let (body, response) = get_endpoint_test_body_response($endpoint);
 
+            // let v: serde_json::Value = serde_json::from_str(&body.unwrap()).unwrap();
+            // println!("{}", v);
+
             let mut mock;
             {
                 let mut server = get_mut_or_init();
@@ -159,6 +162,8 @@ macro_rules! implement_tests {
                 }
                 mock = mock.create();
             }
+
+            println!("MOCK {:?}", mock);
 
             let payload: Option<$payload>;
             if let Some(body) = body {
@@ -201,7 +206,7 @@ macro_rules! implement_service {
 
                 if let Some(payload) = self.payload() {
                     response = response.json(payload);
-                    println!("{}", serde_json::to_string_pretty(&payload).unwrap());
+                    println!("from struct {}", serde_json::to_string(&payload).unwrap());
                 }
 
                 let response = response
@@ -474,82 +479,43 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<S
             "https://api.dropboxapi.com/2/users/get_current_account"
         }
         Endpoint::UsersGetSpaceUsagePost => "https://api.dropboxapi.com/2/users/get_space_usage",
-        Endpoint::CheckUserPost => {
-            "https://api.dropboxapi.com/2/check/app
-"
-        }
-        Endpoint::FileRequestsDeletePost => {
-            "https://api.dropboxapi.com/2/file_requests/delete
-"
-        }
-        Endpoint::FilesCopyPost => {
-            "https://api.dropboxapi.com/2/files/copy_v2
-"
-        }
-        Endpoint::FilesCopyBatchPost => {
-            "https://api.dropboxapi.com/2/files/copy_batch_v2
-"
-        }
+        Endpoint::CheckUserPost => "https://api.dropboxapi.com/2/check/app",
+        Endpoint::FileRequestsDeletePost => "https://api.dropboxapi.com/2/file_requests/delete",
+        Endpoint::FilesCopyPost => "https://api.dropboxapi.com/2/files/copy_v2",
+        Endpoint::FilesCopyBatchPost => "https://api.dropboxapi.com/2/files/copy_batch_v2",
         Endpoint::FilesCopyBatchCheckPost => {
-            "https://api.dropboxapi.com/2/files/copy_batch/check_v2
-"
+            "https://api.dropboxapi.com/2/files/copy_batch/check_v2"
         }
         Endpoint::FilesCopyReferenceGetPost => {
-            "https://api.dropboxapi.com/2/files/copy_reference/get
-"
+            "https://api.dropboxapi.com/2/files/copy_reference/get"
         }
         Endpoint::FilesCopyReferenceSavePost => {
-            "https://api.dropboxapi.com/2/files/copy_reference/save
-"
+            "https://api.dropboxapi.com/2/files/copy_reference/save"
         }
-        Endpoint::FilesCreateFolderPost => {
-            "https://api.dropboxapi.com/2/files/create_folder_v2
-"
-        }
+        Endpoint::FilesCreateFolderPost => "https://api.dropboxapi.com/2/files/create_folder_v2",
         Endpoint::FilesCreateFolderBatchPost => {
-            "https://api.dropboxapi.com/2/files/create_folder_batch
-"
+            "https://api.dropboxapi.com/2/files/create_folder_batch"
         }
         Endpoint::FilesCreateFolderBatchCheckPost => {
-            "https://api.dropboxapi.com/2/files/create_folder_batch/check
-"
+            "https://api.dropboxapi.com/2/files/create_folder_batch/check"
         }
-        Endpoint::FilesDeleteBatchPost => {
-            "https://api.dropboxapi.com/2/files/delete_batch
-"
-        }
+        Endpoint::FilesDeleteBatchPost => "https://api.dropboxapi.com/2/files/delete_batch",
         Endpoint::FilesDeleteBatchCheckPost => {
-            "https://api.dropboxapi.com/2/files/delete_batch/check
-"
+            "https://api.dropboxapi.com/2/files/delete_batch/check"
         }
         Endpoint::FilesDownloadPost => "https://content.dropboxapi.com/2/files/download",
-        Endpoint::FilesDownloadZipPost => {
-            "https://content.dropboxapi.com/2/files/download_zip
-"
-        }
-        Endpoint::FilesExportPost => {
-            "https://content.dropboxapi.com/2/files/export
-"
-        }
+        Endpoint::FilesDownloadZipPost => "https://content.dropboxapi.com/2/files/download_zip",
+        Endpoint::FilesExportPost => "https://content.dropboxapi.com/2/files/export",
         Endpoint::FilesGetFileLockBatchPost => {
-            "https://api.dropboxapi.com/2/files/get_file_lock_batch
-"
+            "https://api.dropboxapi.com/2/files/get_file_lock_batch"
         }
-        Endpoint::FilesGetMetadataPost => {
-            "https://api.dropboxapi.com/2/files/get_metadata
-"
-        }
-        Endpoint::FilesGetPreviewPost => {
-            "https://content.dropboxapi.com/2/files/get_preview
-"
-        }
+        Endpoint::FilesGetMetadataPost => "https://api.dropboxapi.com/2/files/get_metadata",
+        Endpoint::FilesGetPreviewPost => "https://content.dropboxapi.com/2/files/get_preview",
         Endpoint::FilesGetTemporaryLinkPost => {
-            "https://api.dropboxapi.com/2/files/get_temporary_link
-"
+            "https://api.dropboxapi.com/2/files/get_temporary_link"
         }
         Endpoint::FilesGetTemporaryUploadLinkPost => {
-            "https://api.dropboxapi.com/2/files/get_temporary_upload_link
-"
+            "https://api.dropboxapi.com/2/files/get_temporary_upload_link"
         }
         Endpoint::FilesGetThumbnailPost => {
             "https://content.dropboxapi.com/2/files/get_thumbnail_v2"
@@ -562,8 +528,7 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<S
             "https://api.dropboxapi.com/2/files/list_folder/continue"
         }
         Endpoint::FilesListFolderGetLatestCursorPost => {
-            "https://api.dropboxapi.com/2/files/list_folder/get_latest_cursor
-"
+            "https://api.dropboxapi.com/2/files/list_folder/get_latest_cursor"
         }
         Endpoint::FilesListFolderLongpollPost => {
             "https://notify.dropboxapi.com/2/files/list_folder/longpoll"
@@ -790,8 +755,7 @@ pub fn get_endpoint_test_body_response(
             Some(
                 r##"{
     "cursor": "ZtkX9_EHj3x7PMkVuFIhwKYXEpwpLwyxp9vMKomUhllil9q7eWiAu"
-}
-"##,
+}"##,
             ),
             Some(
                 r##"{
@@ -987,8 +951,7 @@ pub fn get_endpoint_test_body_response(
             Some(
                 r##"{
     "query": "foo"
-}
-"##,
+}"##,
             ),
             Some(
                 r##"{
@@ -1347,8 +1310,7 @@ pub fn get_endpoint_test_body_response(
         },
         "size": 7212
     }
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::FilesCopyBatchPost => (
@@ -1406,16 +1368,14 @@ pub fn get_endpoint_test_body_response(
             }
         }
     ]
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::FilesCopyBatchCheckPost => (
             Some(
                 r##"{
     "async_job_id": "34g93hh34h04y384084"
-}
-"##,
+}"##,
             ),
             Some(
                 r##"{
@@ -1955,8 +1915,7 @@ pub fn get_endpoint_test_body_response(
         },
         "size": 7212
     }
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::FilesGetFileLockBatchPost => (
@@ -3205,8 +3164,7 @@ pub fn get_endpoint_test_body_response(
         "offset": 1073741824,
         "session_id": "8dd9d57374911153"
     }
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::FilesUploadSessionFinishBatchPost => (
@@ -3361,8 +3319,7 @@ pub fn get_endpoint_test_body_response(
             Some(
                 r##"{
     "result": "foo"
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::SharingAddFileMemberPost => (
@@ -3424,8 +3381,7 @@ pub fn get_endpoint_test_body_response(
             }
         }
     ]
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::SharingAddFolderMemberPost => (
@@ -3483,8 +3439,7 @@ pub fn get_endpoint_test_body_response(
             Some(
                 r##"{
     "async_job_id": "34g93hh34h04y384084"
-}
-"##,
+}"##,
             ),
             Some(
                 r##"{
@@ -3795,8 +3750,7 @@ pub fn get_endpoint_test_body_response(
       }
     }
   ]
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::SharingGetFolderMetadataPost => (
@@ -4189,8 +4143,7 @@ pub fn get_endpoint_test_body_response(
       }
     }
   ]
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::SharingListFileMembersContinuePost => (
@@ -4994,8 +4947,7 @@ pub fn get_endpoint_test_body_response(
       }
     ]
   }
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::SharingRemoveFolderMemberPost => (
@@ -5169,8 +5121,7 @@ pub fn get_endpoint_test_body_response(
                 r##"{
     "shared_folder_id": "84528192421",
     "to_dropbox_id": "dbid:AAEufNrMPSPe0dMQijRP0N_aZtBJRm26W4Q"
-}
-"##,
+}"##,
             ),
             None,
         ),
@@ -5186,8 +5137,7 @@ pub fn get_endpoint_test_body_response(
             Some(
                 r##"{
     "file": "id:3kmLmQFnf1AAAAAAAAAAAw"
-}
-"##,
+}"##,
             ),
             None,
         ),
@@ -5231,8 +5181,7 @@ pub fn get_endpoint_test_body_response(
       "access_level": "editor"
     }
   ]
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::SharingUpdateFolderMemberPost => (
@@ -5447,8 +5396,7 @@ pub fn get_endpoint_test_body_response(
       "team_member_id": "teamabcdef1234567890"
     }
   ]
-}
-"##,
+}"##,
             ),
         ),
         Endpoint::UsersGetCurrentAccountPost => (
