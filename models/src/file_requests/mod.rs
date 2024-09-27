@@ -6,6 +6,7 @@ mod get;
 mod list;
 mod list_continue;
 
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -17,8 +18,13 @@ pub struct CountFileRequestsResult {
 pub struct CreateFileRequestArgs {
     title: String,
     destination: String,
-    deadline: Option<Deadline>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    deadline: Option<FileRequestDeadline>,
     open: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    video_project_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -26,22 +32,53 @@ pub struct CreateFileRequestResult {
     id: String,
     url: String,
     title: String,
+    created: DateTime<Utc>,
+    is_open: bool,
+    file_count: i64,
     destination: String,
-    deadline: Option<DeadlineResult>,
-    open: bool,
+    deadline: Option<FileRequestDeadline>,
+    description: Option<String>,
+    video_project_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Deadline {
-    deadline: String,
+    deadline: DateTime<Utc>,
     allow_late_uploads: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DeadlineResult {
-    deadline: String,
-    allow_late_uploads: Option<bool>,
-    is_expired: bool,
+pub struct FileRequestDeadline {
+    deadline: DateTime<Utc>,
+    allow_late_uploads: Option<GracePeriod>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+enum GracePeriod {
+    GracePeriodTagged(GracePeriodTagged),
+    GracePeriodUntagged(GracePeriodUntagged),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = ".tag")]
+enum GracePeriodTagged {
+    OneDay,
+    TwoDays,
+    SevenDays,
+    ThirtyDays,
+    Always,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "snake_case")]
+enum GracePeriodUntagged {
+    OneDay,
+    TwoDays,
+    SevenDays,
+    ThirtyDays,
+    Always,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -62,7 +99,8 @@ pub struct DeletedFileRequest {
     id: String,
     title: String,
     destination: String,
-    deadline: Option<DeadlineResult>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    deadline: Option<FileRequestDeadline>,
     url: String,
     open: bool,
 }
@@ -78,7 +116,8 @@ pub struct GetFileRequestResult {
     url: String,
     title: String,
     destination: String,
-    deadline: Option<DeadlineResult>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    deadline: Option<FileRequestDeadline>,
     open: bool,
 }
 
@@ -95,7 +134,8 @@ pub struct FileRequest {
     id: String,
     title: String,
     destination: String,
-    deadline: Option<DeadlineResult>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    deadline: Option<FileRequestDeadline>,
     url: String,
     open: bool,
 }
@@ -125,6 +165,6 @@ pub struct UpdateFileRequestResult {
     url: String,
     title: String,
     destination: String,
-    deadline: Option<DeadlineResult>,
+    deadline: Option<FileRequestDeadline>,
     open: bool,
 }

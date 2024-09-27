@@ -201,6 +201,7 @@ macro_rules! implement_service {
 
                 if let Some(payload) = self.payload() {
                     response = response.json(payload);
+                    println!("{}", serde_json::to_string_pretty(&payload).unwrap());
                 }
 
                 let response = response
