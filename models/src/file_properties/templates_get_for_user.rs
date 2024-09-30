@@ -1,4 +1,4 @@
-use super::{PathWithPropertyGroups, PropertyTemplateWithTaggedType, TemplateId};
+use super::{PropertyTemplateWithTaggedType, TemplateId};
 
 use anyhow::Result;
 use api::{
@@ -24,6 +24,7 @@ pub struct TemplatesGetForUserRequest<'a> {
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 pub struct TemplatesGetForUserResponse {
     payload: ResponsePayload,
 }

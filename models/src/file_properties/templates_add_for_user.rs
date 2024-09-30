@@ -24,6 +24,7 @@ pub struct TemplatesAddForUserRequest<'a> {
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 pub struct TemplatesAddForUserResponse {
     payload: ResponsePayload,
 }

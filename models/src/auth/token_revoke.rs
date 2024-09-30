@@ -22,6 +22,7 @@ pub struct TokenRevokeRequest<'a> {
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 pub struct TokenRevokeResponse {
     payload: ResponsePayload,
 }

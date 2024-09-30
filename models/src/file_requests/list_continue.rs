@@ -24,6 +24,7 @@ pub struct ListContinueRequest<'a> {
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 pub struct ListContinueResponse {
     payload: ResponsePayload,
 }

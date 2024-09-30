@@ -24,6 +24,7 @@ pub struct DeleteFilesRequest<'a> {
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 pub struct DeleteFilesResponse {
     payload: ResponsePayload,
 }

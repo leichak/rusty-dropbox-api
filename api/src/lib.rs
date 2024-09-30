@@ -14,7 +14,7 @@ lazy_static! {
 
 /// Auth test token
 #[cfg(feature = "test-utils")]
-pub static TEST_TOKEN: &'static str = "123456";
+pub static TEST_TOKEN: &str = "123456";
 
 /// Test servers urls and ports
 const MOCK_SERVER_SYNC_URL: &str = "0.0.0.0";
@@ -408,6 +408,7 @@ pub enum Endpoint {
     UsersGetSpaceUsagePost,
 }
 
+#[allow(unused_variables)]
 pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<String>) {
     let url = match endpoint {
         Endpoint::CheckAppPost => "https://api.dropboxapi.com/2/check/app",
@@ -479,7 +480,6 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<S
             "https://api.dropboxapi.com/2/users/get_current_account"
         }
         Endpoint::UsersGetSpaceUsagePost => "https://api.dropboxapi.com/2/users/get_space_usage",
-        Endpoint::CheckUserPost => "https://api.dropboxapi.com/2/check/app",
         Endpoint::FileRequestsDeletePost => "https://api.dropboxapi.com/2/file_requests/delete",
         Endpoint::FilesCopyPost => "https://api.dropboxapi.com/2/files/copy_v2",
         Endpoint::FilesCopyBatchPost => "https://api.dropboxapi.com/2/files/copy_batch_v2",
@@ -555,12 +555,10 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<S
             "https://api.dropboxapi.com/2/files/search/continue_v2"
         }
         Endpoint::FilesTagsAddPost => "https://api.dropboxapi.com/2/files/tags/add",
-        Endpoint::FilesTagsGetPost => "https://api.dropboxapi.com/2/files/tags/get",
         Endpoint::FilesTagsRemovePost => "https://api.dropboxapi.com/2/files/tags/remove",
         Endpoint::FilesUnlockFileBatchPost => {
             "https://api.dropboxapi.com/2/files/unlock_file_batch"
         }
-        Endpoint::FilesUploadPost => "https://content.dropboxapi.com/2/files/upload",
         Endpoint::FilesUploadSessionAppendPost => {
             "https://content.dropboxapi.com/2/files/upload_session/append_v2"
         }
@@ -3309,19 +3307,6 @@ pub fn get_endpoint_test_body_response(
             ),
         ),
         Endpoint::AuthTokenRevokePost => (None, None),
-        Endpoint::CheckUserPost => (
-            Some(
-                r##"S
-{
-    "query": "foo"
-}"##,
-            ),
-            Some(
-                r##"{
-    "result": "foo"
-}"##,
-            ),
-        ),
         Endpoint::SharingAddFileMemberPost => (
             Some(
                 r##"{
