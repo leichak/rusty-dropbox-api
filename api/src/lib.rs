@@ -139,9 +139,6 @@ macro_rules! implement_tests {
         pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
             let (body, response) = get_endpoint_test_body_response($endpoint);
 
-            // let v: serde_json::Value = serde_json::from_str(&body.unwrap()).unwrap();
-            // println!("{}", v);
-
             let mut mock;
             {
                 let mut server = get_mut_or_init();
@@ -208,7 +205,6 @@ macro_rules! implement_service {
 
                 if let Some(payload) = self.payload() {
                     response = response.json(payload);
-                    println!("from struct {}", serde_json::to_string(&payload).unwrap());
                 }
 
                 let response = response
