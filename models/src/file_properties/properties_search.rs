@@ -2,8 +2,8 @@ use super::{MatchesWithPropertyGroups, QueriesWithTemplateFilter};
 
 use anyhow::Result;
 use api::{
-    anyhow, get_endpoint_url, implement_service, implement_utils, ApiError, AsyncClient, BoxFuture,
-    Endpoint, Headers, Service, SyncClient, Utils,
+    anyhow, consts::get_endpoint_url, consts::Endpoint, implement_service, implement_utils,
+    ApiError, AsyncClient, BoxFuture, Headers, Service, SyncClient, Utils,
 };
 use serde::Deserialize;
 use std::{future::Future, pin::Pin};
@@ -49,10 +49,12 @@ mod tests {
 
     use anyhow::Result;
     use api::{
-        get_endpoint_test_body_response, get_endpoint_url, get_mut_or_init, get_mut_or_init_async,
-        implement_tests,
+        consts::get_endpoint_test_body_response,
+        consts::get_endpoint_url,
+        consts::Endpoint,
+        get_mut_or_init, get_mut_or_init_async, implement_tests,
         mockito::{self},
-        Endpoint, Headers, Service,
+        Headers, Service,
     };
     use tokio;
 
