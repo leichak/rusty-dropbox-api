@@ -8,7 +8,7 @@ impl Headers {
     pub fn get_str(&self) -> (&str, &str) {
         match self {
             Headers::ContentTypeAppJson => ("Content-type", "application/json"),
-            Headers::TestAuthorization => ("Authorization", "Bearer 123456"),
+            Headers::TestAuthorization => ("Authorization", "Bearer user"),
         }
     }
 }
