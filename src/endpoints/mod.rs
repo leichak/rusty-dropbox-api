@@ -6,6 +6,7 @@ use super::tests_utils::{
 /// Enum representing api available endpoints
 /// It is passed to fhe function
 #[derive(Debug)]
+#[allow(dead_code)]
 pub enum Endpoint {
     CheckAppPost,
     CheckUserPost,
