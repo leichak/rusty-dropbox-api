@@ -21,8 +21,8 @@ type ResponsePayload = ();
 /// https://api.dropboxapi.com/2/auth/token/revoke
 #[derive(Debug)]
 pub struct TokenRevokeRequest<'a> {
-    access_token: &'a str,
-    payload: Option<RequestPayload>,
+    pub access_token: &'a str,
+    pub payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties

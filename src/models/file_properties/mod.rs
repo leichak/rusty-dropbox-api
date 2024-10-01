@@ -1,14 +1,14 @@
-mod properties_add;
-mod properties_overwrite;
-mod properties_remove;
-mod properties_search;
-mod properties_search_continue;
-mod properties_update;
-mod templates_add_for_user;
-mod templates_get_for_user;
-mod templates_list_for_user;
-mod templates_remove_for_user;
-mod templates_update_for_user;
+pub mod properties_add;
+pub mod properties_overwrite;
+pub mod properties_remove;
+pub mod properties_search;
+pub mod properties_search_continue;
+pub mod properties_update;
+pub mod templates_add_for_user;
+pub mod templates_get_for_user;
+pub mod templates_list_for_user;
+pub mod templates_remove_for_user;
+pub mod templates_update_for_user;
 
 use serde::{Deserialize, Serialize};
 

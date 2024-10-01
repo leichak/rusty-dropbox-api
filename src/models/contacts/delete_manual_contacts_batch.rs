@@ -24,7 +24,7 @@ type ResponsePayload = DeleteManualContactsBatchResult;
 #[allow(dead_code)]
 pub struct DeleteManualContactsBatchRequest<'a> {
     access_token: &'a str,
-    payload: Option<RequestPayload>,
+    pub payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties

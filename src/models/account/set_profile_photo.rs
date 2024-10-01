@@ -24,14 +24,14 @@ type ResponsePayload = SetProfilePhotoResult;
 #[derive(Debug)]
 pub struct SetProfilePhotoRequest<'a> {
     access_token: &'a str,
-    payload: Option<RequestPayload>,
+    pub payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct SetProfilePhotoResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

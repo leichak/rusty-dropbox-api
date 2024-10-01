@@ -13,7 +13,7 @@ static TEST_AUTH_TOKEN: &'static str = "user";
 use serde::{Deserialize, Serialize};
 #[allow(unused)]
 use std::sync::{Mutex, MutexGuard, OnceLock};
-pub use {
+use {
     anyhow, anyhow::Result, async_trait, futures::future::BoxFuture, lazy_static::lazy_static,
     mockito, mockito::Server, reqwest, serde_json, tokio,
 };

@@ -23,7 +23,7 @@ type ResponsePayload = DeleteAllClosedFileRequestsResult;
 #[derive(Debug)]
 pub struct DeleteAllClosedFilesRequest<'a> {
     access_token: &'a str,
-    payload: Option<RequestPayload>,
+    pub payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties

@@ -23,7 +23,7 @@ type ResponsePayload = ();
 #[derive(Debug)]
 pub struct PropertiesUpdateRequest<'a> {
     access_token: &'a str,
-    payload: Option<RequestPayload>,
+    pub payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties

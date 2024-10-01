@@ -23,7 +23,7 @@ type ResponsePayload = DeleteManualContactsResult;
 #[derive(Debug)]
 pub struct DeleteManualContactsRequest<'a> {
     access_token: &'a str,
-    payload: Option<RequestPayload>,
+    pub payload: Option<RequestPayload>,
 }
 
 /// Response struct for adding properties
