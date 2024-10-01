@@ -20,6 +20,6 @@ use {
 
 // Clients
 lazy_static! {
-    pub static ref SyncClient: reqwest::blocking::Client = reqwest::blocking::Client::new();
-    pub static ref AsyncClient: reqwest::Client = reqwest::Client::new();
+    static ref SyncClient: reqwest::blocking::Client = reqwest::blocking::Client::new();
+    static ref AsyncClient: reqwest::Client = reqwest::Client::new();
 }
