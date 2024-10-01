@@ -622,7 +622,17 @@ pub fn get_endpoint_test_body_response(
 }"##,
             ),
         ),
-        Endpoint::ContactsDeleteManualContactsBatchPost => (None, None),
+        Endpoint::ContactsDeleteManualContactsBatchPost => (
+            Some(
+                r##"{
+    "email_addresses": [
+        "contactemailaddress1@domain.com",
+        "contactemailaddress2@domain.com"
+    ]
+}"##,
+            ),
+            None,
+        ),
         Endpoint::ContactsDeleteManualContactsPost => (None, None),
         Endpoint::FilesCopyPost => (
             Some(

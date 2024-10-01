@@ -1,5 +1,4 @@
-use super::{EchoArg, EchoResult};
-
+use super::{DeleteManualContactsArg, DeleteManualContactsResult};
 
 use crate::{
     anyhow::Result,
@@ -16,8 +15,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = DeleteManualContactsRequest<'a>;
 type Response = DeleteManualContactsResponse;
-type RequestPayload = EchoArg;
-type ResponsePayload = EchoResult;
+type RequestPayload = DeleteManualContactsArg;
+type ResponsePayload = DeleteManualContactsResult;
 
 /// Add properties struct for setting up a profile picture
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
@@ -50,9 +49,8 @@ mod tests {
     use crate::TEST_TOKEN;
 
     use super::{Request, RequestPayload};
-    
 
-   use crate::{
+    use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
         tests_utils::{get_endpoint_test_body_response, get_mut_or_init, get_mut_or_init_async},

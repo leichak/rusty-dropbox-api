@@ -1,4 +1,4 @@
-mod set_profile_photo;
+pub mod set_profile_photo;
 
 use serde::{Deserialize, Serialize};
 

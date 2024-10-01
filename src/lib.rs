@@ -1,3 +1,4 @@
+pub mod api;
 mod endpoints;
 mod errors;
 mod macros;

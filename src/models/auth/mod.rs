@@ -1,1 +1,1 @@
-mod token_revoke;
+pub mod token_revoke;

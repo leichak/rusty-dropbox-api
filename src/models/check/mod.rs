@@ -1,5 +1,5 @@
-mod app;
-mod user;
+pub mod app;
+pub mod user;
 
 use serde::{Deserialize, Serialize};
 

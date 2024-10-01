@@ -1,5 +1,6 @@
-mod account;
-mod auth;
-mod check;
-mod file_properties;
-mod file_requests;
+pub mod account;
+pub mod auth;
+pub mod check;
+pub mod contacts;
+pub mod file_properties;
+pub mod file_requests;
