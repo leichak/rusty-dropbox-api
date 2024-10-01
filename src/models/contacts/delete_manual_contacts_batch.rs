@@ -21,6 +21,7 @@ type ResponsePayload = DeleteManualContactsBatchResult;
 /// Add properties struct for setting up a profile picture
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct DeleteManualContactsBatchRequest<'a> {
     access_token: &'a str,
     payload: Option<RequestPayload>,
@@ -28,6 +29,7 @@ pub struct DeleteManualContactsBatchRequest<'a> {
 
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 pub struct DeleteManualContactsBatchResponse {
     payload: ResponsePayload,
 }
@@ -46,7 +48,7 @@ implement_service!(
 
 #[cfg(test)]
 mod tests {
-    use crate::TEST_TOKEN;
+    use crate::TEST_AUTH_TOKEN;
 
     use super::{Request, RequestPayload};
 

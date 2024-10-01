@@ -1,4 +1,4 @@
-use super::{MatchesWithPropertyGroups, QueriesWithTemplateFilter};
+use super::{EchoArg, EchoResult};
 
 use crate::{
     anyhow::Result,
@@ -9,19 +9,20 @@ use crate::{
     traits::{Service, Utils},
     AsyncClient, BoxFuture, SyncClient,
 };
+
 use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = PropertiesSearchRequest<'a>;
-type Response = PropertiesSearchResponse;
-type RequestPayload = QueriesWithTemplateFilter;
-type ResponsePayload = MatchesWithPropertyGroups;
+type Request<'a> = CheckAppRequest<'a>;
+type Response = CheckAppResponse;
+type RequestPayload = EchoArg;
+type ResponsePayload = EchoResult;
 
-/// Add properties struct for file request
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-search
+/// Add properties struct for setting up a profile picture
+/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
 #[derive(Debug)]
-pub struct PropertiesSearchRequest<'a> {
+pub struct CheckAppRequest<'a> {
     access_token: &'a str,
     payload: Option<RequestPayload>,
 }
@@ -29,7 +30,7 @@ pub struct PropertiesSearchRequest<'a> {
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-pub struct PropertiesSearchResponse {
+pub struct CheckAppResponse {
     payload: ResponsePayload,
 }
 
@@ -41,7 +42,7 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilePropertiesPropertiesSearchPost,
+    Endpoint::CheckAppPost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -60,7 +61,7 @@ mod tests {
     use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesPropertiesSearchPost,
+        Endpoint::CheckAppPost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
         Request,
         RequestPayload

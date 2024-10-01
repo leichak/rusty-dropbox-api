@@ -1,4 +1,5 @@
-use super::{MatchesWithPropertyGroups, QueriesWithTemplateFilter};
+use super::{PropertyTemplateWithTaggedType, TemplateId};
+
 
 use crate::{
     anyhow::Result,
@@ -13,15 +14,15 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = PropertiesSearchRequest<'a>;
-type Response = PropertiesSearchResponse;
-type RequestPayload = QueriesWithTemplateFilter;
-type ResponsePayload = MatchesWithPropertyGroups;
+type Request<'a> = TemplatesGetForUserRequest<'a>;
+type Response = TemplatesGetForUserResponse;
+type RequestPayload = TemplateId;
+type ResponsePayload = PropertyTemplateWithTaggedType;
 
 /// Add properties struct for file request
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-search
+/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-templates-get_for_user
 #[derive(Debug)]
-pub struct PropertiesSearchRequest<'a> {
+pub struct TemplatesGetForUserRequest<'a> {
     access_token: &'a str,
     payload: Option<RequestPayload>,
 }
@@ -29,7 +30,7 @@ pub struct PropertiesSearchRequest<'a> {
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-pub struct PropertiesSearchResponse {
+pub struct TemplatesGetForUserResponse {
     payload: ResponsePayload,
 }
 
@@ -41,7 +42,7 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilePropertiesPropertiesSearchPost,
+    Endpoint::FilePropertiesTemplatesGetForUserPost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -51,7 +52,8 @@ mod tests {
 
     use super::{Request, RequestPayload};
 
-    use crate::{
+    
+   use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
         tests_utils::{get_endpoint_test_body_response, get_mut_or_init, get_mut_or_init_async},
@@ -60,7 +62,7 @@ mod tests {
     use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesPropertiesSearchPost,
+        Endpoint::FilePropertiesTemplatesGetForUserPost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
         Request,
         RequestPayload

@@ -48,7 +48,7 @@ implement_service!(
 
 #[cfg(test)]
 mod tests {
-    use crate::TEST_TOKEN;
+    use crate::TEST_AUTH_TOKEN;
 
     use super::{Request, RequestPayload};
 

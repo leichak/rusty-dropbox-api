@@ -1,4 +1,5 @@
-use super::{MatchesWithPropertyGroups, QueriesWithTemplateFilter};
+use super::DeleteAllClosedFileRequestsResult;
+
 
 use crate::{
     anyhow::Result,
@@ -13,15 +14,15 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = PropertiesSearchRequest<'a>;
-type Response = PropertiesSearchResponse;
-type RequestPayload = QueriesWithTemplateFilter;
-type ResponsePayload = MatchesWithPropertyGroups;
+type Request<'a> = DeleteAllClosedFilesRequest<'a>;
+type Response = DeleteAllClosedFilesResponse;
+type RequestPayload = ();
+type ResponsePayload = DeleteAllClosedFileRequestsResult;
 
-/// Add properties struct for file request
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-search
+/// Delete all closed
+/// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-delete_all_closed
 #[derive(Debug)]
-pub struct PropertiesSearchRequest<'a> {
+pub struct DeleteAllClosedFilesRequest<'a> {
     access_token: &'a str,
     payload: Option<RequestPayload>,
 }
@@ -29,7 +30,7 @@ pub struct PropertiesSearchRequest<'a> {
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-pub struct PropertiesSearchResponse {
+pub struct DeleteAllClosedFilesResponse {
     payload: ResponsePayload,
 }
 
@@ -41,8 +42,8 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilePropertiesPropertiesSearchPost,
-    vec![Headers::ContentTypeAppJson]
+    Endpoint::FileRequestsDeleteAllClosedPost,
+    vec![Headers::TestAuthorization]
 );
 
 #[cfg(test)]
@@ -50,18 +51,19 @@ mod tests {
     use crate::TEST_AUTH_TOKEN;
 
     use super::{Request, RequestPayload};
+    
+    use tokio;
 
-    use crate::{
+   use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
         tests_utils::{get_endpoint_test_body_response, get_mut_or_init, get_mut_or_init_async},
         traits::Service,
     };
-    use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesPropertiesSearchPost,
-        vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
+        Endpoint::FileRequestsDeleteAllClosedPost,
+        vec![Headers::TestAuthorization],
         Request,
         RequestPayload
     );

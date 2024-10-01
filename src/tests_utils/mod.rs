@@ -7,7 +7,7 @@ use {
 
 /// Auth test token
 #[cfg(feature = "test-utils")]
-pub static TEST_TOKEN: &str = "123456";
+pub static TEST_AUTH_TOKEN: &str = "123456";
 
 /// Test servers urls and ports
 #[allow(unused)]

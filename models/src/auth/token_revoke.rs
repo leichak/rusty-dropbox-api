@@ -1,4 +1,3 @@
-use super::{MatchesWithPropertyGroups, QueriesWithTemplateFilter};
 
 use crate::{
     anyhow::Result,
@@ -13,15 +12,15 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = PropertiesSearchRequest<'a>;
-type Response = PropertiesSearchResponse;
-type RequestPayload = QueriesWithTemplateFilter;
-type ResponsePayload = MatchesWithPropertyGroups;
+type Request<'a> = TokenRevokeRequest<'a>;
+type Response = TokenRevokeResponse;
+type RequestPayload = ();
+type ResponsePayload = ();
 
-/// Add properties struct for file request
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-search
+/// Add properties struct for token revoke
+/// https://api.dropboxapi.com/2/auth/token/revoke
 #[derive(Debug)]
-pub struct PropertiesSearchRequest<'a> {
+pub struct TokenRevokeRequest<'a> {
     access_token: &'a str,
     payload: Option<RequestPayload>,
 }
@@ -29,7 +28,7 @@ pub struct PropertiesSearchRequest<'a> {
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-pub struct PropertiesSearchResponse {
+pub struct TokenRevokeResponse {
     payload: ResponsePayload,
 }
 
@@ -41,7 +40,7 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilePropertiesPropertiesSearchPost,
+    Endpoint::AuthTokenRevokePost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -50,17 +49,18 @@ mod tests {
     use crate::TEST_AUTH_TOKEN;
 
     use super::{Request, RequestPayload};
+    
+    use tokio;
 
-    use crate::{
+   use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
         tests_utils::{get_endpoint_test_body_response, get_mut_or_init, get_mut_or_init_async},
         traits::Service,
     };
-    use tokio;
 
     implement_tests!(
-        Endpoint::FilePropertiesPropertiesSearchPost,
+        Endpoint::AuthTokenRevokePost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
         Request,
         RequestPayload

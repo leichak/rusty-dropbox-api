@@ -38,7 +38,7 @@ macro_rules! implement_tests {
             }
 
             let request = $req {
-                access_token: &TEST_TOKEN,
+                access_token: &TEST_AUTH_TOKEN,
                 payload,
             };
 
@@ -87,7 +87,7 @@ macro_rules! implement_tests {
             }
 
             let request = $req {
-                access_token: &TEST_TOKEN,
+                access_token: &TEST_AUTH_TOKEN,
                 payload,
             };
 
