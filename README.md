@@ -119,6 +119,12 @@ To run integration tests, use the following command:
 cargo test --test '*'
 ```
 
+To run local tests, use following commands:
+
+```sh
+cargo test --features "test-utils"
+```
+
 ## Contributing
 
 This is an unofficial release of the Dropbox API SDK for Rust. Contributions and issues are welcome. Please follow the standard [GitHub flow](https://guides.github.com/introduction/flow/) for contributions.
