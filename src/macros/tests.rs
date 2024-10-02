@@ -1,4 +1,11 @@
-/// Macro implementing tests
+/// Macro to implement tests for both synchronous and asynchronous API calls.
+/// This macro generates test functions that mock API endpoints and verify the expected behavior of requests.
+///
+/// # Parameters:
+/// - `$endpoint`: The API endpoint being tested.
+/// - `$headers`: A vector of headers to include in the request.
+/// - `$req`: The request type used in the test (struct representing the API request).
+/// - `$payload`: The type of the payload being sent in the request.
 #[macro_export]
 macro_rules! implement_tests {
     ($endpoint:expr, $headers:expr, $req:ident, $payload:ty) => {
@@ -76,8 +83,6 @@ macro_rules! implement_tests {
                 }
                 mock = mock.create();
             }
-
-            println!("MOCK {:?}", mock);
 
             let payload: Option<$payload>;
             if let Some(body) = body {
