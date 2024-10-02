@@ -16,8 +16,8 @@ type Response = DeleteManualContactsResponse;
 type RequestPayload = ();
 type ResponsePayload = ();
 
-/// Add properties struct for setting up a profile picture
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
+/// Struct for removing manually contacts batch
+/// https://www.dropbox.com/developers/documentation/http/documentation#contacts-delete_manual_contacts
 #[derive(Debug)]
 pub struct DeleteManualContactsRequest<'a> {
     access_token: &'a str,

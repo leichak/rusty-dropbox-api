@@ -18,8 +18,8 @@ type Response = CheckAppResponse;
 type RequestPayload = EchoArg;
 type ResponsePayload = EchoResult;
 
-/// Add properties struct for setting up a profile picture
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
+/// Struct for app authentication
+/// https://www.dropbox.com/developers/documentation/http/documentation#check-app
 #[derive(Debug)]
 pub struct CheckAppRequest<'a> {
     access_token: &'a str,
@@ -30,7 +30,7 @@ pub struct CheckAppRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct CheckAppResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

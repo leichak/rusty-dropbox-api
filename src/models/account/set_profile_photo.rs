@@ -19,8 +19,8 @@ type Response = SetProfilePhotoResponse;
 type RequestPayload = SetProfilePhotoArg;
 type ResponsePayload = SetProfilePhotoResult;
 
-/// Add properties struct for setting up a profile picture
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
+/// Set profile photo request
+/// https://www.dropbox.com/developers/documentation/http/documentation#account-set_profile_photo
 #[derive(Debug)]
 pub struct SetProfilePhotoRequest<'a> {
     access_token: &'a str,

@@ -17,7 +17,7 @@ type Response = TokenRevokeResponse;
 type RequestPayload = ();
 type ResponsePayload = ();
 
-/// Add properties struct for token revoke
+/// Struct for token revoke
 /// https://api.dropboxapi.com/2/auth/token/revoke
 #[derive(Debug)]
 pub struct TokenRevokeRequest<'a> {

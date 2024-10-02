@@ -19,7 +19,7 @@ type RequestPayload = Option<DeleteManualContactsBatchArg>;
 type ResponsePayload = ();
 
 /// Add properties struct for setting up a profile picture
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
+/// https://www.dropbox.com/developers/documentation/http/documentation#contacts-delete_manual_contacts_batch
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct DeleteManualContactsBatchRequest<'a> {

@@ -5,5 +5,5 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteManualContactsBatchArg {
-    email_addresses: Vec<String>,
+    pub email_addresses: Vec<String>,
 }

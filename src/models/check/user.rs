@@ -18,8 +18,8 @@ type Response = CheckUserResponse;
 type RequestPayload = EchoArg;
 type ResponsePayload = EchoResult;
 
-/// Add properties struct for setting up a profile picture
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
+/// Struct for user authentication
+/// https://www.dropbox.com/developers/documentation/http/documentation#check-user
 #[derive(Debug)]
 pub struct CheckUserRequest<'a> {
     access_token: &'a str,
