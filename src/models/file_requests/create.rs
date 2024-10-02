@@ -22,7 +22,7 @@ type ResponsePayload = CreateFileRequestResult;
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-create
 #[derive(Debug)]
 pub struct CreateFileRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct CreateFileRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct CreateFileResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

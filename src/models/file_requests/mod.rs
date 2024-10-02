@@ -11,20 +11,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CountFileRequestsResult {
-    file_request_count: u32,
+    pub file_request_count: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFileRequestArgs {
-    title: String,
-    destination: String,
+    pub title: String,
+    pub destination: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    deadline: Option<FileRequestDeadline>,
-    open: bool,
+    pub deadline: Option<FileRequestDeadline>,
+    pub open: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    video_project_id: Option<String>,
+    pub video_project_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -32,19 +32,19 @@ pub struct CreateFileRequestResult(FileRequest);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Deadline {
-    deadline: DateTime<Utc>,
-    allow_late_uploads: Option<bool>,
+    pub deadline: DateTime<Utc>,
+    pub allow_late_uploads: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FileRequestDeadline {
-    deadline: DateTime<Utc>,
-    allow_late_uploads: Option<GracePeriod>,
+    pub deadline: DateTime<Utc>,
+    pub allow_late_uploads: Option<GracePeriod>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
-enum GracePeriod {
+pub enum GracePeriod {
     GracePeriodTagged(GracePeriodTagged),
     GracePeriodUntagged(GracePeriodUntagged),
 }
@@ -72,33 +72,33 @@ enum GracePeriodUntagged {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteFileRequestArgs {
-    ids: Vec<String>,
+    pub ids: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteFileRequestResult {
-    file_requests: Vec<FileRequest>,
+    pub file_requests: Vec<FileRequest>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteAllClosedFileRequestsResult {
-    file_requests: Vec<FileRequest>,
+    pub file_requests: Vec<FileRequest>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeletedFileRequest {
-    id: String,
-    title: String,
-    destination: String,
+    pub id: String,
+    pub title: String,
+    pub destination: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    deadline: Option<FileRequestDeadline>,
-    url: String,
-    open: bool,
+    pub deadline: Option<FileRequestDeadline>,
+    pub url: String,
+    pub open: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetFileRequestArgs {
-    id: String,
+    pub id: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -106,58 +106,58 @@ pub struct GetFileRequestResult(FileRequest);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFileRequestsArgs {
-    limit: u64,
+    pub limit: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFileRequestsResult {
-    file_requests: Vec<FileRequest>,
-    cursor: String,
-    has_more: bool,
+    pub file_requests: Vec<FileRequest>,
+    pub cursor: String,
+    pub has_more: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FileRequest {
-    id: String,
-    url: String,
-    title: String,
-    created: DateTime<Utc>,
-    is_open: bool,
-    file_count: i64,
-    destination: String,
+    pub id: String,
+    pub url: String,
+    pub title: String,
+    pub created: DateTime<Utc>,
+    pub is_open: bool,
+    pub file_count: i64,
+    pub destination: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    deadline: Option<FileRequestDeadline>,
+    pub deadline: Option<FileRequestDeadline>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    video_project_id: Option<String>,
+    pub video_project_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFileRequestsContinueArgs {
-    cursor: String,
+    pub cursor: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFileRequestsContinueResult {
-    file_requests: Vec<FileRequest>,
+    pub file_requests: Vec<FileRequest>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateFileRequestArgs {
-    id: String,
-    title: Option<String>,
-    destination: Option<String>,
-    deadline: Option<Deadline>,
-    open: Option<bool>,
+    pub id: String,
+    pub title: Option<String>,
+    pub destination: Option<String>,
+    pub deadline: Option<Deadline>,
+    pub open: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateFileRequestResult {
-    id: String,
-    url: String,
-    title: String,
-    destination: String,
-    deadline: Option<FileRequestDeadline>,
-    open: bool,
+    pub id: String,
+    pub url: String,
+    pub title: String,
+    pub destination: String,
+    pub deadline: Option<FileRequestDeadline>,
+    pub open: bool,
 }
