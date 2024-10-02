@@ -1,5 +1,3 @@
-use super::{DeleteManualContactsArg, DeleteManualContactsResult};
-
 use crate::{
     anyhow::Result,
     endpoints::headers::Headers,
@@ -15,8 +13,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = DeleteManualContactsRequest<'a>;
 type Response = DeleteManualContactsResponse;
-type RequestPayload = DeleteManualContactsArg;
-type ResponsePayload = DeleteManualContactsResult;
+type RequestPayload = ();
+type ResponsePayload = ();
 
 /// Add properties struct for setting up a profile picture
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add

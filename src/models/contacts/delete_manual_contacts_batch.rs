@@ -1,4 +1,4 @@
-use super::{DeleteManualContactsBatchArg, DeleteManualContactsBatchResult};
+use super::DeleteManualContactsBatchArg;
 
 use crate::{
     anyhow::Result,
@@ -16,7 +16,7 @@ use std::{future::Future, pin::Pin};
 type Request<'a> = DeleteManualContactsBatchRequest<'a>;
 type Response = DeleteManualContactsBatchResponse;
 type RequestPayload = Option<DeleteManualContactsBatchArg>;
-type ResponsePayload = DeleteManualContactsBatchResult;
+type ResponsePayload = ();
 
 /// Add properties struct for setting up a profile picture
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-add
