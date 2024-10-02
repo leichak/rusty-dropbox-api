@@ -5,10 +5,6 @@ use {
     std::sync::{Mutex, MutexGuard, OnceLock},
 };
 
-/// Auth test token
-#[cfg(feature = "test-utils")]
-pub static TEST_AUTH_TOKEN: &str = "123456";
-
 /// Test servers urls and ports
 #[allow(unused)]
 pub const MOCK_SERVER_SYNC_URL: &str = "0.0.0.0";

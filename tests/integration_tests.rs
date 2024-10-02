@@ -11,7 +11,7 @@ mod tests {
     fn call_sync_example() {
         let request = api::auth::token_revoke::TokenRevokeRequest {
             access_token: "12345",
-            payload: None,
+            payload: None,  
         };
 
         if let Ok(Some(result)) = Service::call_sync(&request) {

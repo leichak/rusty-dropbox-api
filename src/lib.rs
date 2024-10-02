@@ -7,7 +7,7 @@ mod tests_utils;
 mod traits;
 
 #[cfg(test)]
-static TEST_AUTH_TOKEN: &'static str = "user";
+static TEST_AUTH_TOKEN: &'static str = "12345";
 
 #[allow(unused)]
 use serde::{Deserialize, Serialize};
