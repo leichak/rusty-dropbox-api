@@ -1,7 +1,5 @@
 
-# Dropbox SDK for Rust
-
-![Dropbox Logo](https://www.google.pl/url?sa=i&url=https%3A%2F%2Flogos-world.net%2Fdropbox-logo%2F&psig=AOvVaw2T9NZreniL0GwQ1RJqmTYj&ust=1727949126602000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCKCq0qC274gDFQAAAAAdAAAAABAH)
+# Dropbox for Rust
 
 **Unofficial Dropbox API SDK for Rust**
 
