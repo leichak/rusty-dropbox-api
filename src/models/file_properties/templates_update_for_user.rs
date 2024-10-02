@@ -30,7 +30,7 @@ pub struct TemplatesUpdateForUserRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct TemplatesUpdateForUserResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

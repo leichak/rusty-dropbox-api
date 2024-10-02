@@ -22,7 +22,7 @@ type ResponsePayload = ListFileRequestsContinueResult;
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-list-continue
 #[derive(Debug)]
 pub struct ListContinueRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct ListContinueRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct ListContinueResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

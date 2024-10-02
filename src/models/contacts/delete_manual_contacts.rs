@@ -27,7 +27,7 @@ pub struct DeleteManualContactsRequest<'a> {
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 pub struct DeleteManualContactsResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

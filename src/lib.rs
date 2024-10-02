@@ -13,7 +13,7 @@ static TEST_AUTH_TOKEN: &'static str = "user";
 use serde::{Deserialize, Serialize};
 #[allow(unused)]
 use std::sync::{Mutex, MutexGuard, OnceLock};
-use {anyhow, futures::future::BoxFuture, lazy_static::lazy_static, reqwest};
+use {anyhow, futures::future::BoxFuture, lazy_static::lazy_static};
 
 // Clients
 lazy_static! {

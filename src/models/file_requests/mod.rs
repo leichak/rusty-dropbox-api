@@ -52,7 +52,7 @@ pub enum GracePeriod {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = ".tag")]
-enum GracePeriodTagged {
+pub enum GracePeriodTagged {
     OneDay,
     TwoDays,
     SevenDays,
@@ -62,7 +62,7 @@ enum GracePeriodTagged {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
-enum GracePeriodUntagged {
+pub enum GracePeriodUntagged {
     OneDay,
     TwoDays,
     SevenDays,

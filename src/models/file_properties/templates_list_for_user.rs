@@ -22,7 +22,7 @@ type ResponsePayload = TemplateIds;
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-templates-list_for_user
 #[derive(Debug)]
 pub struct TemplatesListForUserRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct TemplatesListForUserRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct TemplatesListForUserResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

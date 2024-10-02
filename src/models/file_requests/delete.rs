@@ -22,7 +22,7 @@ type ResponsePayload = DeleteFileRequestResult;
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-delete
 #[derive(Debug)]
 pub struct DeleteFilesRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct DeleteFilesRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct DeleteFilesResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

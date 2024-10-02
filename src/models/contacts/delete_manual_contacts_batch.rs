@@ -31,7 +31,7 @@ pub struct DeleteManualContactsBatchRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct DeleteManualContactsBatchResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

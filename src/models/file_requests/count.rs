@@ -22,7 +22,7 @@ type ResponsePayload = CountFileRequestsResult;
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-count
 #[derive(Debug)]
 pub struct CountFilesRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct CountFilesRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct CountFilesResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

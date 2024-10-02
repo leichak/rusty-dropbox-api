@@ -22,7 +22,7 @@ type ResponsePayload = MatchesWithPropertyGroups;
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-search-continue
 #[derive(Debug)]
 pub struct PropertiesSearchContinueRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct PropertiesSearchContinueRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct PropertiesSearchContinueResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

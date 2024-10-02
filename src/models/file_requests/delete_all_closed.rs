@@ -22,7 +22,7 @@ type ResponsePayload = DeleteAllClosedFileRequestsResult;
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-delete_all_closed
 #[derive(Debug)]
 pub struct DeleteAllClosedFilesRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct DeleteAllClosedFilesRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct DeleteAllClosedFilesResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

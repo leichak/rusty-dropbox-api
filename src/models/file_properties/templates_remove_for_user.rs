@@ -22,7 +22,7 @@ type ResponsePayload = ();
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-templates-remove_for_user
 #[derive(Debug)]
 pub struct TemplatesRemoveForUserRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct TemplatesRemoveForUserRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct TemplatesRemoveForUserResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

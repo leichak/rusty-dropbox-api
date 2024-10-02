@@ -22,7 +22,7 @@ type ResponsePayload = ();
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-remove
 #[derive(Debug)]
 pub struct PropertiesRemoveRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct PropertiesRemoveRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct PropertiesRemoveResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait

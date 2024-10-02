@@ -22,7 +22,7 @@ type ResponsePayload = PropertyTemplateWithTaggedType;
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-templates-get_for_user
 #[derive(Debug)]
 pub struct TemplatesGetForUserRequest<'a> {
-    access_token: &'a str,
+    pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
 
@@ -30,7 +30,7 @@ pub struct TemplatesGetForUserRequest<'a> {
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
 pub struct TemplatesGetForUserResponse {
-    payload: ResponsePayload,
+    pub payload: ResponsePayload,
 }
 
 // Impl utils trait
