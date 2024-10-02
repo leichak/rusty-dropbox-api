@@ -5,7 +5,7 @@ repository = "https://github.com/leichak/rusty-dropbox-api"
 readme = "README.md"
 version = "0.1.0"
 edition = "2021"
-license = "GNU General Public License v3.0"
+license = "GPL-3.0-only"
 keywords = ["sdk", "dropbox"]
 authors = ["Dan Kac <dankaccoder@icloud.com>"]
 
