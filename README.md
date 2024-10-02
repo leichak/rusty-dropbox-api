@@ -22,6 +22,9 @@ The following Dropbox API categories have support in the SDK:
 - `file_properties`
 - `file_requests`
 
+Planned:
+- `files`, `sharing`, `users`
+
 Full support for all Dropbox API endpoints is coming soon!
 
 ## Installation

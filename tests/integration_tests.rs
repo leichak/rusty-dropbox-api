@@ -3,9 +3,9 @@
 
 mod tests {
     use chrono::DateTime;
-    use dropbox_api::api;
-    use dropbox_api::api::file_requests::{CreateFileRequestArgs, FileRequestDeadline};
-    use dropbox_api::api::Service;
+    use rusty_dropbox_sdk::api;
+    use rusty_dropbox_sdk::api::file_requests::{CreateFileRequestArgs, FileRequestDeadline};
+    use rusty_dropbox_sdk::api::Service;
     use tokio;
 
     #[test]
