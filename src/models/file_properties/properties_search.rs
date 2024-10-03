@@ -1,4 +1,4 @@
-use super::{MatchesWithPropertyGroups, QueriesWithTemplateFilter};
+use super::{MatchesWithPropertyGroupsResult, QueriesWithTemplateFilterArgs};
 
 use crate::{
     anyhow::Result,
@@ -15,8 +15,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = PropertiesSearchRequest<'a>;
 type Response = PropertiesSearchResponse;
-type RequestPayload = QueriesWithTemplateFilter;
-type ResponsePayload = MatchesWithPropertyGroups;
+type RequestPayload = QueriesWithTemplateFilterArgs;
+type ResponsePayload = MatchesWithPropertyGroupsResult;
 
 /// Add properties struct for file request
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-search

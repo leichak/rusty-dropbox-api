@@ -1,4 +1,4 @@
-use super::PathWithTemplateIds;
+use super::PathWithTemplateIdsArgs;
 
 use crate::{
     anyhow::Result,
@@ -15,7 +15,7 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = PropertiesRemoveRequest<'a>;
 type Response = PropertiesRemoveResponse;
-type RequestPayload = PathWithTemplateIds;
+type RequestPayload = PathWithTemplateIdsArgs;
 type ResponsePayload = ();
 
 /// Add properties struct for file request

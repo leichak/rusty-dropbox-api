@@ -1,4 +1,4 @@
-use super::{PropertyTemplate, TemplateId};
+use super::{PropertyTemplateArgs, TemplateIdResult};
 
 use crate::{
     anyhow::Result,
@@ -15,8 +15,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = TemplatesAddForUserRequest<'a>;
 type Response = TemplatesAddForUserResponse;
-type RequestPayload = PropertyTemplate;
-type ResponsePayload = TemplateId;
+type RequestPayload = PropertyTemplateArgs;
+type ResponsePayload = TemplateIdResult;
 
 /// Add properties struct for file request
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-templates-add_for_user
