@@ -51,11 +51,9 @@ mod upload_session_start_batch;
 
 use serde::{Deserialize, Serialize};
 
-use std::collections::HashMap;
-
 // Common Metadata Structs
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum Metadata {
     #[serde(rename = "file")]
@@ -66,7 +64,7 @@ pub enum Metadata {
     Deleted(DeletedMetadata),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct FileMetadata {
     pub name: String,
     pub id: String,
@@ -81,7 +79,7 @@ pub struct FileMetadata {
     pub file_lock_info: Option<FileLockMetadata>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct FolderMetadata {
     pub name: String,
     pub id: String,
@@ -90,26 +88,26 @@ pub struct FolderMetadata {
     pub property_groups: Option<Vec<PropertyGroup>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeletedMetadata {
     pub name: String,
     pub path_lower: Option<String>,
     pub path_display: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PropertyGroup {
     pub template_id: String,
     pub fields: Vec<PropertyField>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PropertyField {
     pub name: String,
     pub value: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct FileLockMetadata {
     pub is_lockholder: Option<bool>,
     pub lockholder_name: Option<String>,
@@ -118,7 +116,7 @@ pub struct FileLockMetadata {
 
 // Error Structs
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum ApiError {
     #[serde(rename = "path_lookup")]
@@ -133,7 +131,7 @@ pub enum ApiError {
     Other,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum LookupError {
     #[serde(rename = "malformed_path")]
@@ -142,7 +140,7 @@ pub enum LookupError {
     NotFound,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum WriteError {
     #[serde(rename = "malformed_path")]
@@ -155,7 +153,7 @@ pub enum WriteError {
     DisallowedName,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum ConflictType {
     #[serde(rename = "file")]
@@ -168,7 +166,7 @@ pub enum ConflictType {
 
 // files/copy_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CopyArgs {
     pub from_path: String,
     pub to_path: String,
@@ -177,26 +175,26 @@ pub struct CopyArgs {
     pub allow_ownership_transfer: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CopyResult {
     pub metadata: Metadata,
 }
 
 // files/copy_batch_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CopyBatchArgs {
     pub autorename: bool,
     pub entries: Vec<RelocationPath>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RelocationPath {
     pub from_path: String,
     pub to_path: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum RelocationBatchV2Launch {
     #[serde(rename = "async_job_id")]
@@ -205,12 +203,12 @@ pub enum RelocationBatchV2Launch {
     Complete(RelocationBatchV2Result),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RelocationBatchV2Result {
     pub entries: Vec<RelocationBatchResultEntry>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum RelocationBatchResultEntry {
     #[serde(rename = "success")]
@@ -219,21 +217,21 @@ pub enum RelocationBatchResultEntry {
     Failure { failure: RelocationBatchErrorEntry },
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RelocationBatchErrorEntry {
     pub relocation_error: Option<RelocationError>,
 }
 
 // files/copy_batch/check_v2
 
-#[derive(Serialize, Deserialize)]
-pub struct PollArg {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CopyBatchCheckArgs {
     pub async_job_id: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
-pub enum RelocationBatchV2JobStatus {
+pub enum CopyBatchCheckResult {
     #[serde(rename = "complete")]
     Complete(RelocationBatchV2Result),
     #[serde(rename = "in_progress")]
@@ -242,12 +240,12 @@ pub enum RelocationBatchV2JobStatus {
 
 // files/copy_reference/get
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetCopyReferenceArgs {
     pub path: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetCopyReferenceResult {
     pub copy_reference: String,
     pub expires: String,
@@ -256,40 +254,40 @@ pub struct GetCopyReferenceResult {
 
 // files/copy_reference/save
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SaveCopyReferenceArgs {
     pub copy_reference: String,
     pub path: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SaveCopyReferenceResult {
     pub metadata: Metadata,
 }
 
 // files/create_folder_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderArgs {
     pub path: String,
     pub autorename: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResult {
     pub metadata: FolderMetadata,
 }
 
 // files/create_folder_batch
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderBatchArgs {
     pub paths: Vec<String>,
     pub autorename: Option<bool>,
     pub force_async: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum CreateFolderBatchLaunch {
     #[serde(rename = "async_job_id")]
@@ -298,12 +296,12 @@ pub enum CreateFolderBatchLaunch {
     Complete(CreateFolderBatchResult),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderBatchResult {
     pub entries: Vec<CreateFolderBatchResultEntry>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum CreateFolderBatchResultEntry {
     #[serde(rename = "success")]
@@ -312,12 +310,12 @@ pub enum CreateFolderBatchResultEntry {
     Failure(CreateFolderEntryError),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderEntryResult {
     pub metadata: FolderMetadata,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum CreateFolderEntryError {
     #[serde(rename = "path")]
@@ -326,7 +324,7 @@ pub enum CreateFolderEntryError {
 
 // files/create_folder_batch/check
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum CreateFolderBatchJobStatus {
     #[serde(rename = "complete")]
@@ -337,25 +335,25 @@ pub enum CreateFolderBatchJobStatus {
 
 // files/delete_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteArgs {
     pub path: String,
     pub parent_rev: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteResult {
     pub metadata: Metadata,
 }
 
 // files/delete_batch
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteBatchArgs {
     pub entries: Vec<DeleteArg>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum DeleteBatchLaunch {
     #[serde(rename = "async_job_id")]
@@ -364,12 +362,12 @@ pub enum DeleteBatchLaunch {
     Complete(DeleteBatchResult),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteBatchResult {
     pub entries: Vec<DeleteBatchResultEntry>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum DeleteBatchResultEntry {
     #[serde(rename = "success")]
@@ -378,14 +376,14 @@ pub enum DeleteBatchResultEntry {
     Failure(DeleteError),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteBatchResultData {
     pub metadata: Metadata,
 }
 
 // files/delete_batch/check
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum DeleteBatchJobStatus {
     #[serde(rename = "complete")]
@@ -396,13 +394,13 @@ pub enum DeleteBatchJobStatus {
 
 // files/download
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DownloadArg {
     pub path: String,
     pub rev: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct FileMetadataV2 {
     pub client_modified: String,
     pub server_modified: String,
@@ -417,31 +415,31 @@ pub struct FileMetadataV2 {
 
 // files/download_zip
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DownloadZipArg {
     pub path: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DownloadZipResult {
     pub metadata: FolderMetadata,
 }
 
 // files/export
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ExportArgs {
     pub path: String,
     pub export_format: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ExportResult {
     pub export_metadata: ExportMetadata,
     pub file_metadata: FileMetadata,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ExportMetadata {
     pub name: String,
     pub size: u64,
@@ -450,22 +448,22 @@ pub struct ExportMetadata {
 
 // files/get_file_lock_batch
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LockFileBatchArgs {
     pub entries: Vec<LockFileArg>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LockFileArg {
     pub path: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LockFileBatchResult {
     pub entries: Vec<LockFileResultEntry>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum LockFileResultEntry {
     #[serde(rename = "success")]
@@ -474,13 +472,13 @@ pub enum LockFileResultEntry {
     Failure(LockFileError),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LockFileResult {
     pub metadata: Metadata,
     pub lock: Option<FileLock>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct FileLock {
     pub created: String,
     pub lock_holder_account_id: String,
@@ -489,7 +487,7 @@ pub struct FileLock {
 
 // files/get_metadata
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetMetadataArgs {
     pub path: String,
     pub include_media_info: Option<bool>,
@@ -498,19 +496,19 @@ pub struct GetMetadataArgs {
     pub include_property_groups: Option<Vec<String>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetMetadataResult {
     pub metadata: Metadata,
 }
 
 // files/get_temporary_link
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetTemporaryLinkArgs {
     pub path: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetTemporaryLinkResult {
     pub link: String,
     pub metadata: Metadata,
@@ -518,13 +516,13 @@ pub struct GetTemporaryLinkResult {
 
 // files/get_temporary_upload_link
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetTemporaryUploadLinkArgs {
     pub commit_info: CommitInfo,
     pub duration: Option<f64>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CommitInfo {
     pub path: String,
     pub mode: WriteMode,
@@ -535,7 +533,7 @@ pub struct CommitInfo {
     pub strict_conflict: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum WriteMode {
     #[serde(rename = "add")]
@@ -546,14 +544,14 @@ pub enum WriteMode {
     Update { rev: String },
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetTemporaryUploadLinkResult {
     pub link: String,
 }
 
 // files/get_thumbnail_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ThumbnailV2Arg {
     pub resource: PathOrLink,
     pub format: ThumbnailFormat,
@@ -562,21 +560,21 @@ pub struct ThumbnailV2Arg {
     pub quality: ThumbnailQuality,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum PathOrLink {
     Path { path: String },
     Link(SharedLinkFileInfo),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SharedLinkFileInfo {
     pub url: String,
     pub path: Option<String>,
     pub password: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum ThumbnailFormat {
     #[serde(rename = "jpeg")]
@@ -587,7 +585,7 @@ pub enum ThumbnailFormat {
     Webp,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum ThumbnailSize {
     #[serde(rename = "w32h32")]
@@ -610,7 +608,7 @@ pub enum ThumbnailSize {
     W2048h1536,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum ThumbnailMode {
     #[serde(rename = "strict")]
@@ -623,7 +621,7 @@ pub enum ThumbnailMode {
     Original,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum ThumbnailQuality {
     #[serde(rename = "quality_80")]
@@ -632,7 +630,7 @@ pub enum ThumbnailQuality {
     Quality90,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PreviewResult {
     pub file_metadata: Option<FileMetadata>,
     pub link_metadata: Option<SharedLinkFileInfo>,
@@ -640,7 +638,7 @@ pub struct PreviewResult {
 
 // files/list_folder
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderArgs {
     pub path: String,
     pub recursive: Option<bool>,
@@ -654,13 +652,13 @@ pub struct ListFolderArgs {
     pub include_non_downloadable_files: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SharedLink {
     pub url: String,
     pub password: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderResult {
     pub entries: Vec<Metadata>,
     pub cursor: String,
@@ -669,19 +667,19 @@ pub struct ListFolderResult {
 
 // files/list_folder/continue
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderContinueArgs {
     pub cursor: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderContinueResult {
     pub entries: Vec<Metadata>,
     pub cursor: String,
     pub has_more: bool,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum ListFolderContinueError {
     #[serde(rename = "path")]
@@ -694,7 +692,7 @@ pub enum ListFolderContinueError {
 
 // files/list_folder/get_latest_cursor
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetLatestCursorArgs {
     pub path: String,
     pub recursive: Option<bool>,
@@ -708,20 +706,20 @@ pub struct GetLatestCursorArgs {
     pub include_non_downloadable_files: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetLatestCursorResult {
     pub cursor: String,
 }
 
 // files/list_folder/longpoll
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderLongpollArgs {
     pub cursor: String,
     pub timeout: Option<u64>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderLongpollResult {
     pub changes: bool,
     pub backoff: Option<u64>,
@@ -729,14 +727,14 @@ pub struct ListFolderLongpollResult {
 
 // files/list_revisions
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ListRevisionsArgs {
     pub path: String,
     pub mode: Option<ListRevisionsMode>,
     pub limit: Option<u64>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum ListRevisionsMode {
     #[serde(rename = "path")]
@@ -745,20 +743,20 @@ pub enum ListRevisionsMode {
     Id,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ListRevisionsResult {
     pub entries: Vec<FileMetadata>,
     pub is_deleted: bool,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LockFileError {
     pub lock_conflict: Option<FileLock>,
 }
 
 // files/move_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct MoveArgs {
     pub from_path: String,
     pub to_path: String,
@@ -767,21 +765,21 @@ pub struct MoveArgs {
     pub allow_ownership_transfer: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct MoveResult {
     pub metadata: Metadata,
 }
 
 // files/move_batch_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct MoveBatchArgs {
     pub autorename: Option<bool>,
     pub entries: Vec<RelocationPath>,
     pub allow_ownership_transfer: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum MoveBatchResult {
     #[serde(rename = "complete")]
@@ -792,7 +790,7 @@ pub enum MoveBatchResult {
 
 // files/move_batch/check_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum MoveBatchJobStatus {
     #[serde(rename = "complete")]
@@ -803,13 +801,13 @@ pub enum MoveBatchJobStatus {
 
 // files/paper/create
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PaperCreateArgs {
     pub path: String,
     pub import_format: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PaperCreateResult {
     pub file_id: String,
     pub paper_revision: i64,
@@ -819,7 +817,7 @@ pub struct PaperCreateResult {
 
 // files/paper/update
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PaperUpdateArgs {
     pub path: String,
     pub import_format: String,
@@ -833,7 +831,7 @@ pub struct PaperUpdateResult {
 
 // files/permanently_delete
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PermanentlyDeleteArgs {
     pub path: String,
     pub parent_rev: Option<String>,
@@ -841,13 +839,13 @@ pub struct PermanentlyDeleteArgs {
 
 // files/restore
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RestoreArgs {
     pub path: String,
     pub rev: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RestoreResult {
     pub metadata: Metadata,
 }
@@ -856,20 +854,20 @@ pub struct RestoreResult {
 
 // files/save_url
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SaveUrlArg {
     pub path: String,
     pub url: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum SaveUrlResult {
     Complete(FileMetadata),
     AsyncJobId { async_job_id: String },
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum SaveUrlError {
     Path(LookupError),
@@ -880,7 +878,7 @@ pub enum SaveUrlError {
 
 // files/save_url/check_job_status
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum SaveUrlJobStatus {
     InProgress,
@@ -890,14 +888,14 @@ pub enum SaveUrlJobStatus {
 
 // files/search_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SearchV2Arg {
     pub query: String,
     pub options: Option<SearchOptions>,
     pub match_field_options: Option<SearchMatchFieldOptions>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SearchOptions {
     pub file_status: Option<String>,
     pub filename_only: Option<bool>,
@@ -905,50 +903,50 @@ pub struct SearchOptions {
     pub path: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SearchMatchFieldOptions {
     pub include_highlights: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SearchV2Result {
     pub matches: Vec<SearchMatch>,
     pub has_more: bool,
     pub cursor: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum SearchMetadata {
     Metadata(SearchFileMatch),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SearchFileMatch {
     pub metadata: Metadata,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SearchMatch {
     pub metadata: SearchMetadata,
 }
 
 // files/search/continue_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SearchV2ContinueArg {
     pub cursor: String,
 }
 
 // files/tags/add
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AddTagArg {
     pub path: String,
     pub tag_text: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum AddTagError {
     Path(LookupError),
@@ -957,42 +955,42 @@ pub enum AddTagError {
 
 // files/tags/get
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetTagsArg {
     pub paths: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetTagsResult {
     pub paths_to_tags: Vec<PathToTags>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PathToTags {
     pub path: String,
     pub tags: Vec<Tag>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum Tag {
     UserGeneratedTag(UserGeneratedTag),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UserGeneratedTag {
     pub tag_text: String,
 }
 
 // files/tags/remove
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RemoveTagArg {
     pub path: String,
     pub tag_text: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum RemoveTagError {
     Path(LookupError),
@@ -1001,19 +999,19 @@ pub enum RemoveTagError {
 
 // files/unlock_file_batch
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UnlockFileBatchArg {
     pub entries: Vec<UnlockFileArg>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UnlockFileArg {
     pub path: String,
 }
 
 // files/upload
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadArg {
     pub path: String,
     pub mode: WriteMode,
@@ -1025,7 +1023,7 @@ pub struct UploadArg {
     pub content_hash: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum UploadError {
     Path(WriteError),
@@ -1036,20 +1034,20 @@ pub enum UploadError {
 
 // files/upload_session/append_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionAppendArg {
     pub cursor: UploadSessionCursor,
     pub close: Option<bool>,
     pub content_hash: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionCursor {
     pub session_id: String,
     pub offset: u64,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum UploadSessionAppendError {
     NotFound,
@@ -1064,25 +1062,25 @@ pub enum UploadSessionAppendError {
 
 // files/upload_session/append_batch
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionAppendBatchArg {
     pub entries: Vec<UploadSessionAppendBatchEntry>,
     pub content_hash: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionAppendBatchEntry {
     pub cursor: UploadSessionCursor,
     pub close: bool,
     pub length: u64,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionAppendBatchResult {
     pub entries: Vec<UploadSessionAppendBatchResultEntry>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum UploadSessionAppendBatchResultEntry {
     Success,
@@ -1091,14 +1089,14 @@ pub enum UploadSessionAppendBatchResultEntry {
 
 // files/upload_session/finish
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionFinishArg {
     pub cursor: UploadSessionCursor,
     pub commit: CommitInfo,
     pub content_hash: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum UploadSessionFinishError {
     LookupFailed,
@@ -1115,23 +1113,23 @@ pub enum UploadSessionFinishError {
 
 // files/upload_session/finish_batch_v2
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionFinishBatchArg {
     pub entries: Vec<UploadSessionFinishBatchEntry>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionFinishBatchEntry {
     pub cursor: UploadSessionCursor,
     pub commit: CommitInfo,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionFinishBatchResult {
     pub entries: Vec<UploadSessionFinishBatchResultEntry>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum UploadSessionFinishBatchResultEntry {
     Success(FileMetadataV2),
@@ -1140,7 +1138,7 @@ pub enum UploadSessionFinishBatchResultEntry {
 
 // files/upload_session/finish_batch/check
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum UploadSessionFinishBatchJobStatus {
     InProgress,
@@ -1149,19 +1147,19 @@ pub enum UploadSessionFinishBatchJobStatus {
 
 // files/upload_session/start
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionStartArg {
     pub close: Option<bool>,
     pub session_type: Option<UploadSessionType>,
     pub content_hash: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionStartResult {
     pub session_id: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum UploadSessionStartError {
     ConcurrentSessionDataNotAllowed,
@@ -1172,18 +1170,18 @@ pub enum UploadSessionStartError {
 
 // files/upload_session/start_batch
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionStartBatchArg {
     pub num_sessions: u64,
     pub session_type: Option<UploadSessionType>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionStartBatchResult {
     pub session_ids: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum UploadSessionType {
     #[serde(rename = "sequential")]
@@ -1194,7 +1192,7 @@ pub enum UploadSessionType {
 
 // RelocationError
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum RelocationError {
     #[serde(rename = "from_lookup")]
@@ -1231,7 +1229,7 @@ pub enum RelocationError {
 
 // MoveIntoVaultError
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum MoveIntoVaultError {
     #[serde(rename = "is_shared_folder")]
@@ -1242,7 +1240,7 @@ pub enum MoveIntoVaultError {
 
 // MoveIntoFamilyError
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum MoveIntoFamilyError {
     #[serde(rename = "is_shared_folder")]
@@ -1253,7 +1251,7 @@ pub enum MoveIntoFamilyError {
 
 // DeleteArg
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteArg {
     pub path: String,
     pub parent_rev: Option<String>,
@@ -1261,7 +1259,7 @@ pub struct DeleteArg {
 
 // DeleteError
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum DeleteError {
     #[serde(rename = "path_lookup")]
