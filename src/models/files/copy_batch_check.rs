@@ -1,4 +1,4 @@
-use super::{CopyBatchCheckArgs as Args, CopyBatchCheckResult as RequestResult};
+use super::{AsyncJobCheckCheckArgs as Args, CopyBatchCheckResult as RequestResult};
 
 use crate::{
     anyhow::Result,

@@ -225,7 +225,7 @@ pub struct RelocationBatchErrorEntry {
 // files/copy_batch/check_v2
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CopyBatchCheckArgs {
+pub struct AsyncJobCheckCheckArgs {
     pub async_job_id: String,
 }
 
@@ -326,7 +326,7 @@ pub enum CreateFolderEntryError {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
-pub enum CreateFolderBatchJobStatus {
+pub enum CreateFolderBatchCheckResult {
     #[serde(rename = "complete")]
     Complete(CreateFolderBatchResult),
     #[serde(rename = "in_progress")]

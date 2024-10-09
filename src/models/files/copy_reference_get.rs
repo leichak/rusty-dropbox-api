@@ -18,7 +18,7 @@ type Response = CopyReferenceGetResponse;
 type RequestPayload = Args;
 type ResponsePayload = RequestResult;
 
-/// Copy
+/// Copy reference get
 /// https://www.dropbox.com/developers/documentation/http/documentation#files-copy_reference-get
 #[derive(Debug)]
 pub struct CopyReferenceGetRequest<'a> {
