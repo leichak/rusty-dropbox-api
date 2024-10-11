@@ -430,6 +430,7 @@ pub struct DownloadZipResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ExportArgs {
     pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub export_format: Option<String>,
 }
 
