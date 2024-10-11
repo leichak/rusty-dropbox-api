@@ -19,8 +19,14 @@ macro_rules! implement_tests {
 
                 let url = get_endpoint_url($endpoint).2;
 
+                let postfix_idx = if url.as_ref().unwrap().as_str().contains(".content") {
+                    23
+                } else {
+                    19
+                };
+
                 mock = server
-                    .mock("POST", &url.unwrap().as_str()[19..])
+                    .mock("POST", &url.unwrap().as_str()[postfix_idx..])
                     .with_status(200);
 
                 let headers: Vec<Headers> = $headers;
@@ -67,8 +73,14 @@ macro_rules! implement_tests {
                 let mut server = get_mut_or_init();
                 let url = get_endpoint_url($endpoint).1;
 
+                let postfix_idx = if url.as_ref().unwrap().as_str().contains(".content") {
+                    23
+                } else {
+                    19
+                };
+
                 mock = server
-                    .mock("POST", &url.unwrap().as_str()[19..])
+                    .mock("POST", &url.unwrap().as_str()[postfix_idx..])
                     .with_status(200);
 
                 let headers: Vec<Headers> = $headers;

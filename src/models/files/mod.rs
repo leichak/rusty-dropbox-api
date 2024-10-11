@@ -398,7 +398,6 @@ pub enum DeleteBatchJobStatus {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DownloadArg {
     pub path: String,
-    pub rev: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

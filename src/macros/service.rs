@@ -23,7 +23,15 @@ macro_rules! implement_service {
                 let mut response = SyncClient.post(endpoint).bearer_auth(self.access_token);
 
                 for h in &headers {
-                    response = response.header(h.get_str().0, h.get_str().1);
+                    match h {
+                        Headers::DropboxApiArg(_) => {
+                            let temp_h = Headers::DropboxApiArg(
+                                serde_json::json!(self.payload().unwrap()).to_string(),
+                            );
+                            response = response.header(temp_h.get_str().0, temp_h.get_str().1);
+                        }
+                        _ => response = response.header(h.get_str().0, h.get_str().1),
+                    }
                 }
 
                 if let Some(payload) = self.payload() {
@@ -65,7 +73,15 @@ macro_rules! implement_service {
                 let mut response = AsyncClient.post(endpoint).bearer_auth(self.access_token);
 
                 for h in &headers {
-                    response = response.header(h.get_str().0, h.get_str().1);
+                    match h {
+                        Headers::DropboxApiArg(_) => {
+                            let temp_h = Headers::DropboxApiArg(
+                                serde_json::json!(self.payload().unwrap()).to_string(),
+                            );
+                            response = response.header(temp_h.get_str().0, temp_h.get_str().1);
+                        }
+                        _ => response = response.header(h.get_str().0, h.get_str().1),
+                    }
                 }
 
                 if let Some(payload) = &self.payload() {
