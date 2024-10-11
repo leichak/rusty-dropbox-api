@@ -146,7 +146,7 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<S
         Endpoint::ContactsDeleteManualContactsPost => {
             "https://api.dropboxapi.com/2/contacts/delete_manual_contacts"
         }
-        Endpoint::FilesDeletePost => "https://api.dropboxapi.com/2/delete",
+        Endpoint::FilesDeletePost => "https://api.dropboxapi.com/2/files/delete_v2",
         Endpoint::FilesUploadPost => "https://content.dropboxapi.com/2/files/upload",
 
         Endpoint::FilesTagsGetPost => "https://api.dropboxapi.com/2/get",
@@ -434,5 +434,6 @@ fn test_url(url: &str) -> (String, Option<String>, Option<String>) {
         MOCK_SERVER_ASYNC_PORT,
         &url[idx..]
     );
+    println!("{} {} {}", url, url_test_sync, url_test_async);
     (url.to_string(), Some(url_test_sync), Some(url_test_async))
 }

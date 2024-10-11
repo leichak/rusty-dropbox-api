@@ -1005,11 +1005,7 @@ pub fn get_endpoint_test_body_response(
             ),
         ),
         Endpoint::FilesDeletePost => (
-            Some(
-                r##"{
-    "path": "/Homework/math/Prime_Numbers.txt"
-}"##,
-            ),
+            Some(r##"{"path": "somefile.txt"}"##),
             Some(
                 r##"{
     "metadata": {

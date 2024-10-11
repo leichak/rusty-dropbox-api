@@ -31,6 +31,7 @@ macro_rules! implement_tests {
                 if let Some(body) = &body {
                     mock = mock.match_body(mockito::Matcher::JsonString(body.to_string()));
                 }
+
                 if let Some(response) = &response {
                     mock = mock.with_body(response);
                 }
@@ -39,7 +40,7 @@ macro_rules! implement_tests {
 
             let payload: Option<$payload>;
             if let Some(body) = body {
-                payload = Some(serde_json::from_str(&body).expect("failed to deserialise"));
+                payload = Some(serde_json::from_str(&body).expect("failed to deserialize"));
             } else {
                 payload = None;
             }
