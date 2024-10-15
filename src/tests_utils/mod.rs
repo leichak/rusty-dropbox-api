@@ -1005,7 +1005,7 @@ pub fn get_endpoint_test_body_response(
             ),
         ),
         Endpoint::FilesDeletePost => (
-            Some(r##"{"path": "somefile.txt"}"##),
+            None,
             Some(
                 r##"{
     "metadata": {
@@ -1292,7 +1292,7 @@ pub fn get_endpoint_test_body_response(
 }"##,
             ),
             Some(
-                r##"S
+                r##"
 {
     "entries": [
         {

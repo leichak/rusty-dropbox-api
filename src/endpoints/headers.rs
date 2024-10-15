@@ -10,10 +10,7 @@ impl Headers {
         match self {
             Headers::ContentTypeAppJson => ("Content-type", "application/json"),
             Headers::TestAuthorization => ("Authorization", "Bearer user"),
-            Headers::DropboxApiArg(path) => {
-                println!("API ARG {}", path);
-                ("Dropbox-API-Arg", &path)
-            }
+            Headers::DropboxApiArg(path) => ("Dropbox-API-Arg", &path),
         }
     }
 }

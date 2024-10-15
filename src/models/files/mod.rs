@@ -109,8 +109,11 @@ pub struct PropertyField {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FileLockMetadata {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub is_lockholder: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lockholder_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub created: Option<String>,
 }
 
@@ -447,6 +450,13 @@ pub struct ExportMetadata {
     pub export_hash: Option<String>,
 }
 
+// files/get_preview
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetPreviewArg {
+    pub path: String,
+}
+
 // files/get_file_lock_batch
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -476,13 +486,17 @@ pub enum LockFileResultEntry {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LockFileResult {
     pub metadata: Metadata,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lock: Option<FileLock>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FileLock {
-    pub created: String,
-    pub lock_holder_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lock_holder_account_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lock_holder_team_id: Option<String>,
 }
 
@@ -491,16 +505,18 @@ pub struct FileLock {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetMetadataArgs {
     pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_media_info: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_deleted: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_has_explicit_shared_members: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_property_groups: Option<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct GetMetadataResult {
-    pub metadata: Metadata,
-}
+pub struct GetMetadataResult(Metadata);
 
 // files/get_temporary_link
 
@@ -512,7 +528,7 @@ pub struct GetTemporaryLinkArgs {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetTemporaryLinkResult {
     pub link: String,
-    pub metadata: Metadata,
+    pub metadata: FileMetadata,
 }
 
 // files/get_temporary_upload_link
@@ -526,11 +542,16 @@ pub struct GetTemporaryUploadLinkArgs {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CommitInfo {
     pub path: String,
-    pub mode: WriteMode,
+    pub mode: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub autorename: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub client_modified: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub mute: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub property_groups: Option<Vec<PropertyGroup>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub strict_conflict: Option<bool>,
 }
 
@@ -632,13 +653,12 @@ pub enum ThumbnailQuality {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct PreviewResult {
+pub struct GetPreviewResult {
     pub file_metadata: Option<FileMetadata>,
     pub link_metadata: Option<SharedLinkFileInfo>,
 }
 
 // files/list_folder
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderArgs {
     pub path: String,
