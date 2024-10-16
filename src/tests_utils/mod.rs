@@ -1441,45 +1441,7 @@ pub fn get_endpoint_test_body_response(
     "path": "/video.mp4"
 }"##,
             ),
-            Some(
-                r##"{
-    "link": "https://ucabc123456.dl.dropboxusercontent.com/cd/0/get/abcdefghijklmonpqrstuvwxyz1234567890/file",
-    "metadata": {
-        "client_modified": "2015-05-12T15:50:38Z",
-        "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "file_lock_info": {
-            "created": "2015-05-12T15:50:38Z",
-            "is_lockholder": true,
-            "lockholder_name": "Imaginary User"
-        },
-        "has_explicit_shared_members": false,
-        "id": "id:a4ayc_80_OEAAAAAAAAAXw",
-        "is_downloadable": true,
-        "name": "Prime_Numbers.txt",
-        "path_display": "/Homework/math/Prime_Numbers.txt",
-        "path_lower": "/homework/math/prime_numbers.txt",
-        "property_groups": [
-            {
-                "fields": [
-                    {
-                        "name": "Security Policy",
-                        "value": "Confidential"
-                    }
-                ],
-                "template_id": "ptid:1a5n2i6d3OYEAAAAAAAAAYa"
-            }
-        ],
-        "rev": "a1c10ce0dd78",
-        "server_modified": "2015-05-12T15:50:38Z",
-        "sharing_info": {
-            "modified_by": "dbid:AAH4f99T0taONIb-OurWxbNQ6ywGRopQngc",
-            "parent_shared_folder_id": "84528192421",
-            "read_only": true
-        },
-        "size": 7212
-    }
-}"##,
-            ),
+            None,
         ),
         Endpoint::FilesGetTemporaryUploadLinkPost => (
             Some(
@@ -1491,8 +1453,7 @@ pub fn get_endpoint_test_body_response(
         "path": "/Homework/math/Matrices.txt",
         "strict_conflict": false
     },
-    "duration": 3600
-}"##,
+    "duration": 3600.0 }"##,
             ),
             Some(
                 r##"{

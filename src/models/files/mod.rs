@@ -72,10 +72,15 @@ pub struct FileMetadata {
     pub server_modified: String,
     pub rev: String,
     pub size: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub path_lower: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub path_display: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_hash: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub property_groups: Option<Vec<PropertyGroup>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub file_lock_info: Option<FileLockMetadata>,
 }
 
@@ -536,19 +541,17 @@ pub struct GetTemporaryLinkResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetTemporaryUploadLinkArgs {
     pub commit_info: CommitInfo,
-    pub duration: Option<f64>,
+    pub duration: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CommitInfo {
     pub path: String,
     pub mode: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub autorename: Option<bool>,
+    pub autorename: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_modified: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub mute: Option<bool>,
+    pub mute: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub property_groups: Option<Vec<PropertyGroup>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -574,8 +577,23 @@ pub struct GetTemporaryUploadLinkResult {
 // files/get_thumbnail_v2
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct ThumbnailArgs {
+    entries: Vec<ThumbnailArg>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ThumbnailArg {
+    pub path: String,
+    pub format: ThumbnailFormat,
+    pub size: ThumbnailSize,
+    pub mode: ThumbnailMode,
+    pub quality: ThumbnailQuality,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ThumbnailV2Arg {
-    pub resource: PathOrLink,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resource: Option<PathOrLink>,
     pub format: ThumbnailFormat,
     pub size: ThumbnailSize,
     pub mode: ThumbnailMode,
@@ -585,7 +603,9 @@ pub struct ThumbnailV2Arg {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum PathOrLink {
+    #[serde(rename = "path")]
     Path { path: String },
+    #[serde(rename = "link")]
     Link(SharedLinkFileInfo),
 }
 
@@ -597,7 +617,54 @@ pub struct SharedLinkFileInfo {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct ThumbnailEntry {
+    metadata: FileMetadata,
+    thumbnail: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
+pub enum GetThumbnailBatchEntry {
+    #[serde(rename = "success")]
+    Success(ThumbnailEntry),
+    #[serde(rename = "failure")]
+    Failure(ThumbnailError),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetThumbnailBatchResult {
+    entries: Vec<GetThumbnailBatchEntry>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetThumbnailResult {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    file_metadata: Option<FileMetadata>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    link_metadata: Option<MinimalFileLinkMetadata>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct MinimalFileLinkMetadata {
+    url: String,
+    rev: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    path: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = "error_type", rename_all = "snake_case")]
+pub enum ThumbnailError {
+    PathLookupError(LookupError),
+    UnsupportedExtension,
+    UnsupportedImage,
+    EncryptedContent,
+    ConversionError,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub enum ThumbnailFormat {
     #[serde(rename = "jpeg")]
     Jpeg,
@@ -608,7 +675,6 @@ pub enum ThumbnailFormat {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
 pub enum ThumbnailSize {
     #[serde(rename = "w32h32")]
     W32h32,
@@ -631,7 +697,6 @@ pub enum ThumbnailSize {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
 pub enum ThumbnailMode {
     #[serde(rename = "strict")]
     Strict,
@@ -644,7 +709,6 @@ pub enum ThumbnailMode {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
 pub enum ThumbnailQuality {
     #[serde(rename = "quality_80")]
     Quality80,
