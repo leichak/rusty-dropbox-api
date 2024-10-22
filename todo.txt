@@ -1,0 +1,1 @@
+Differentiate basic vs bearer in request 

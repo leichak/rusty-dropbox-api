@@ -21,6 +21,8 @@ macro_rules! implement_tests {
 
                 let postfix_idx = if url.as_ref().unwrap().as_str().contains(".content") {
                     23
+                } else if url.as_ref().unwrap().as_str().contains(".notify") {
+                    22
                 } else {
                     19
                 };
@@ -75,6 +77,8 @@ macro_rules! implement_tests {
 
                 let postfix_idx = if url.as_ref().unwrap().as_str().contains(".content") {
                     23
+                } else if url.as_ref().unwrap().as_str().contains(".notify") {
+                    22
                 } else {
                     19
                 };

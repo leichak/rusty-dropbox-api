@@ -726,14 +726,23 @@ pub struct GetPreviewResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderArgs {
     pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub recursive: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_media_info: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_deleted: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_has_explicit_shared_members: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_mounted_folders: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_link: Option<SharedLink>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_property_groups: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_non_downloadable_files: Option<bool>,
 }
 
@@ -780,14 +789,23 @@ pub enum ListFolderContinueError {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetLatestCursorArgs {
     pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub recursive: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_media_info: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_deleted: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_has_explicit_shared_members: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_mounted_folders: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_link: Option<SharedLink>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_property_groups: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_non_downloadable_files: Option<bool>,
 }
 
@@ -801,12 +819,14 @@ pub struct GetLatestCursorResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderLongpollArgs {
     pub cursor: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub timeout: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolderLongpollResult {
     pub changes: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub backoff: Option<u64>,
 }
 
@@ -815,12 +835,12 @@ pub struct ListFolderLongpollResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListRevisionsArgs {
     pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub mode: Option<ListRevisionsMode>,
     pub limit: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
 pub enum ListRevisionsMode {
     #[serde(rename = "path")]
     Path,
