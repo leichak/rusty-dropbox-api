@@ -233,7 +233,7 @@ pub struct RelocationBatchErrorEntry {
 // files/copy_batch/check_v2
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AsyncJobCheckCheckArgs {
+pub struct AsyncJobCheckArgs {
     pub async_job_id: String,
 }
 
@@ -278,6 +278,7 @@ pub struct SaveCopyReferenceResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderArgs {
     pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub autorename: Option<bool>,
 }
 
@@ -291,7 +292,9 @@ pub struct CreateFolderResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderBatchArgs {
     pub paths: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub autorename: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub force_async: Option<bool>,
 }
 
@@ -417,7 +420,9 @@ pub struct FileMetadataV2 {
     pub path_lower: String,
     pub path_display: String,
     pub content_hash: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub property_groups: Option<Vec<PropertyGroup>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub file_lock_info: Option<FileLockMetadata>,
 }
 
@@ -452,6 +457,7 @@ pub struct ExportResult {
 pub struct ExportMetadata {
     pub name: String,
     pub size: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub export_hash: Option<String>,
 }
 
@@ -612,7 +618,9 @@ pub enum PathOrLink {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SharedLinkFileInfo {
     pub url: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub password: Option<String>,
 }
 
@@ -718,7 +726,9 @@ pub enum ThumbnailQuality {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetPreviewResult {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub file_metadata: Option<FileMetadata>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub link_metadata: Option<SharedLinkFileInfo>,
 }
 
@@ -749,6 +759,7 @@ pub struct ListFolderArgs {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SharedLink {
     pub url: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub password: Option<String>,
 }
 
@@ -837,6 +848,7 @@ pub struct ListRevisionsArgs {
     pub path: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mode: Option<ListRevisionsMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<u64>,
 }
 
@@ -865,8 +877,11 @@ pub struct LockFileError {
 pub struct MoveArgs {
     pub from_path: String,
     pub to_path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_shared_folder: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub autorename: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_ownership_transfer: Option<bool>,
 }
 
@@ -879,8 +894,10 @@ pub struct MoveResult {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MoveBatchArgs {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub autorename: Option<bool>,
     pub entries: Vec<RelocationPath>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_ownership_transfer: Option<bool>,
 }
 
@@ -927,6 +944,7 @@ pub struct PaperUpdateArgs {
     pub path: String,
     pub import_format: String,
     pub doc_update_policy: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub paper_revision: Option<i64>,
 }
 
@@ -939,6 +957,7 @@ pub struct PaperUpdateResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PermanentlyDeleteArgs {
     pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_rev: Option<String>,
 }
 
@@ -996,20 +1015,27 @@ pub enum SaveUrlJobStatus {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SearchV2Arg {
     pub query: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<SearchOptions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub match_field_options: Option<SearchMatchFieldOptions>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SearchOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub file_status: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub filename_only: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_results: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SearchMatchFieldOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_highlights: Option<bool>,
 }
 
@@ -1017,6 +1043,7 @@ pub struct SearchMatchFieldOptions {
 pub struct SearchV2Result {
     pub matches: Vec<SearchMatch>,
     pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<String>,
 }
 
@@ -1120,11 +1147,17 @@ pub struct UnlockFileArg {
 pub struct UploadArg {
     pub path: String,
     pub mode: WriteMode,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub autorename: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub client_modified: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub mute: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub property_groups: Option<Vec<PropertyGroup>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub strict_conflict: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_hash: Option<String>,
 }
 
@@ -1142,7 +1175,9 @@ pub enum UploadError {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionAppendArg {
     pub cursor: UploadSessionCursor,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub close: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_hash: Option<String>,
 }
 
@@ -1170,6 +1205,7 @@ pub enum UploadSessionAppendError {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionAppendBatchArg {
     pub entries: Vec<UploadSessionAppendBatchEntry>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_hash: Option<String>,
 }
 
@@ -1198,6 +1234,7 @@ pub enum UploadSessionAppendBatchResultEntry {
 pub struct UploadSessionFinishArg {
     pub cursor: UploadSessionCursor,
     pub commit: CommitInfo,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_hash: Option<String>,
 }
 
@@ -1254,8 +1291,11 @@ pub enum UploadSessionFinishBatchJobStatus {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionStartArg {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub close: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub session_type: Option<UploadSessionType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_hash: Option<String>,
 }
 
@@ -1278,6 +1318,7 @@ pub enum UploadSessionStartError {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadSessionStartBatchArg {
     pub num_sessions: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub session_type: Option<UploadSessionType>,
 }
 

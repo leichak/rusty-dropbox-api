@@ -1,4 +1,4 @@
-use super::{AsyncJobCheckCheckArgs as Args, CreateFolderBatchCheckResult as RequestResult};
+use super::{AsyncJobCheckArgs as Args, CreateFolderBatchCheckResult as RequestResult};
 
 use crate::{
     anyhow::Result,
