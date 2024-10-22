@@ -1,4 +1,4 @@
-use super::{ListRevisionsArgs as Args, ListRevisionsResult as RequestResult};
+use super::{LockFileBatchArgs as Args, LockFileBatchResult as RequestResult};
 
 use crate::{
     anyhow::Result,
@@ -13,15 +13,15 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = ListRevisionsRequest<'a>;
-type Response = ListRevisionsResponse;
+type Request<'a> = LockFileBatchRequest<'a>;
+type Response = LockFileBatchResponse;
 type RequestPayload = Args;
 type ResponsePayload = RequestResult;
 
-/// List revisions
-/// https://www.dropbox.com/developers/documentation/http/documentation#files-list_revisions
+/// Lock file batch
+/// https://www.dropbox.com/developers/documentation/http/documentation#files-lock_file_batch
 #[derive(Debug)]
-pub struct ListRevisionsRequest<'a> {
+pub struct LockFileBatchRequest<'a> {
     pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
@@ -29,7 +29,7 @@ pub struct ListRevisionsRequest<'a> {
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-pub struct ListRevisionsResponse {
+pub struct LockFileBatchResponse {
     pub payload: ResponsePayload,
 }
 
@@ -41,7 +41,7 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilesListRevisionsPost,
+    Endpoint::FilesLockFileBatchPost,
     vec![Headers::ContentTypeAppJson]
 );
 
@@ -61,7 +61,7 @@ mod tests {
     };
 
     implement_tests!(
-        Endpoint::FilesListRevisionsPost,
+        Endpoint::FilesLockFileBatchPost,
         vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
         Request,
         RequestPayload
