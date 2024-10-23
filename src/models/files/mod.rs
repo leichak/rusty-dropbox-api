@@ -948,6 +948,7 @@ pub struct PaperUpdateArgs {
     pub paper_revision: Option<i64>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PaperUpdateResult {
     pub paper_revision: i64,
 }
