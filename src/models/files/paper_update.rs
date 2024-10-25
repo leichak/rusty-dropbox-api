@@ -19,7 +19,7 @@ type RequestPayload = Args;
 type ResponsePayload = RequestResult;
 
 /// Paper update
-/// https://www.dropbox.com/developers/documentation/http/documentation#files-paper-create
+/// https://www.dropbox.com/developers/documentation/http/documentation#files-paper-update
 #[derive(Debug)]
 pub struct PaperUpdateRequest<'a> {
     pub access_token: &'a str,

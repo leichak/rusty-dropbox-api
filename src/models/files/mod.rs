@@ -64,7 +64,37 @@ pub enum Metadata {
     Deleted(DeletedMetadata),
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+// #[derive(Serialize, Deserialize, Debug)]
+// pub struct FileMetadata {
+//     pub name: String,
+//     pub id: String,
+//     pub client_modified: String,
+//     pub server_modified: String,
+//     pub rev: String,
+//     pub size: u64,
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub path_lower: Option<String>,
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub path_display: Option<String>,
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub parent_shared_folder_id: Option<String>,
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub preview_url: Option<String>,
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub media_info: Option<MediaInfo>,
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub content_hash: Option<String>,
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub property_groups: Option<Vec<PropertyGroup>>,
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub file_lock_info: Option<FileLockMetadata>,
+// }
+// #[derive(Serialize, Deserialize, Debug)]
+// pub struct MediaInfo {
+
+// }
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct FileMetadata {
     pub name: String,
     pub id: String,
@@ -72,16 +102,125 @@ pub struct FileMetadata {
     pub server_modified: String,
     pub rev: String,
     pub size: u64,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub path_lower: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub path_display: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub content_hash: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "parent_shared_folder_id",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub parent_shared_folder_id: Option<String>,
+    #[serde(rename = "preview_url", skip_serializing_if = "Option::is_none")]
+    pub preview_url: Option<String>,
+    #[serde(rename = "media_info", skip_serializing_if = "Option::is_none")]
+    pub media_info: Option<MediaInfo>,
+    #[serde(rename = "symlink_info", skip_serializing_if = "Option::is_none")]
+    pub symlink_info: Option<SymlinkInfo>,
+    #[serde(rename = "sharing_info", skip_serializing_if = "Option::is_none")]
+    pub sharing_info: Option<FileSharingInfo>,
+    #[serde(rename = "is_downloadable")]
+    pub is_downloadable: bool,
+    #[serde(rename = "export_info", skip_serializing_if = "Option::is_none")]
+    pub export_info: Option<ExportInfo>,
+    #[serde(rename = "property_groups", skip_serializing_if = "Option::is_none")]
     pub property_groups: Option<Vec<PropertyGroup>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "has_explicit_shared_members",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub has_explicit_shared_members: Option<bool>,
+    #[serde(rename = "content_hash", skip_serializing_if = "Option::is_none")]
+    pub content_hash: Option<String>,
+    #[serde(rename = "file_lock_info", skip_serializing_if = "Option::is_none")]
     pub file_lock_info: Option<FileLockMetadata>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum MediaInfo {
+    Pending,
+    Metadata(MediaMetadata),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MediaMetadata {
+    pub photo: Option<PhotoMetadata>,
+    pub video: Option<VideoMetadata>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PhotoMetadata {
+    pub dimensions: Option<Dimensions>,
+    pub location: Option<GpsCoordinates>,
+    #[serde(rename = "time_taken", skip_serializing_if = "Option::is_none")]
+    pub time_taken: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct VideoMetadata {
+    pub dimensions: Option<Dimensions>,
+    pub location: Option<GpsCoordinates>,
+    #[serde(rename = "time_taken", skip_serializing_if = "Option::is_none")]
+    pub time_taken: Option<String>,
+    #[serde(rename = "duration", skip_serializing_if = "Option::is_none")]
+    pub duration: Option<u64>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Dimensions {
+    pub height: u64,
+    pub width: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GpsCoordinates {
+    pub latitude: f64,
+    pub longitude: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SymlinkInfo {
+    pub target: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FileSharingInfo {
+    pub read_only: bool,
+    pub parent_shared_folder_id: String,
+    #[serde(rename = "modified_by", skip_serializing_if = "Option::is_none")]
+    pub modified_by: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExportInfo {
+    #[serde(rename = "export_as", skip_serializing_if = "Option::is_none")]
+    pub export_as: Option<String>,
+    #[serde(rename = "export_options", skip_serializing_if = "Option::is_none")]
+    pub export_options: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PropertyGroup {
+    pub template_id: String,
+    pub fields: Vec<PropertyField>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PropertyField {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FileLockMetadata {
+    pub is_lockholder: Option<bool>,
+    #[serde(rename = "lockholder_name", skip_serializing_if = "Option::is_none")]
+    pub lockholder_name: Option<String>,
+    #[serde(
+        rename = "lockholder_account_id",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub lockholder_account_id: Option<String>,
+    #[serde(rename = "created", skip_serializing_if = "Option::is_none")]
+    pub created: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -98,28 +237,6 @@ pub struct DeletedMetadata {
     pub name: String,
     pub path_lower: Option<String>,
     pub path_display: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct PropertyGroup {
-    pub template_id: String,
-    pub fields: Vec<PropertyField>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct PropertyField {
-    pub name: String,
-    pub value: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct FileLockMetadata {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_lockholder: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub lockholder_name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub created: Option<String>,
 }
 
 // Error Structs
@@ -972,7 +1089,7 @@ pub struct RestoreArgs {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RestoreResult {
-    pub metadata: Metadata,
+    pub metadata: FileMetadata,
 }
 
 // Common Metadata Structs
@@ -988,7 +1105,9 @@ pub struct SaveUrlArg {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum SaveUrlResult {
+    #[serde(rename = "complete")]
     Complete(FileMetadata),
+    #[serde(rename = "async_job_id")]
     AsyncJobId { async_job_id: String },
 }
 
@@ -1006,8 +1125,11 @@ pub enum SaveUrlError {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum SaveUrlJobStatus {
+    #[serde(rename = "in_progress")]
     InProgress,
+    #[serde(rename = "complete")]
     Complete(FileMetadata),
+    #[serde(rename = "failed")]
     Failed(SaveUrlError),
 }
 
@@ -1040,12 +1162,40 @@ pub struct SearchMatchFieldOptions {
     pub include_highlights: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SearchV2Result {
-    pub matches: Vec<SearchMatch>,
+    pub matches: Vec<SearchMatchV2>,
+    #[serde(rename = "has_more")]
     pub has_more: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "cursor", skip_serializing_if = "Option::is_none")]
     pub cursor: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SearchMatchV2 {
+    pub metadata: Metadata,
+    #[serde(rename = "match_type", skip_serializing_if = "Option::is_none")]
+    pub match_type: Option<SearchMatchTypeV2>,
+    #[serde(rename = "highlight_spans", skip_serializing_if = "Option::is_none")]
+    pub highlight_spans: Option<Vec<HighlightSpan>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(tag = "match_type")] // Open union for match type
+pub enum SearchMatchTypeV2 {
+    Filename,
+    FileContent,
+    FilenameAndContent,
+    ImageContent,
+    Metadata,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HighlightSpan {
+    #[serde(rename = "highlight_str")]
+    pub highlight_str: String,
+    #[serde(rename = "is_highlighted")]
+    pub is_highlighted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -1057,11 +1207,6 @@ pub enum SearchMetadata {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SearchFileMatch {
     pub metadata: Metadata,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SearchMatch {
-    pub metadata: SearchMetadata,
 }
 
 // files/search/continue_v2

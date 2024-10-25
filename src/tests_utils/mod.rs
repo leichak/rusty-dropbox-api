@@ -2072,7 +2072,7 @@ pub fn get_endpoint_test_body_response(
         ),
         Endpoint::FilesRestorePost => (
             Some(
-                r##"S
+                r##"
 {
     "path": "/root/word.docx",
     "rev": "a1c10ce0dd78"
