@@ -64,6 +64,11 @@ pub enum Metadata {
     Deleted(DeletedMetadata),
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct MetadataV2 {
+    metadata: Metadata,
+}
+
 // #[derive(Serialize, Deserialize, Debug)]
 // pub struct FileMetadata {
 //     pub name: String,
@@ -1173,7 +1178,7 @@ pub struct SearchV2Result {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SearchMatchV2 {
-    pub metadata: Metadata,
+    pub metadata: MetadataV2,
     #[serde(rename = "match_type", skip_serializing_if = "Option::is_none")]
     pub match_type: Option<SearchMatchTypeV2>,
     #[serde(rename = "highlight_spans", skip_serializing_if = "Option::is_none")]

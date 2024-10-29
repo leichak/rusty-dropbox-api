@@ -1303,8 +1303,7 @@ pub fn get_endpoint_test_body_response(
                     "created": "2015-05-12T15:50:38Z",
                     "lock_holder_account_id": "dbid:AAH4f99T0taONIb-OurWxbNQ6ywGRopQngc",
                     "lock_holder_team_id": "dbtid:1234abcd"
-                }
-            },
+            }},
             "metadata": {
                 ".tag": "file",
                 "client_modified": "2015-05-12T15:50:38Z",
