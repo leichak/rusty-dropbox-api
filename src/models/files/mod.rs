@@ -1257,6 +1257,7 @@ pub struct PathToTags {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag")]
 pub enum Tag {
+    #[serde(rename = "user_generated_tag")]
     UserGeneratedTag(UserGeneratedTag),
 }
 
