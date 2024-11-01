@@ -79,6 +79,10 @@ macro_rules! implement_service {
                                 serde_json::json!(self.payload().unwrap()).to_string(),
                             );
                             response = response.header(temp_h.get_str().0, temp_h.get_str().1);
+                        },
+                        Headers::ContentTypeAppOctetStream() {
+                            response = response.header(h.get_str().0, h.get_str().1);
+
                         }
                         _ => response = response.header(h.get_str().0, h.get_str().1),
                     }
