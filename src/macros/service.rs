@@ -30,6 +30,10 @@ macro_rules! implement_service {
                             );
                             response = response.header(temp_h.get_str().0, temp_h.get_str().1);
                         }
+                        Headers::ContentTypeAppOctetStream(data_binary) => {
+                            response = response.header(h.get_str().0, h.get_str().1);
+                            response = response.header("data-binary", data_binary.as_str());
+                        }
                         _ => response = response.header(h.get_str().0, h.get_str().1),
                     }
                 }
@@ -79,10 +83,10 @@ macro_rules! implement_service {
                                 serde_json::json!(self.payload().unwrap()).to_string(),
                             );
                             response = response.header(temp_h.get_str().0, temp_h.get_str().1);
-                        },
-                        Headers::ContentTypeAppOctetStream() {
+                        }
+                        Headers::ContentTypeAppOctetStream(data_binary) => {
                             response = response.header(h.get_str().0, h.get_str().1);
-
+                            response = response.header("data-binary", data_binary.as_str());
                         }
                         _ => response = response.header(h.get_str().0, h.get_str().1),
                     }
