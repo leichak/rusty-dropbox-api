@@ -2476,17 +2476,17 @@ pub fn get_endpoint_test_body_response(
             ),
             Some(
                 r##"{
-    "commit": {
-        "autorename": true,
-        "mode": "add",
-        "mute": false,
-        "path": "/Homework/math/Vectors.txt",
-        "strict_conflict": false
-    },
-    "cursor": {
-        "offset": 1073741824,
-        "session_id": "8dd9d57374911153"
-    }
+    "client_modified": "2015-05-12T15:50:38Z",
+    "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "has_explicit_shared_members": false,
+    "id": "id:a4ayc_80_OEAAAAAAAAAXw",
+    "is_downloadable": true,
+    "name": "Matrices.txt",
+    "path_display": "/Homework/math/Matrices.txt",
+    "path_lower": "/homework/math/matrices.txt",
+    "rev": "a1c10ce0dd78",
+    "server_modified": "2015-05-12T15:50:38Z",
+    "size": 7212
 }"##,
             ),
         ),
@@ -2512,34 +2512,8 @@ pub fn get_endpoint_test_body_response(
             ),
             Some(
                 r##"{
-    "entries": [
-        {
-            "commit": {
-                "autorename": true,
-                "mode": "add",
-                "mute": false,
-                "path": "/Homework/math/Matrices.txt",
-                "strict_conflict": false
-            },
-            "cursor": {
-                "offset": 0,
-                "session_id": "1234faaf0678bcde"
-            }
-        },
-        {
-            "commit": {
-                "autorename": true,
-                "mode": "add",
-                "mute": false,
-                "path": "/Homework/math/Vectors.txt",
-                "strict_conflict": false
-            },
-            "cursor": {
-                "offset": 1073741824,
-                "session_id": "8dd9d57374911153"
-            }
-        }
-    ]
+    ".tag": "async_job_id",
+    "async_job_id": "34g93hh34h04y384084"
 }"##,
             ),
         ),

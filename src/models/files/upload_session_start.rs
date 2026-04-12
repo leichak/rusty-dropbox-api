@@ -1,5 +1,5 @@
 
-use super::{FileMetadata as Args, UploadSessionStartArg as RequestResult};
+use super::{UploadSessionStartArg, UploadSessionStartResult};
 
 use crate::{
     anyhow::Result,
@@ -16,8 +16,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = UploadSessionStartRequest<'a>;
 type Response = UploadSessionStartResponse;
-type RequestPayload = Args;
-type ResponsePayload = RequestResult;
+type RequestPayload = UploadSessionStartArg;
+type ResponsePayload = UploadSessionStartResult;
 
 /// UploadSessionStart
 /// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionStart

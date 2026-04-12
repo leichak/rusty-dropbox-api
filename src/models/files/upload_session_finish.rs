@@ -1,4 +1,4 @@
-use super::{FileMetadata as Args, UploadSessionFinishArg as RequestResult};
+use super::{FileMetadata, UploadSessionFinishArg};
 
 use crate::{
     anyhow::Result,
@@ -15,8 +15,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = UploadSessionFinishRequest<'a>;
 type Response = UploadSessionFinishResponse;
-type RequestPayload = Args;
-type ResponsePayload = RequestResult;
+type RequestPayload = UploadSessionFinishArg;
+type ResponsePayload = FileMetadata;
 
 /// UploadSessionFinish
 /// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionFinish

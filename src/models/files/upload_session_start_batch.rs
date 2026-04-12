@@ -1,4 +1,4 @@
-use super::{FileMetadata as Args, UploadSessionStartBatchArg as RequestResult};
+use super::{UploadSessionStartBatchArg, UploadSessionStartBatchResult};
 
 use crate::{
     anyhow::Result,
@@ -15,8 +15,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = UploadSessionStartBatchRequest<'a>;
 type Response = UploadSessionStartBatchResponse;
-type RequestPayload = Args;
-type ResponsePayload = RequestResult;
+type RequestPayload = UploadSessionStartBatchArg;
+type ResponsePayload = UploadSessionStartBatchResult;
 
 /// UploadSessionStartBatch
 /// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionStartBatch

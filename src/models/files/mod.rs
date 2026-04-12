@@ -1439,6 +1439,18 @@ pub enum UploadSessionFinishBatchJobStatus {
     Complete(UploadSessionFinishBatchResult),
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum UploadSessionFinishBatchLaunch {
+    AsyncJobId { async_job_id: String },
+    Complete(UploadSessionFinishBatchResult),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PollArg {
+    pub async_job_id: String,
+}
+
 // files/upload_session/start
 
 #[derive(Serialize, Deserialize, Debug)]

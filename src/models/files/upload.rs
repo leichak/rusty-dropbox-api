@@ -1,4 +1,4 @@
-use super::{FileMetadata as Args, UploadArg as RequestResult};
+use super::{FileMetadata, UploadArg};
 
 use crate::{
     anyhow::Result,
@@ -15,8 +15,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = UploadRequest<'a>;
 type Response = UploadResponse;
-type RequestPayload = Args;
-type ResponsePayload = RequestResult;
+type RequestPayload = UploadArg;
+type ResponsePayload = FileMetadata;
 
 /// Upload
 /// https://www.dropbox.com/developers/documentation/http/documentation#files-upload

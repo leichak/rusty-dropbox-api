@@ -1,4 +1,4 @@
-use super::{FileMetadata as Args, UploadSessionFinishBatchJobStatus as RequestResult};
+use super::{PollArg, UploadSessionFinishBatchJobStatus};
 
 use crate::{
     anyhow::Result,
@@ -15,8 +15,8 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = UploadSessionFinishBatchCheckRequest<'a>;
 type Response = UploadSessionFinishBatchCheckResponse;
-type RequestPayload = Args;
-type ResponsePayload = RequestResult;
+type RequestPayload = PollArg;
+type ResponsePayload = UploadSessionFinishBatchJobStatus;
 
 /// UploadSessionFinishBatchCheck
 /// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionFinishBatchCheck
