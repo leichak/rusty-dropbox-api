@@ -2,6 +2,7 @@
 /// Thiserror macro to derive std::error::Error trait
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
+    #[allow(dead_code)]
     #[error("Unknown")] // display trait
     Unknown,
     #[error("Reqwest error: {0}")] // display trait
