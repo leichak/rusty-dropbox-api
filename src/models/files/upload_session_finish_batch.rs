@@ -1,5 +1,5 @@
 
-use super::{FileMetadata as Args, UploadSessionFinishBatchStartBatchArg as RequestResult};
+use super::{FileMetadata as Args, UploadSessionFinishBatchArg as RequestResult};
 
 use crate::{
     anyhow::Result,
@@ -14,15 +14,15 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = UploadSessionFinishBatchStartBatchRequest<'a>;
-type Response = UploadSessionFinishBatchStartBatchResponse;
+type Request<'a> = UploadSessionFinishBatchRequest<'a>;
+type Response = UploadSessionFinishBatchResponse;
 type RequestPayload = Args;
 type ResponsePayload = RequestResult;
 
-/// UploadSessionFinishBatchStartBatch
-/// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionFinishBatchStartBatch
+/// UploadSessionFinishBatch
+/// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionFinishBatch
 #[derive(Debug)]
-pub struct UploadSessionFinishBatchStartBatchRequest<'a> {
+pub struct UploadSessionFinishBatchRequest<'a> {
     pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
@@ -30,7 +30,7 @@ pub struct UploadSessionFinishBatchStartBatchRequest<'a> {
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-pub struct UploadSessionFinishBatchStartBatchResponse {
+pub struct UploadSessionFinishBatchResponse {
     pub payload: ResponsePayload,
 }
 
@@ -42,7 +42,7 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilesUploadSessionFinishBatchStartBatchPost,
+    Endpoint::FilesUploadSessionFinishBatchPost,
     vec![
         Headers::ContentTypeAppOctetStream("".to_string()),
         Headers::DropboxApiArg("".to_string())
@@ -65,7 +65,7 @@ mod tests {
     };
 
     implement_tests!(
-        Endpoint::FilesUploadSessionFinishBatchStartBatchPost,
+        Endpoint::FilesUploadSessionFinishBatchPost,
         vec![
             Headers::TestAuthorization,
             Headers::ContentTypeAppOctetStream("".to_string()),

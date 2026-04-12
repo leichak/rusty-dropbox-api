@@ -1,4 +1,4 @@
-use super::{FileMetadata as Args, UploadSessionFinishStartBatchArg as RequestResult};
+use super::{FileMetadata as Args, UploadSessionFinishArg as RequestResult};
 
 use crate::{
     anyhow::Result,
@@ -13,15 +13,15 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = UploadSessionFinishStartBatchRequest<'a>;
-type Response = UploadSessionFinishStartBatchResponse;
+type Request<'a> = UploadSessionFinishRequest<'a>;
+type Response = UploadSessionFinishResponse;
 type RequestPayload = Args;
 type ResponsePayload = RequestResult;
 
-/// UploadSessionFinishStartBatch
-/// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionFinishStartBatch
+/// UploadSessionFinish
+/// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionFinish
 #[derive(Debug)]
-pub struct UploadSessionFinishStartBatchRequest<'a> {
+pub struct UploadSessionFinishRequest<'a> {
     pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
@@ -29,7 +29,7 @@ pub struct UploadSessionFinishStartBatchRequest<'a> {
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-pub struct UploadSessionFinishStartBatchResponse {
+pub struct UploadSessionFinishResponse {
     pub payload: ResponsePayload,
 }
 
@@ -41,7 +41,7 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilesUploadSessionFinishStartBatchPost,
+    Endpoint::FilesUploadSessionFinishPost,
     vec![
         Headers::ContentTypeAppOctetStream("".to_string()),
         Headers::DropboxApiArg("".to_string())
@@ -64,7 +64,7 @@ mod tests {
     };
 
     implement_tests!(
-        Endpoint::FilesUploadSessionFinishStartBatchPost,
+        Endpoint::FilesUploadSessionFinishPost,
         vec![
             Headers::TestAuthorization,
             Headers::ContentTypeAppOctetStream("".to_string()),

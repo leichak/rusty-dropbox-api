@@ -1,4 +1,4 @@
-use super::{FileMetadata as Args, UploadSessionFinishBatchContinueBatchArg as RequestResult};
+use super::{FileMetadata as Args, UploadSessionFinishBatchJobStatus as RequestResult};
 
 use crate::{
     anyhow::Result,
@@ -13,15 +13,15 @@ use serde::Deserialize;
 use std::{future::Future, pin::Pin};
 
 /// Type aliases for readability
-type Request<'a> = UploadSessionFinishBatchContinueBatchRequest<'a>;
-type Response = UploadSessionFinishBatchContinueBatchResponse;
+type Request<'a> = UploadSessionFinishBatchCheckRequest<'a>;
+type Response = UploadSessionFinishBatchCheckResponse;
 type RequestPayload = Args;
 type ResponsePayload = RequestResult;
 
-/// UploadSessionFinishBatchContinueBatch
-/// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionFinishBatchContinueBatch
+/// UploadSessionFinishBatchCheck
+/// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionFinishBatchCheck
 #[derive(Debug)]
-pub struct UploadSessionFinishBatchContinueBatchRequest<'a> {
+pub struct UploadSessionFinishBatchCheckRequest<'a> {
     pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
 }
@@ -29,7 +29,7 @@ pub struct UploadSessionFinishBatchContinueBatchRequest<'a> {
 /// Response struct for adding properties
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-pub struct UploadSessionFinishBatchContinueBatchResponse {
+pub struct UploadSessionFinishBatchCheckResponse {
     pub payload: ResponsePayload,
 }
 
@@ -41,7 +41,7 @@ implement_service!(
     Request<'_>,
     Response,
     ResponsePayload,
-    Endpoint::FilesUploadSessionFinishBatchContinueBatchPost,
+    Endpoint::FilesUploadSessionFinishBatchCheckPost,
     vec![
         Headers::ContentTypeAppOctetStream("".to_string()),
         Headers::DropboxApiArg("".to_string())
@@ -64,7 +64,7 @@ mod tests {
     };
 
     implement_tests!(
-        Endpoint::FilesUploadSessionFinishBatchContinueBatchPost,
+        Endpoint::FilesUploadSessionFinishBatchCheckPost,
         vec![
             Headers::TestAuthorization,
             Headers::ContentTypeAppOctetStream("".to_string()),
