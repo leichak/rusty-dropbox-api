@@ -45,8 +45,18 @@ macro_rules! implement_tests {
                     }
                 }
 
+                let is_download_endpoint = headers
+                    .iter()
+                    .any(|h| matches!(h, Headers::DropboxApiResult));
                 if let Some(response) = &response {
-                    mock = mock.with_body(response);
+                    if is_download_endpoint {
+                        // HTTP headers cannot contain raw newlines; collapse
+                        // the pretty-printed fixture to a single line.
+                        let compact = response.replace('\n', "");
+                        mock = mock.with_header("Dropbox-API-Result", &compact);
+                    } else {
+                        mock = mock.with_body(response);
+                    }
                 }
                 mock = mock.create_async().await;
             }
@@ -105,8 +115,18 @@ macro_rules! implement_tests {
                         mock = mock.match_body(mockito::Matcher::JsonString(body.to_string()));
                     }
                 }
+                let is_download_endpoint = headers
+                    .iter()
+                    .any(|h| matches!(h, Headers::DropboxApiResult));
                 if let Some(response) = &response {
-                    mock = mock.with_body(response);
+                    if is_download_endpoint {
+                        // HTTP headers cannot contain raw newlines; collapse
+                        // the pretty-printed fixture to a single line.
+                        let compact = response.replace('\n', "");
+                        mock = mock.with_header("Dropbox-API-Result", &compact);
+                    } else {
+                        mock = mock.with_body(response);
+                    }
                 }
                 mock = mock.create();
             }

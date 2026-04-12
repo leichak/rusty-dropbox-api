@@ -55,6 +55,11 @@ macro_rules! implement_service {
                     .map_err(|err| ApiError::Request(err.into()))?;
 
                 let status = response.status();
+                let api_result_header = response
+                    .headers()
+                    .get("Dropbox-API-Result")
+                    .and_then(|v| v.to_str().ok())
+                    .map(|s| s.to_string());
                 let text = response
                     .text()
                     .map_err(|err| ApiError::Parsing(err.into()))?;
@@ -66,11 +71,21 @@ macro_rules! implement_service {
                     .into());
                 }
 
-                if text.is_empty() {
+                let is_download_endpoint = headers
+                    .iter()
+                    .any(|h| matches!(h, Headers::DropboxApiResult));
+
+                let payload_source = if is_download_endpoint {
+                    api_result_header.unwrap_or_default()
+                } else {
+                    text
+                };
+
+                if payload_source.is_empty() {
                     return Ok(None);
                 }
 
-                let response: $resp_payload = serde_json::from_str(&text)
+                let response: $resp_payload = serde_json::from_str(&payload_source)
                     .map_err(|err| ApiError::Parsing(err.into()))?;
                 let response = $resp { payload: response };
                 Ok(Some(response))
@@ -109,14 +124,23 @@ macro_rules! implement_service {
                     }
                 }
 
+                let is_download_endpoint = headers
+                    .iter()
+                    .any(|h| matches!(h, Headers::DropboxApiResult));
+
                 let response = response.send();
 
-                let block = async {
+                let block = async move {
                     let response = response
                         .await
                         .map_err(|err| ApiError::Request(err.into()))?;
 
                     let status = response.status();
+                    let api_result_header = response
+                        .headers()
+                        .get("Dropbox-API-Result")
+                        .and_then(|v| v.to_str().ok())
+                        .map(|s| s.to_string());
                     let text = response
                         .text()
                         .await
@@ -131,12 +155,18 @@ macro_rules! implement_service {
                         .into());
                     }
 
-                    if text.is_empty() {
+                    let payload_source = if is_download_endpoint {
+                        api_result_header.unwrap_or_default()
+                    } else {
+                        text
+                    };
+
+                    if payload_source.is_empty() {
                         return Ok(None);
                     }
 
-                    let response: $resp_payload =
-                        serde_json::from_str(&text).map_err(|err| ApiError::Parsing(err.into()))?;
+                    let response: $resp_payload = serde_json::from_str(&payload_source)
+                        .map_err(|err| ApiError::Parsing(err.into()))?;
                     let response = $resp { payload: response };
 
                     Result::<Option<$resp>>::Ok(Some(response))

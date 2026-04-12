@@ -7,6 +7,11 @@ pub enum Headers {
     ContentTypeAppOctetStream,
     TestAuthorization,
     DropboxApiArg(String),
+    /// Marker for download-class endpoints that return metadata in the
+    /// `Dropbox-API-Result` response header and binary body separately. When
+    /// present the service macro parses the response payload from the header
+    /// instead of the body. Exposing the binary body to callers is a follow-up.
+    DropboxApiResult,
 }
 
 impl Headers {
@@ -16,6 +21,7 @@ impl Headers {
             Headers::ContentTypeAppOctetStream => ("Content-Type", "application/octet-stream"),
             Headers::TestAuthorization => ("Authorization", "Bearer user"),
             Headers::DropboxApiArg(path) => ("Dropbox-API-Arg", &path),
+            Headers::DropboxApiResult => ("Dropbox-API-Result", ""),
         }
     }
 }

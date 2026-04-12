@@ -42,7 +42,10 @@ implement_service!(
     Response,
     ResponsePayload,
     Endpoint::FilesGetPreviewPost,
-    vec![Headers::DropboxApiArg("".to_string())]
+    vec![
+        Headers::DropboxApiArg("".to_string()),
+        Headers::DropboxApiResult,
+    ]
 );
 
 #[cfg(test)]
@@ -64,7 +67,8 @@ mod tests {
         Endpoint::FilesGetPreviewPost,
         vec![
             Headers::TestAuthorization,
-            Headers::DropboxApiArg("".to_string())
+            Headers::DropboxApiArg("".to_string()),
+            Headers::DropboxApiResult,
         ],
         Request,
         RequestPayload
