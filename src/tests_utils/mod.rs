@@ -2214,7 +2214,8 @@ pub fn get_endpoint_test_body_response(
                     },
                     "size": 7212
                 }
-            }
+            },
+            "match_type": {".tag": "filename_and_content"}
         }
     ]
 }"##,

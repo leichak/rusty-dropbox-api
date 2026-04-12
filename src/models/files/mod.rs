@@ -1186,7 +1186,7 @@ pub struct SearchMatchV2 {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(tag = "match_type")] // Open union for match type
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum SearchMatchTypeV2 {
     Filename,
     FileContent,
