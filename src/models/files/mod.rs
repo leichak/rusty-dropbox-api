@@ -1424,7 +1424,7 @@ pub struct UploadSessionFinishBatchResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum UploadSessionFinishBatchResultEntry {
     Success(FileMetadataV2),
     Failure(UploadSessionFinishError),
@@ -1433,7 +1433,7 @@ pub enum UploadSessionFinishBatchResultEntry {
 // files/upload_session/finish_batch/check
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum UploadSessionFinishBatchJobStatus {
     InProgress,
     Complete(UploadSessionFinishBatchResult),

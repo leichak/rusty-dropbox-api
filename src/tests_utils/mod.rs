@@ -2365,7 +2365,7 @@ pub fn get_endpoint_test_body_response(
             Some(
                 r##"{
     "autorename": false,
-    "mode": "add",
+    "mode": {".tag": "add"},
     "mute": false,
     "path": "/Homework/math/Matrices.txt",
     "strict_conflict": false
