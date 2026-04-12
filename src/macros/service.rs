@@ -7,6 +7,12 @@
 /// - `$resp_payload`: The type of the payload inside the response structure.
 /// - `$endpoints`: The API endpoint URLs, which may vary depending on conditions (sync/async).
 /// - `$headers`: A vector of headers to include in the request.
+///
+/// On non-2xx responses the response body is run through
+/// `$crate::errors::decode_dropbox_error::<serde_json::Value>` which parses the
+/// Dropbox `{"error": ..., "error_summary": ...}` envelope and includes both
+/// fields in the returned `anyhow::Error`. A future variant of this macro can
+/// accept a typed error parameter to enable `downcast_ref` pattern matching.
 #[macro_export]
 macro_rules! implement_service {
     ($req:ty, $resp:ident, $resp_payload:ty, $endpoints:expr, $headers:expr) => {
@@ -46,23 +52,26 @@ macro_rules! implement_service {
                     .send()
                     .map_err(|err| ApiError::Request(err.into()))?;
 
-                match response.error_for_status() {
-                    Ok(response) => {
-                        let text = response
-                            .text()
-                            .map_err(|err| ApiError::Parsing(err.into()))?;
+                let status = response.status();
+                let text = response
+                    .text()
+                    .map_err(|err| ApiError::Parsing(err.into()))?;
 
-                        if text.is_empty() {
-                            return Ok(None);
-                        }
-
-                        let response: $resp_payload = serde_json::from_str(&text)
-                            .map_err(|err| ApiError::Parsing(err.into()))?;
-                        let response = $resp { payload: response };
-                        Ok(Some(response))
-                    }
-                    Err(err) => Err(ApiError::DropBox(err.into()).into()),
+                if !status.is_success() {
+                    return Err(ApiError::DropBox(
+                        $crate::errors::decode_dropbox_error::<serde_json::Value>(status, &text),
+                    )
+                    .into());
                 }
+
+                if text.is_empty() {
+                    return Ok(None);
+                }
+
+                let response: $resp_payload = serde_json::from_str(&text)
+                    .map_err(|err| ApiError::Parsing(err.into()))?;
+                let response = $resp { payload: response };
+                Ok(Some(response))
             }
 
             // Asynchronous call implementation
@@ -103,14 +112,20 @@ macro_rules! implement_service {
                         .await
                         .map_err(|err| ApiError::Request(err.into()))?;
 
-                    let response = response
-                        .error_for_status()
-                        .map_err(|err| ApiError::DropBox(err.into()))?;
-
+                    let status = response.status();
                     let text = response
                         .text()
                         .await
                         .map_err(|err| ApiError::Parsing(err.into()))?;
+
+                    if !status.is_success() {
+                        return Err(ApiError::DropBox(
+                            $crate::errors::decode_dropbox_error::<serde_json::Value>(
+                                status, &text,
+                            ),
+                        )
+                        .into());
+                    }
 
                     if text.is_empty() {
                         return Ok(None);
