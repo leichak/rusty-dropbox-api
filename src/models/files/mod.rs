@@ -1584,3 +1584,98 @@ pub enum DeleteError {
     #[serde(rename = "other")]
     Other,
 }
+
+// DownloadError
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum DownloadError {
+    Path(LookupError),
+    UnsupportedFile,
+    Other,
+}
+
+// DownloadZipError
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum DownloadZipError {
+    Path(LookupError),
+    TooLarge,
+    TooManyFiles,
+    Other,
+}
+
+// ExportError
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum ExportError {
+    Path(LookupError),
+    NonExportable,
+    InvalidExportFormat,
+    RetryError,
+    Other,
+}
+
+// PreviewError
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum PreviewError {
+    Path(LookupError),
+    InProgress,
+    UnsupportedExtension,
+    UnsupportedContent,
+    Other,
+}
+
+// GetTemporaryLinkError
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum GetTemporaryLinkError {
+    Path(LookupError),
+    EmailNotVerified,
+    UnsupportedFile,
+    NotAllowed,
+    Other,
+}
+
+// ListFolderError
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum ListFolderError {
+    Path(LookupError),
+    Other,
+}
+
+// ListFolderLongpollError
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum ListFolderLongpollError {
+    Reset,
+    Other,
+}
+
+// ListRevisionsError
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum ListRevisionsError {
+    Path(LookupError),
+    Other,
+}
+
+// SearchError
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum SearchError {
+    Path(LookupError),
+    InvalidArgument(Option<String>),
+    InternalError,
+    Other,
+}
