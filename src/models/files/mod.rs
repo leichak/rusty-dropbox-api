@@ -232,9 +232,33 @@ pub struct FileLockMetadata {
 pub struct FolderMetadata {
     pub name: String,
     pub id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub path_lower: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub path_display: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_shared_folder_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub preview_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shared_folder_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sharing_info: Option<FolderSharingInfo>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub property_groups: Option<Vec<PropertyGroup>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FolderSharingInfo {
+    pub read_only: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_shared_folder_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shared_folder_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub traverse_only: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub no_access: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
