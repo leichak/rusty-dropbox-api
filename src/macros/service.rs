@@ -28,6 +28,10 @@ macro_rules! implement_service {
 
                 let mut response = SyncClient.post(endpoint).bearer_auth(self.access_token);
 
+                let is_content_endpoint = headers
+                    .iter()
+                    .any(|h| matches!(h, Headers::ContentTypeAppOctetStream));
+
                 for h in &headers {
                     match h {
                         Headers::DropboxApiArg(_) => {
@@ -36,16 +40,14 @@ macro_rules! implement_service {
                             );
                             response = response.header(temp_h.get_str().0, temp_h.get_str().1);
                         }
-                        Headers::ContentTypeAppOctetStream(data_binary) => {
-                            response = response.header(h.get_str().0, h.get_str().1);
-                            response = response.header("data-binary", data_binary.as_str());
-                        }
                         _ => response = response.header(h.get_str().0, h.get_str().1),
                     }
                 }
 
-                if let Some(payload) = self.payload() {
-                    response = response.json(payload);
+                if !is_content_endpoint {
+                    if let Some(payload) = self.payload() {
+                        response = response.json(payload);
+                    }
                 }
 
                 let response = response
@@ -85,6 +87,10 @@ macro_rules! implement_service {
 
                 let mut response = AsyncClient.post(endpoint).bearer_auth(self.access_token);
 
+                let is_content_endpoint = headers
+                    .iter()
+                    .any(|h| matches!(h, Headers::ContentTypeAppOctetStream));
+
                 for h in &headers {
                     match h {
                         Headers::DropboxApiArg(_) => {
@@ -93,16 +99,14 @@ macro_rules! implement_service {
                             );
                             response = response.header(temp_h.get_str().0, temp_h.get_str().1);
                         }
-                        Headers::ContentTypeAppOctetStream(data_binary) => {
-                            response = response.header(h.get_str().0, h.get_str().1);
-                            response = response.header("data-binary", data_binary.as_str());
-                        }
                         _ => response = response.header(h.get_str().0, h.get_str().1),
                     }
                 }
 
-                if let Some(payload) = &self.payload() {
-                    response = response.json(payload);
+                if !is_content_endpoint {
+                    if let Some(payload) = &self.payload() {
+                        response = response.json(payload);
+                    }
                 }
 
                 let response = response.send();

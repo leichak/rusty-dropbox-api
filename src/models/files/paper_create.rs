@@ -43,7 +43,7 @@ implement_service!(
     ResponsePayload,
     Endpoint::FilesPaperCreatePost,
     vec![
-        Headers::ContentTypeAppOctetStream("".to_string()),
+        Headers::ContentTypeAppOctetStream,
         Headers::DropboxApiArg("".to_string())
     ]
 );
@@ -67,7 +67,7 @@ mod tests {
         Endpoint::FilesPaperCreatePost,
         vec![
             Headers::TestAuthorization,
-            Headers::ContentTypeAppOctetStream("".to_string()),
+            Headers::ContentTypeAppOctetStream,
             Headers::DropboxApiArg("".to_string())
         ],
         Request,

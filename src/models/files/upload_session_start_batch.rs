@@ -43,7 +43,7 @@ implement_service!(
     ResponsePayload,
     Endpoint::FilesUploadSessionStartBatchPost,
     vec![
-        Headers::ContentTypeAppOctetStream("".to_string()),
+        Headers::ContentTypeAppOctetStream,
         Headers::DropboxApiArg("".to_string())
     ]
 );
@@ -67,7 +67,7 @@ mod tests {
         Endpoint::FilesUploadSessionStartBatchPost,
         vec![
             Headers::TestAuthorization,
-            Headers::ContentTypeAppOctetStream("".to_string()),
+            Headers::ContentTypeAppOctetStream,
             Headers::DropboxApiArg("".to_string()),
         ],
         Request,

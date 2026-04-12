@@ -32,11 +32,17 @@ macro_rules! implement_tests {
 
                 let headers: Vec<Headers> = $headers;
 
+                let is_content_endpoint = headers
+                    .iter()
+                    .any(|h| matches!(h, Headers::ContentTypeAppOctetStream));
+
                 for h in &headers {
                     mock = mock.with_header(h.get_str().0, h.get_str().1);
                 }
-                if let Some(body) = &body {
-                    mock = mock.match_body(mockito::Matcher::JsonString(body.to_string()));
+                if !is_content_endpoint {
+                    if let Some(body) = &body {
+                        mock = mock.match_body(mockito::Matcher::JsonString(body.to_string()));
+                    }
                 }
 
                 if let Some(response) = &response {
@@ -87,11 +93,17 @@ macro_rules! implement_tests {
 
                 let headers: Vec<Headers> = $headers;
 
+                let is_content_endpoint = headers
+                    .iter()
+                    .any(|h| matches!(h, Headers::ContentTypeAppOctetStream));
+
                 for h in &headers {
                     mock = mock.with_header(h.get_str().0, h.get_str().1);
                 }
-                if let Some(body) = &body {
-                    mock = mock.match_body(mockito::Matcher::JsonString(body.to_string()));
+                if !is_content_endpoint {
+                    if let Some(body) = &body {
+                        mock = mock.match_body(mockito::Matcher::JsonString(body.to_string()));
+                    }
                 }
                 if let Some(response) = &response {
                     mock = mock.with_body(response);
