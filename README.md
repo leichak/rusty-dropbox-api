@@ -21,9 +21,11 @@ The following Dropbox API categories have support in the SDK:
 - `contacts`
 - `file_properties`
 - `file_requests`
+- `files` — all v2 endpoints (copy, move, delete, download, upload,
+  upload_session/\*, list_folder, search, tags, lock_file, paper, etc.)
 
 Planned:
-- `files`, `sharing`, `users`
+- `sharing`, `users`
 
 Full support for all Dropbox API endpoints is coming soon!
 
@@ -76,6 +78,42 @@ async fn main() {
     match request.call().await {
         Ok(result) => println!("Token revoked: {:?}", result),
         Err(e) => println!("Error: {:?}", e),
+    }
+}
+```
+
+### Listing a folder
+
+```rust
+use rusty_dropbox_sdk::api;
+use rusty_dropbox_sdk::api::Service;
+
+#[tokio::main]
+async fn main() {
+    let request = api::files::list_folder::ListFolderRequest {
+        access_token: "your_access_token",
+        payload: Some(api::files::ListFolderArgs {
+            path: "".to_string(),      // "" = root in Dropbox
+            recursive: Some(false),
+            include_media_info: None,
+            include_deleted: None,
+            include_has_explicit_shared_members: None,
+            include_mounted_folders: None,
+            limit: Some(50),
+            shared_link: None,
+            include_property_groups: None,
+            include_non_downloadable_files: None,
+        }),
+    };
+
+    match request.call().unwrap().await {
+        Ok(Some(result)) => {
+            for entry in result.payload.entries {
+                println!("{:?}", entry);
+            }
+        }
+        Ok(None) => println!("Empty response"),
+        Err(e) => eprintln!("Error: {e}"),
     }
 }
 ```
