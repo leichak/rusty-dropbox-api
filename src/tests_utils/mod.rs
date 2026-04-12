@@ -7,11 +7,11 @@ use {
 
 /// Test servers urls and ports
 #[allow(unused)]
-pub const MOCK_SERVER_SYNC_URL: &str = "0.0.0.0";
+pub const MOCK_SERVER_SYNC_URL: &str = "127.0.0.1";
 #[allow(unused)]
 pub const MOCK_SERVER_SYNC_PORT: u16 = 8002;
 #[allow(unused)]
-pub const MOCK_SERVER_ASYNC_URL: &str = "0.0.0.0";
+pub const MOCK_SERVER_ASYNC_URL: &str = "127.0.0.1";
 #[allow(unused)]
 pub const MOCK_SERVER_ASYNC_PORT: u16 = 1420;
 

@@ -19,13 +19,12 @@ macro_rules! implement_tests {
 
                 let url = get_endpoint_url($endpoint).2;
 
-                let postfix_idx = if url.as_ref().unwrap().as_str().contains(".content") {
-                    23
-                } else if url.as_ref().unwrap().as_str().contains(".notify") {
-                    22
-                } else {
-                    19
-                };
+                let url_str = url.as_ref().unwrap().as_str();
+                let scheme_end = url_str.find("://").expect("scheme") + 3;
+                let postfix_idx = url_str[scheme_end..]
+                    .find('/')
+                    .map(|i| scheme_end + i)
+                    .expect("path");
 
                 mock = server
                     .mock("POST", &url.unwrap().as_str()[postfix_idx..])
@@ -75,13 +74,12 @@ macro_rules! implement_tests {
                 let mut server = get_mut_or_init();
                 let url = get_endpoint_url($endpoint).1;
 
-                let postfix_idx = if url.as_ref().unwrap().as_str().contains(".content") {
-                    23
-                } else if url.as_ref().unwrap().as_str().contains(".notify") {
-                    22
-                } else {
-                    19
-                };
+                let url_str = url.as_ref().unwrap().as_str();
+                let scheme_end = url_str.find("://").expect("scheme") + 3;
+                let postfix_idx = url_str[scheme_end..]
+                    .find('/')
+                    .map(|i| scheme_end + i)
+                    .expect("path");
 
                 mock = server
                     .mock("POST", &url.unwrap().as_str()[postfix_idx..])
