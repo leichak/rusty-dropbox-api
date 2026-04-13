@@ -4019,8 +4019,16 @@ pub fn get_endpoint_test_body_response(
             ),
             Some(
                 r##"{
-    "direct_only": true,
-    "path": "id:a4ayc_80_OEAAAAAAAAAYa"
+    "links": [
+        {
+            ".tag": "file",
+            "url": "https://www.dropbox.com/s/2sn712vy1ovegw8/Prime_Numbers.txt?dl=0",
+            "id": "id:a4ayc_80_OEAAAAAAAAAXw",
+            "name": "Prime_Numbers.txt",
+            "path_lower": "/homework/math/prime_numbers.txt"
+        }
+    ],
+    "has_more": false
 }"##,
             ),
         ),

@@ -5,4 +5,5 @@ pub mod contacts;
 pub mod file_properties;
 pub mod file_requests;
 pub mod files;
+pub mod sharing;
 pub mod users;
