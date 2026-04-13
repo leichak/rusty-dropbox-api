@@ -153,3 +153,46 @@ pub async fn upload_large_file<R: AsyncRead + Unpin>(
         .context("upload_session/finish returned empty")?;
     Ok(resp.payload)
 }
+
+#[cfg(all(test, feature = "test-utils"))]
+mod tests {
+    use super::upload_large_file;
+    use crate::api::files::WriteMode;
+    use crate::tests_utils::get_mut_or_init_async;
+    use std::io::Cursor;
+
+    #[tokio::test]
+    async fn single_chunk_file_does_start_then_finish() {
+        let start_resp = r#"{"session_id":"session-1"}"#;
+        let finish_resp = r#"{"name":"hi.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":5,"path_lower":"/hi.txt","path_display":"/hi.txt","is_downloadable":true}"#;
+
+        let (start_mock, finish_mock);
+        {
+            let mut server = get_mut_or_init_async().await;
+            start_mock = server
+                .mock("POST", "/2/files/upload_session/start")
+                .with_status(200)
+                .with_header("Content-Type", "application/json")
+                .with_body(start_resp)
+                .create_async()
+                .await;
+            finish_mock = server
+                .mock("POST", "/2/files/upload_session/finish")
+                .with_status(200)
+                .with_header("Content-Type", "application/json")
+                .with_body(finish_resp)
+                .create_async()
+                .await;
+        }
+
+        let reader = Cursor::new(b"hello".to_vec());
+        // chunk_size > body length forces first-chunk EOF path.
+        let meta = upload_large_file("test", "/hi.txt", reader, 4096, WriteMode::Add)
+            .await
+            .expect("upload_large_file returned error");
+        assert_eq!(meta.name, "hi.txt");
+        assert_eq!(meta.size, 5);
+        start_mock.assert();
+        finish_mock.assert();
+    }
+}

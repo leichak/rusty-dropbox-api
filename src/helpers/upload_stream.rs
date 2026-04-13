@@ -7,6 +7,7 @@
 //! `UploadRequest.data`.
 
 use crate::api::files::{FileMetadata, UploadArg, WriteMode};
+use crate::endpoints::{get_endpoint_url, Endpoint};
 use anyhow::{Context, Result};
 use bytes::Bytes;
 use futures::stream;
@@ -57,8 +58,12 @@ where
     });
     let body = reqwest::Body::wrap_stream(body_stream);
 
+    let url = get_endpoint_url(Endpoint::FilesUploadPost)
+        .2
+        .unwrap_or_else(|| get_endpoint_url(Endpoint::FilesUploadPost).0);
+
     let resp = crate::AsyncClient
-        .post("https://content.dropboxapi.com/2/files/upload")
+        .post(url)
         .bearer_auth(token)
         .header("Content-Type", "application/octet-stream")
         .header("Dropbox-API-Arg", arg_json)
@@ -71,4 +76,38 @@ where
 
     let meta: FileMetadata = resp.json().await.context("parse upload response")?;
     Ok(meta)
+}
+
+#[cfg(all(test, feature = "test-utils"))]
+mod tests {
+    use super::upload_stream;
+    use crate::api::files::WriteMode;
+    use crate::tests_utils::get_mut_or_init_async;
+    use std::io::Cursor;
+
+    #[tokio::test]
+    async fn streams_payload_and_parses_metadata() {
+        let meta_json =
+            r#"{"name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":5,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
+
+        let mut mock;
+        {
+            let mut server = get_mut_or_init_async().await;
+            mock = server
+                .mock("POST", "/2/files/upload")
+                .with_status(200)
+                .with_header("Content-Type", "application/json")
+                .with_body(meta_json)
+                .create_async()
+                .await;
+        }
+
+        let reader = Cursor::new(b"hello".to_vec());
+        let meta = upload_stream("test", "/f.txt", reader, WriteMode::Add)
+            .await
+            .expect("upload_stream returned error");
+        assert_eq!(meta.name, "f.txt");
+        assert_eq!(meta.size, 5);
+        mock.assert();
+    }
 }
