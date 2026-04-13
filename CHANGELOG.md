@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0]
+
+### Added
+- `auth` module with OAuth2 helpers: `authorize_url`, `exchange_code`,
+  `refresh`, `refresh_sync`, `revoke`, `Tokens` struct.
+- `Client::with_refresh(...)` — Client now optionally carries a
+  `RefreshConfig` and exposes `ensure_fresh()` / `ensure_fresh_sync()` to
+  re-mint the access token via Dropbox's `oauth2/token` refresh grant.
+- `openid` namespace with the `userinfo` endpoint and `UserInfoResult`.
+- Typed enums on `sharing::SharedLinkSettings`: `RequestedVisibility`,
+  `LinkAudience`, `LinkAccessLevel` (replace `Option<String>` fields).
+- Typed Response wrappers for 17 sharing endpoints:
+  `ListFoldersResult`, `ListReceivedFilesResult`, `ListFileMembersResult`,
+  `ListFolderMembersResult`, `ShareFolderLaunch`, `LaunchEmptyResult`,
+  `JobStatus`, `ShareFolderJobStatus`, `RemoveMemberJobStatus`.
+- `get_shared_link_file` now uses `implement_download_service!` — actually
+  downloads bytes via `Dropbox-API-Result` header + body split.
+- `User-Agent: rusty_dropbox_sdk/<version>` set on both clients.
+
+### Changed
+- **Breaking**: retry loop now retries on 5xx as well as 429, with
+  exponential backoff (1s/2s/4s) when no `Retry-After` header is sent.
+- **Breaking**: `Client::token()` returns `String` instead of `&str` so the
+  internal RwLock guard isn't held across the request lifetime.
+- **Breaking**: `sharing::SharedLinkSettings` fields are now typed enums,
+  not `Option<String>`.
+
 ## [0.2.1]
 
 ### Added
