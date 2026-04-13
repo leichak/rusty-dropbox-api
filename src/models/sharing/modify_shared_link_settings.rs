@@ -12,8 +12,8 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = ModifySharedLinkSettingsRequest<'a>;
 type Response = ModifySharedLinkSettingsResponse;
-type RequestPayload = serde_json::Value;
-type ResponsePayload = serde_json::Value;
+type RequestPayload = super::ModifySharedLinkSettingsArgs;
+type ResponsePayload = super::SharedLinkMetadata;
 
 /// `modify_shared_link_settings`
 /// Payload and response are modelled as `serde_json::Value` for now — the

@@ -2791,7 +2791,8 @@ pub fn get_endpoint_test_body_response(
         ),
         Endpoint::SharingCreateSharedLinkWithSettingsPost => (
             Some(
-                r##"    "path": "/Prime_Numbers.txt",
+                r##"{
+    "path": "/Prime_Numbers.txt",
     "settings": {
         "access": "viewer",
         "allow_download": true,

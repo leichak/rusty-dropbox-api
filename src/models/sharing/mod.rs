@@ -73,8 +73,108 @@ pub struct ListSharedLinksArg {
 /// Result of `list_shared_links`.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListSharedLinksResult {
-    pub links: Vec<serde_json::Value>,
+    pub links: Vec<SharedLinkMetadata>,
     pub has_more: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<String>,
+}
+
+// ---- Shared-link metadata tree ----
+
+/// Top-level SharedLinkMetadata. Dropbox flattens file/folder-specific fields
+/// at the same level as `.tag`, so we use struct variants with `#[serde(rename)]`.
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum SharedLinkMetadata {
+    File(FileLinkMetadata),
+    Folder(FolderLinkMetadata),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FileLinkMetadata {
+    pub url: String,
+    pub id: String,
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub path_lower: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rev: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub client_modified: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub server_modified: Option<String>,
+    /// The link permission tree is deeply nested — kept loosely typed for now.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_permissions: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub team_member_info: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content_owner_team_info: Option<serde_json::Value>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FolderLinkMetadata {
+    pub url: String,
+    pub id: String,
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub path_lower: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_permissions: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub team_member_info: Option<serde_json::Value>,
+}
+
+// ---- create_shared_link_with_settings ----
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CreateSharedLinkWithSettingsArg {
+    pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub settings: Option<SharedLinkSettings>,
+}
+
+/// Optional settings when creating a shared link. All fields optional; any
+/// unspecified key defaults to Dropbox's per-account policy.
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct SharedLinkSettings {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub requested_visibility: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_password: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub audience: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub access: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_download: Option<bool>,
+}
+
+// ---- get_shared_link_metadata ----
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetSharedLinkMetadataArg {
+    pub url: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_password: Option<String>,
+}
+
+// ---- modify_shared_link_settings ----
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ModifySharedLinkSettingsArgs {
+    pub url: String,
+    pub settings: SharedLinkSettings,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remove_expiration: Option<bool>,
 }

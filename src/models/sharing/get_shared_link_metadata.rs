@@ -12,8 +12,8 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = GetSharedLinkMetadataRequest<'a>;
 type Response = GetSharedLinkMetadataResponse;
-type RequestPayload = serde_json::Value;
-type ResponsePayload = serde_json::Value;
+type RequestPayload = super::GetSharedLinkMetadataArg;
+type ResponsePayload = super::SharedLinkMetadata;
 
 /// `get_shared_link_metadata`
 /// Payload and response are modelled as `serde_json::Value` for now — the
