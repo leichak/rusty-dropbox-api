@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0]
+
+### Added
+- Round-trip tests for all 39 sharing endpoints (was 2).
+- `tests_utils::with_test_server_async` / `with_test_server_sync` helpers.
+
+### Changed
+- **Breaking**: `sharing::MemberSelector` and `sharing::InviteeInfo` use
+  struct variants (`Email { email: String }`) instead of tuple variants
+  of String. Tuple-of-newtype-String doesn't work with serde
+  internally-tagged enums; the wire form was already
+  `{".tag": "email", "email": "..."}`.
+- **Breaking**: `sharing::update_folder_policy` Response type is now
+  `SharedFolderMetadata` (was the wrong `ShareFolderLaunch`).
+- Test infrastructure: replaced the shared-global mockito server
+  (`OnceLock<Mutex<Server>>` per port) with per-test ephemeral
+  `mockito::Server::new_async()` instances. A thread-local URL override
+  consulted by `endpoints::test_url` lets each test point at its own
+  random-port server. No more shared-mutex poison cascade; tests run in
+  parallel safely. Total stable test count: 243 (was 171).
+- `MOCK_SERVER_SYNC` / `MOCK_SERVER_ASYNC` statics and
+  `get_mut_or_init` / `get_mut_or_init_async` removed.
+- CI test runner reverted to default parallel (no `--test-threads=1`
+  needed).
+
 ## [0.6.0]
 
 ### Removed
