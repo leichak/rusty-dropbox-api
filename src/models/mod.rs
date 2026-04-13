@@ -6,7 +6,5 @@ pub mod file_properties;
 pub mod file_requests;
 pub mod files;
 pub mod openid;
-pub mod secondary_emails;
-pub mod seen_state;
 pub mod sharing;
 pub mod users;

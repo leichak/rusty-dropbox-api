@@ -4754,9 +4754,5 @@ pub fn get_endpoint_test_body_response(
 }"##,
             ),
         ),
-        Endpoint::SecondaryEmailsAddPost
-        | Endpoint::SecondaryEmailsDeletePost
-        | Endpoint::SecondaryEmailsResendVerificationEmailsPost
-        | Endpoint::SeenStateMarkSeenPost => (None, None),
     }
 }

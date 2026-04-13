@@ -61,10 +61,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `SharedFolderMetadata`, `SharedFileMetadata`. Swapped into
   `FileLinkMetadata`, `FolderLinkMetadata`, `ListFileMembersResult`,
   `ListFolderMembersResult`, `ListFoldersResult`, `ListReceivedFilesResult`.
-- `secondary_emails` namespace (3 endpoints): `add`, `delete`,
-  `resend_verification_emails`.
-- `seen_state` namespace (1 endpoint): `mark_seen`.
-
 ### Changed
 - **Breaking**: macros now return `ApiError::Unauthorized(...)` on HTTP 401
   instead of folding it into `ApiError::DropBox(...)`. Callers that match
