@@ -53,6 +53,7 @@ mod tests_utils;
 mod traits;
 
 pub use client::Client;
+pub use errors::TypedError;
 
 /// Ergonomic re-exports. `use rusty_dropbox_sdk::prelude::*;` brings in the
 /// `Service` trait (so `request.call().await?` resolves), the `Client`
