@@ -329,3 +329,65 @@ pub struct ListFolderMembersContinueArg {
 pub struct PollArg {
     pub async_job_id: String,
 }
+
+// ---- member selectors and Args ----
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum MemberSelector {
+    DropboxId(String),
+    Email(String),
+}
+
+/// `members` is a list of `{member, custom_message?, ...}` entries; we keep
+/// individual members as Value to avoid pulling in InviteeInfo etc.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AddFileMemberArgs {
+    pub file: String,
+    pub members: Vec<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_message: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quiet: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub access_level: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub add_message_as_comment: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AddFolderMemberArg {
+    pub shared_folder_id: String,
+    pub members: Vec<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quiet: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_message: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RemoveFileMemberArg {
+    pub file: String,
+    pub member: MemberSelector,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RemoveFolderMemberArg {
+    pub shared_folder_id: String,
+    pub member: MemberSelector,
+    pub leave_a_copy: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UpdateFileMemberArgs {
+    pub file: String,
+    pub member: MemberSelector,
+    pub access_level: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UpdateFolderMemberArg {
+    pub shared_folder_id: String,
+    pub member: MemberSelector,
+    pub access_level: String,
+}

@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = UpdateFileMemberRequest<'a>;
 type Response = UpdateFileMemberResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::UpdateFileMemberArgs;
 type ResponsePayload = serde_json::Value;
 
 /// `update_file_member`

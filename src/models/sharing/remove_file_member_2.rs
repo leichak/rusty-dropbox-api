@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = RemoveFileMember2Request<'a>;
 type Response = RemoveFileMember2Response;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::RemoveFileMemberArg;
 type ResponsePayload = serde_json::Value;
 
 /// `remove_file_member_2`

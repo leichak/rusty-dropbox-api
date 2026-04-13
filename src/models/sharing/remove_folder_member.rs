@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = RemoveFolderMemberRequest<'a>;
 type Response = RemoveFolderMemberResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::RemoveFolderMemberArg;
 type ResponsePayload = serde_json::Value;
 
 /// `remove_folder_member`
