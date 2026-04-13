@@ -669,11 +669,22 @@ pub struct GetMetadataArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_has_explicit_shared_members: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub include_property_groups: Option<Vec<String>>,
+    pub include_property_groups: Option<TemplateFilterBase>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetMetadataResult(Metadata);
+
+/// Filter for `include_property_groups` on list_folder / get_metadata /
+/// search. Dropbox shape:
+///   {".tag": "filter_some", "filter_some": ["ptid:..."]}
+///   {".tag": "filter_none"}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum TemplateFilterBase {
+    FilterSome { filter_some: Vec<String> },
+    FilterNone,
+}
 
 // files/get_temporary_link
 
@@ -897,7 +908,7 @@ pub struct ListFolderArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_link: Option<SharedLink>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub include_property_groups: Option<Vec<String>>,
+    pub include_property_groups: Option<TemplateFilterBase>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_non_downloadable_files: Option<bool>,
 }
@@ -961,7 +972,7 @@ pub struct GetLatestCursorArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_link: Option<SharedLink>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub include_property_groups: Option<Vec<String>>,
+    pub include_property_groups: Option<TemplateFilterBase>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_non_downloadable_files: Option<bool>,
 }
