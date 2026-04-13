@@ -584,7 +584,7 @@ pub struct LinkAudienceOption {
     pub audience: LinkAudience,
     pub allowed: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub disallowed_reason: Option<serde_json::Value>,
+    pub disallowed_reason: Option<LinkAudienceDisallowedReason>,
 }
 
 // =============================================================================
@@ -679,7 +679,7 @@ pub struct UserMembershipInfo {
     pub access_type: AccessLevel,
     pub user: UserInfo,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub permissions: Option<Vec<serde_json::Value>>,
+    pub permissions: Option<Vec<MemberPermission>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub initials: Option<String>,
     #[serde(default)]
@@ -691,7 +691,7 @@ pub struct GroupMembershipInfo {
     pub access_type: AccessLevel,
     pub group: GroupInfo,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub permissions: Option<Vec<serde_json::Value>>,
+    pub permissions: Option<Vec<MemberPermission>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub initials: Option<String>,
     #[serde(default)]
@@ -703,7 +703,7 @@ pub struct InviteeMembershipInfo {
     pub access_type: AccessLevel,
     pub invitee: InviteeInfo,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub permissions: Option<Vec<serde_json::Value>>,
+    pub permissions: Option<Vec<MemberPermission>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub initials: Option<String>,
     #[serde(default)]
@@ -751,7 +751,7 @@ pub enum AccessInheritance {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FolderPolicy {
     pub acl_update_policy: AclUpdatePolicy,
-    pub shared_link_policy: serde_json::Value,
+    pub shared_link_policy: SharedLinkPolicy,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub member_policy: Option<MemberPolicy>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -785,25 +785,25 @@ pub struct SharedFolderMetadata {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub access_inheritance: Option<AccessInheritance>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub permissions: Option<Vec<serde_json::Value>>,
+    pub permissions: Option<Vec<FolderPermission>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub time_last_modified: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub link_metadata: Option<serde_json::Value>,
+    pub link_metadata: Option<SharedContentLinkMetadata>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SharedFileMetadata {
     pub id: String,
     pub name: String,
-    pub policy: serde_json::Value,
+    pub policy: FolderPolicy,
     pub preview_url: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub access_type: Option<AccessLevel>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub expected_link_metadata: Option<serde_json::Value>,
+    pub expected_link_metadata: Option<SharedContentLinkMetadata>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub link_metadata: Option<serde_json::Value>,
+    pub link_metadata: Option<SharedContentLinkMetadata>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub owner_display_names: Option<Vec<String>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -815,7 +815,165 @@ pub struct SharedFileMetadata {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub path_lower: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub permissions: Option<Vec<serde_json::Value>>,
+    pub permissions: Option<Vec<FilePermission>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub time_invited: Option<String>,
+}
+
+// =============================================================================
+// Permission / action / reason taxonomy (was Vec<Value> before)
+// =============================================================================
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum SharedLinkPolicy {
+    Anyone,
+    Members,
+    Team,
+    Other,
+}
+
+/// Used inside `LinkAudienceOption.disallowed_reason`.
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum LinkAudienceDisallowedReason {
+    UserNotOnTeam,
+    UserAccountType,
+    PermissionDenied,
+    Other,
+}
+
+/// Used inside member/folder/file permissions when an action is denied.
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum PermissionDeniedReason {
+    UserNotSameTeamAsOwner,
+    UserNotAllowedByOwner,
+    TargetIsIndirectMember,
+    TargetIsOwner,
+    TargetIsSelf,
+    TargetNotActive,
+    FolderIsLimitedTeamFolder,
+    OwnerNotOnTeam,
+    PermissionDenied,
+    RestrictedByTeam,
+    UserAccountType,
+    UserNotOnTeam,
+    FolderIsInsideSharedFolder,
+    RestrictedByParentFolder,
+    InsufficientPlan(serde_json::Value),
+    Other,
+}
+
+/// Member-level actions. Used by `update_file_member` and friends.
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum MemberAction {
+    LeaveACopy,
+    MakeEditor,
+    MakeOwner,
+    MakeViewer,
+    MakeViewerNoComment,
+    Remove,
+    Other,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct MemberPermission {
+    pub action: MemberAction,
+    pub allow: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<PermissionDeniedReason>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum FolderAction {
+    ChangeOptions,
+    DisableViewerInfo,
+    EditContents,
+    EnableViewerInfo,
+    InviteEditor,
+    InviteViewer,
+    InviteViewerNoComment,
+    RelinquishMembership,
+    Unmount,
+    Unshare,
+    LeaveACopy,
+    ShareLink,
+    CreateLink,
+    SetAccessInheritance,
+    Other,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FolderPermission {
+    pub action: FolderAction,
+    pub allow: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<PermissionDeniedReason>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum FileAction {
+    DisableViewerInfo,
+    EditContents,
+    EnableViewerInfo,
+    InviteEditor,
+    InviteViewer,
+    InviteViewerNoComment,
+    Unshare,
+    RelinquishMembership,
+    ShareLink,
+    CreateLink,
+    CreateViewLink,
+    CreateEditLink,
+    Other,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FilePermission {
+    pub action: FileAction,
+    pub allow: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<PermissionDeniedReason>,
+}
+
+/// Shape of the link metadata embedded in `SharedFileMetadata`.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SharedContentLinkMetadata {
+    pub audience_options: Vec<LinkAudience>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_audience: Option<LinkAudience>,
+    pub link_permissions: Vec<LinkPermission>,
+    pub password_protected: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub access_level: Option<AccessLevel>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub audience_restricting_shared_folder: Option<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expiry: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LinkPermission {
+    pub action: LinkAction,
+    pub allow: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<PermissionDeniedReason>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum LinkAction {
+    ChangeAccessLevel,
+    ChangeAudience,
+    RemoveExpiry,
+    RemovePassword,
+    SetExpiry,
+    SetPassword,
+    Other,
 }
