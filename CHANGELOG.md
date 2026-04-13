@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0]
+
+### Added
+- `helpers::upload_stream::upload_stream(token, path, reader, mode)` — single
+  `/files/upload` POST that streams the body from any `AsyncRead`. Pair with
+  `chunked_upload::upload_large_file` for files over 150 MiB.
+- Typed permission/action taxonomy for sharing:
+  `MemberPermission`, `FolderPermission`, `FilePermission` (`action` + `allow`
+  + optional `reason`), `MemberAction`, `FolderAction`, `FileAction`,
+  `PermissionDeniedReason`.
+- `SharedContentLinkMetadata`, `LinkPermission`, `LinkAction` — typed body
+  for the `link_metadata` / `expected_link_metadata` fields on
+  `SharedFileMetadata`.
+- `SharedLinkPolicy`, `LinkAudienceDisallowedReason` enums replacing
+  `serde_json::Value` holes.
+
+### Changed
+- **Breaking**: `UserMembershipInfo.permissions`, `GroupMembershipInfo.permissions`,
+  `InviteeMembershipInfo.permissions` are now `Option<Vec<MemberPermission>>`
+  (was `Option<Vec<serde_json::Value>>`).
+- **Breaking**: `SharedFolderMetadata.permissions` is
+  `Option<Vec<FolderPermission>>`, `.link_metadata` is
+  `Option<SharedContentLinkMetadata>`.
+- **Breaking**: `SharedFileMetadata.policy` is `FolderPolicy`,
+  `.permissions` is `Option<Vec<FilePermission>>`,
+  `.link_metadata` / `.expected_link_metadata` are
+  `Option<SharedContentLinkMetadata>`.
+- **Breaking**: `FolderPolicy.shared_link_policy` is `SharedLinkPolicy`.
+- **Breaking**: `LinkAudienceOption.disallowed_reason` is
+  `Option<LinkAudienceDisallowedReason>`.
+
 ## [0.4.0]
 
 ### Added
