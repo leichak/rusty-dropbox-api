@@ -33,7 +33,7 @@ pub async fn upload_large_file<R: AsyncRead + Unpin>(
     path: &str,
     mut reader: R,
     chunk_size: usize,
-    mode: &str,
+    mode: crate::api::files::WriteMode,
 ) -> Result<FileMetadata> {
     // Read first chunk and open the session.
     let mut first_chunk = vec![0u8; chunk_size];
@@ -106,7 +106,7 @@ pub async fn upload_large_file<R: AsyncRead + Unpin>(
                         },
                         commit: CommitInfo {
                             path: path.to_string(),
-                            mode: mode.to_string(),
+                            mode: mode.clone(),
                             autorename: true,
                             client_modified: None,
                             mute: false,
@@ -136,7 +136,7 @@ pub async fn upload_large_file<R: AsyncRead + Unpin>(
             },
             commit: CommitInfo {
                 path: path.to_string(),
-                mode: mode.to_string(),
+                mode,
                 autorename: true,
                 client_modified: None,
                 mute: false,

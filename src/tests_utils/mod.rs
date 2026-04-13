@@ -1449,7 +1449,7 @@ pub fn get_endpoint_test_body_response(
                 r##"{
     "commit_info": {
         "autorename": true,
-        "mode": "add",
+        "mode": {".tag": "add"},
         "mute": false,
         "path": "/Homework/math/Matrices.txt",
         "strict_conflict": false
@@ -2466,7 +2466,7 @@ pub fn get_endpoint_test_body_response(
                 r##"{
     "commit": {
         "autorename": true,
-        "mode": "add",
+        "mode": {".tag": "add"},
         "mute": false,
         "path": "/Homework/math/Matrices.txt",
         "strict_conflict": false
@@ -2500,7 +2500,7 @@ pub fn get_endpoint_test_body_response(
         {
             "commit": {
                 "autorename": true,
-                "mode": "add",
+                "mode": {".tag": "add"},
                 "mute": false,
                 "path": "/Homework/math/Matrices.txt",
                 "strict_conflict": false

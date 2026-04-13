@@ -710,7 +710,7 @@ pub struct GetTemporaryUploadLinkArgs {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CommitInfo {
     pub path: String,
-    pub mode: String,
+    pub mode: WriteMode,
     pub autorename: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_modified: Option<String>,
@@ -721,7 +721,7 @@ pub struct CommitInfo {
     pub strict_conflict: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = ".tag")]
 pub enum WriteMode {
     #[serde(rename = "add")]
