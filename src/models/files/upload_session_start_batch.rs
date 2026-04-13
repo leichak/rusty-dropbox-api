@@ -48,7 +48,7 @@ implement_service!(
     ]
 );
 
-#[cfg(test)]
+#[cfg(all(test, feature = "test-utils"))]
 mod tests {
     use crate::TEST_AUTH_TOKEN;
 

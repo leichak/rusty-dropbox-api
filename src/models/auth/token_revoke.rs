@@ -44,7 +44,7 @@ implement_service!(
     vec![Headers::ContentTypeAppJson]
 );
 
-#[cfg(test)]
+#[cfg(all(test, feature = "test-utils"))]
 mod tests {
     use crate::TEST_AUTH_TOKEN;
 
