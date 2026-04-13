@@ -57,14 +57,15 @@ macro_rules! implement_service {
                     let builder = response
                         .try_clone()
                         .ok_or_else(|| ApiError::Request(anyhow::anyhow!(
-                            "request body not clonable; 429 retry unsupported"
+                            "request body not clonable; retry unsupported"
                         )))?;
                     let r = builder
                         .send()
                         .map_err(|err| ApiError::Request(err.into()))?;
-                    if r.status() != reqwest::StatusCode::TOO_MANY_REQUESTS
-                        || attempts >= 3
-                    {
+                    let status = r.status();
+                    let retryable = status == reqwest::StatusCode::TOO_MANY_REQUESTS
+                        || status.is_server_error();
+                    if !retryable || attempts >= 3 {
                         break r;
                     }
                     let wait = r
@@ -72,7 +73,7 @@ macro_rules! implement_service {
                         .get("Retry-After")
                         .and_then(|v| v.to_str().ok())
                         .and_then(|s| s.parse::<u64>().ok())
-                        .unwrap_or(1);
+                        .unwrap_or(1u64 << attempts); // exponential: 1s, 2s, 4s
                     std::thread::sleep(std::time::Duration::from_secs(wait));
                     attempts += 1;
                 };
@@ -159,15 +160,16 @@ macro_rules! implement_service {
                         let builder = response
                             .try_clone()
                             .ok_or_else(|| ApiError::Request(anyhow::anyhow!(
-                                "request body not clonable; 429 retry unsupported"
+                                "request body not clonable; retry unsupported"
                             )))?;
                         let r = builder
                             .send()
                             .await
                             .map_err(|err| ApiError::Request(err.into()))?;
-                        if r.status() != reqwest::StatusCode::TOO_MANY_REQUESTS
-                            || attempts >= 3
-                        {
+                        let status = r.status();
+                        let retryable = status == reqwest::StatusCode::TOO_MANY_REQUESTS
+                            || status.is_server_error();
+                        if !retryable || attempts >= 3 {
                             break r;
                         }
                         let wait = r
@@ -175,7 +177,7 @@ macro_rules! implement_service {
                             .get("Retry-After")
                             .and_then(|v| v.to_str().ok())
                             .and_then(|s| s.parse::<u64>().ok())
-                            .unwrap_or(1);
+                            .unwrap_or(1u64 << attempts);
                         tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                         attempts += 1;
                     };
@@ -315,15 +317,16 @@ macro_rules! implement_download_service {
                         let builder = response
                             .try_clone()
                             .ok_or_else(|| ApiError::Request(anyhow::anyhow!(
-                                "request body not clonable; 429 retry unsupported"
+                                "request body not clonable; retry unsupported"
                             )))?;
                         let r = builder
                             .send()
                             .await
                             .map_err(|err| ApiError::Request(err.into()))?;
-                        if r.status() != reqwest::StatusCode::TOO_MANY_REQUESTS
-                            || attempts >= 3
-                        {
+                        let status = r.status();
+                        let retryable = status == reqwest::StatusCode::TOO_MANY_REQUESTS
+                            || status.is_server_error();
+                        if !retryable || attempts >= 3 {
                             break r;
                         }
                         let wait = r
@@ -331,7 +334,7 @@ macro_rules! implement_download_service {
                             .get("Retry-After")
                             .and_then(|v| v.to_str().ok())
                             .and_then(|s| s.parse::<u64>().ok())
-                            .unwrap_or(1);
+                            .unwrap_or(1u64 << attempts);
                         tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
                         attempts += 1;
                     };

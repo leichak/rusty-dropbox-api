@@ -74,8 +74,18 @@ use serde::{Deserialize, Serialize};
 use std::sync::{Mutex, MutexGuard, OnceLock};
 use {anyhow, lazy_static::lazy_static};
 
+/// User-Agent advertised on every request. Lets Dropbox support trace traffic
+/// from this SDK and lets you bump the version when filing issues against them.
+pub const USER_AGENT: &str = concat!("rusty_dropbox_sdk/", env!("CARGO_PKG_VERSION"));
+
 // Clients
 lazy_static! {
-    static ref SyncClient: reqwest::blocking::Client = reqwest::blocking::Client::new();
-    static ref AsyncClient: reqwest::Client = reqwest::Client::new();
+    static ref SyncClient: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .user_agent(USER_AGENT)
+        .build()
+        .expect("sync client");
+    static ref AsyncClient: reqwest::Client = reqwest::Client::builder()
+        .user_agent(USER_AGENT)
+        .build()
+        .expect("async client");
 }
