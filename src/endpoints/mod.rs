@@ -128,6 +128,10 @@ pub enum Endpoint {
     UsersGetAccountBatchPost,
     UsersGetCurrentAccountPost,
     UsersGetSpaceUsagePost,
+    SecondaryEmailsAddPost,
+    SecondaryEmailsDeletePost,
+    SecondaryEmailsResendVerificationEmailsPost,
+    SeenStateMarkSeenPost,
 }
 
 #[allow(unused_variables)]
@@ -202,6 +206,18 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<S
             "https://api.dropboxapi.com/2/users/get_current_account"
         }
         Endpoint::UsersGetSpaceUsagePost => "https://api.dropboxapi.com/2/users/get_space_usage",
+        Endpoint::SecondaryEmailsAddPost => {
+            "https://api.dropboxapi.com/2/secondary_emails/add"
+        }
+        Endpoint::SecondaryEmailsDeletePost => {
+            "https://api.dropboxapi.com/2/secondary_emails/delete"
+        }
+        Endpoint::SecondaryEmailsResendVerificationEmailsPost => {
+            "https://api.dropboxapi.com/2/secondary_emails/resend_verification_emails"
+        }
+        Endpoint::SeenStateMarkSeenPost => {
+            "https://api.dropboxapi.com/2/seen_state/mark_seen"
+        }
         Endpoint::FileRequestsDeletePost => "https://api.dropboxapi.com/2/file_requests/delete",
         Endpoint::FilesCopyPost => "https://api.dropboxapi.com/2/files/copy_v2",
         Endpoint::FilesCopyBatchPost => "https://api.dropboxapi.com/2/files/copy_batch_v2",
