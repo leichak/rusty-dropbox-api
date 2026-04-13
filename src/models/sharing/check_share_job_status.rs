@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = CheckShareJobStatusRequest<'a>;
 type Response = CheckShareJobStatusResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::PollArg;
 type ResponsePayload = serde_json::Value;
 
 /// `check_share_job_status`

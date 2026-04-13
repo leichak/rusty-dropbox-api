@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = UpdateFolderPolicyRequest<'a>;
 type Response = UpdateFolderPolicyResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::UpdateFolderPolicyArg;
 type ResponsePayload = serde_json::Value;
 
 /// `update_folder_policy`

@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = GetFileMetadataBatchRequest<'a>;
 type Response = GetFileMetadataBatchResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::GetFileMetadataBatchArg;
 type ResponsePayload = serde_json::Value;
 
 /// `get_file_metadata_batch`

@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = ListReceivedFilesRequest<'a>;
 type Response = ListReceivedFilesResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::ListFoldersArgs;
 type ResponsePayload = serde_json::Value;
 
 /// `list_received_files`

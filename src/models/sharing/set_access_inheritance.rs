@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = SetAccessInheritanceRequest<'a>;
 type Response = SetAccessInheritanceResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::SetAccessInheritanceArg;
 type ResponsePayload = serde_json::Value;
 
 /// `set_access_inheritance`

@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = RelinquishFileMembershipRequest<'a>;
 type Response = RelinquishFileMembershipResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::UnshareFileArg;
 type ResponsePayload = serde_json::Value;
 
 /// `relinquish_file_membership`

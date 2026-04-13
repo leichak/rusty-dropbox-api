@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = ListFoldersContinueRequest<'a>;
 type Response = ListFoldersContinueResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::ListFoldersContinueArg;
 type ResponsePayload = serde_json::Value;
 
 /// `list_folders_continue`

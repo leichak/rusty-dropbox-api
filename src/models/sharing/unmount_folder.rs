@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = UnmountFolderRequest<'a>;
 type Response = UnmountFolderResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::SharedFolderIdArg;
 type ResponsePayload = serde_json::Value;
 
 /// `unmount_folder`

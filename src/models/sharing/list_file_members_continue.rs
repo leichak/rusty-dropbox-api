@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = ListFileMembersContinueRequest<'a>;
 type Response = ListFileMembersContinueResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::ListFileMembersContinueArg;
 type ResponsePayload = serde_json::Value;
 
 /// `list_file_members_continue`

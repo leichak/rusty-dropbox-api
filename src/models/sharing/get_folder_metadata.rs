@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = GetFolderMetadataRequest<'a>;
 type Response = GetFolderMetadataResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::GetFolderMetadataArg;
 type ResponsePayload = serde_json::Value;
 
 /// `get_folder_metadata`

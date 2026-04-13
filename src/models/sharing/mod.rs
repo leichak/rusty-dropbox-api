@@ -178,3 +178,154 @@ pub struct ModifySharedLinkSettingsArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub remove_expiration: Option<bool>,
 }
+
+// ---- shared folder Arg/cursor types (responses kept as serde_json::Value) ----
+
+/// A shared_folder_id-only request (used by mount, unmount, unshare, transfer,
+/// relinquish_folder_membership and similar simple folder ops).
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SharedFolderIdArg {
+    pub shared_folder_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ShareFolderArg {
+    pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acl_update_policy: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub force_async: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub member_policy: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shared_link_policy: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub viewer_info_policy: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub access_inheritance: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_settings: Option<serde_json::Value>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UnshareFolderArg {
+    pub shared_folder_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub leave_a_copy: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TransferFolderArg {
+    pub shared_folder_id: String,
+    pub to_dropbox_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UpdateFolderPolicyArg {
+    pub shared_folder_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub member_policy: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acl_update_policy: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub viewer_info_policy: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shared_link_policy: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_settings: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Vec<String>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SetAccessInheritanceArg {
+    pub shared_folder_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub access_inheritance: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
+pub struct ListFoldersArgs {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Vec<String>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListFoldersContinueArg {
+    pub cursor: String,
+}
+
+// ---- file-membership Arg types ----
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UnshareFileArg {
+    pub file: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetFileMetadataArg {
+    pub file: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Vec<String>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetFileMetadataBatchArg {
+    pub files: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Vec<String>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetFolderMetadataArg {
+    pub shared_folder_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Vec<String>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListFileMembersArg {
+    pub file: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_inherited: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListFileMembersBatchArg {
+    pub files: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListFileMembersContinueArg {
+    pub cursor: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListFolderMembersArgs {
+    pub shared_folder_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListFolderMembersContinueArg {
+    pub cursor: String,
+}
+
+/// PollArg-shaped argument used by `check_*_job_status` endpoints.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PollArg {
+    pub async_job_id: String,
+}

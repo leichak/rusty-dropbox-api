@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = UnshareFileRequest<'a>;
 type Response = UnshareFileResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::UnshareFileArg;
 type ResponsePayload = serde_json::Value;
 
 /// `unshare_file`

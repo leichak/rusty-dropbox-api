@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = ListFolderMembersRequest<'a>;
 type Response = ListFolderMembersResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::ListFolderMembersArgs;
 type ResponsePayload = serde_json::Value;
 
 /// `list_folder_members`

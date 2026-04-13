@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = TransferFolderRequest<'a>;
 type Response = TransferFolderResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::TransferFolderArg;
 type ResponsePayload = serde_json::Value;
 
 /// `transfer_folder`

@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = CheckRemoveMemberJobStatusRequest<'a>;
 type Response = CheckRemoveMemberJobStatusResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::PollArg;
 type ResponsePayload = serde_json::Value;
 
 /// `check_remove_member_job_status`

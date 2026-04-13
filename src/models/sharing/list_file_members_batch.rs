@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = ListFileMembersBatchRequest<'a>;
 type Response = ListFileMembersBatchResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::ListFileMembersBatchArg;
 type ResponsePayload = serde_json::Value;
 
 /// `list_file_members_batch`

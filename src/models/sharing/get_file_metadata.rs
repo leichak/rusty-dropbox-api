@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = GetFileMetadataRequest<'a>;
 type Response = GetFileMetadataResponse;
-type RequestPayload = serde_json::Value;
+type RequestPayload = super::GetFileMetadataArg;
 type ResponsePayload = serde_json::Value;
 
 /// `get_file_metadata`
