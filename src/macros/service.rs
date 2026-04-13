@@ -52,9 +52,30 @@ macro_rules! implement_service {
                     response = response.body(data.to_vec());
                 }
 
-                let response = response
-                    .send()
-                    .map_err(|err| ApiError::Request(err.into()))?;
+                let mut attempts = 0u32;
+                let response = loop {
+                    let builder = response
+                        .try_clone()
+                        .ok_or_else(|| ApiError::Request(anyhow::anyhow!(
+                            "request body not clonable; 429 retry unsupported"
+                        )))?;
+                    let r = builder
+                        .send()
+                        .map_err(|err| ApiError::Request(err.into()))?;
+                    if r.status() != reqwest::StatusCode::TOO_MANY_REQUESTS
+                        || attempts >= 3
+                    {
+                        break r;
+                    }
+                    let wait = r
+                        .headers()
+                        .get("Retry-After")
+                        .and_then(|v| v.to_str().ok())
+                        .and_then(|s| s.parse::<u64>().ok())
+                        .unwrap_or(1);
+                    std::thread::sleep(std::time::Duration::from_secs(wait));
+                    attempts += 1;
+                };
 
                 let status = response.status();
                 let api_result_header = response
@@ -132,12 +153,32 @@ macro_rules! implement_service {
                     .iter()
                     .any(|h| matches!(h, Headers::DropboxApiResult));
 
-                let response = response.send();
-
                 let block = async move {
-                    let response = response
-                        .await
-                        .map_err(|err| ApiError::Request(err.into()))?;
+                    let mut attempts = 0u32;
+                    let response = loop {
+                        let builder = response
+                            .try_clone()
+                            .ok_or_else(|| ApiError::Request(anyhow::anyhow!(
+                                "request body not clonable; 429 retry unsupported"
+                            )))?;
+                        let r = builder
+                            .send()
+                            .await
+                            .map_err(|err| ApiError::Request(err.into()))?;
+                        if r.status() != reqwest::StatusCode::TOO_MANY_REQUESTS
+                            || attempts >= 3
+                        {
+                            break r;
+                        }
+                        let wait = r
+                            .headers()
+                            .get("Retry-After")
+                            .and_then(|v| v.to_str().ok())
+                            .and_then(|s| s.parse::<u64>().ok())
+                            .unwrap_or(1);
+                        tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
+                        attempts += 1;
+                    };
 
                     let status = response.status();
                     let api_result_header = response
@@ -268,12 +309,32 @@ macro_rules! implement_download_service {
                     }
                 }
 
-                let response = response.send();
-
                 let block = async move {
-                    let response = response
-                        .await
-                        .map_err(|err| ApiError::Request(err.into()))?;
+                    let mut attempts = 0u32;
+                    let response = loop {
+                        let builder = response
+                            .try_clone()
+                            .ok_or_else(|| ApiError::Request(anyhow::anyhow!(
+                                "request body not clonable; 429 retry unsupported"
+                            )))?;
+                        let r = builder
+                            .send()
+                            .await
+                            .map_err(|err| ApiError::Request(err.into()))?;
+                        if r.status() != reqwest::StatusCode::TOO_MANY_REQUESTS
+                            || attempts >= 3
+                        {
+                            break r;
+                        }
+                        let wait = r
+                            .headers()
+                            .get("Retry-After")
+                            .and_then(|v| v.to_str().ok())
+                            .and_then(|s| s.parse::<u64>().ok())
+                            .unwrap_or(1);
+                        tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
+                        attempts += 1;
+                    };
 
                     let status = response.status();
                     let api_result_header = response
