@@ -113,6 +113,80 @@ impl Client {
         Ok(())
     }
 
+    /// Unconditionally mint a new access token via the refresh grant. No-op
+    /// if the client was constructed without a `RefreshConfig`. Used by
+    /// `call` when a 401 comes back despite our expiry clock saying the
+    /// token was still fresh.
+    pub async fn force_refresh(&self) -> Result<()> {
+        let cfg = match &self.inner.refresh {
+            Some(c) => c.clone(),
+            None => return Ok(()),
+        };
+        let tokens = crate::auth::refresh(
+            &cfg.client_id,
+            &cfg.client_secret,
+            &cfg.refresh_token,
+        )
+        .await?;
+        let mut state = self.inner.token.write().unwrap();
+        state.access_token = tokens.access_token;
+        state.expires_at = Some(Instant::now() + Duration::from_secs(tokens.expires_in));
+        Ok(())
+    }
+
+    /// Sync variant of [`force_refresh`].
+    pub fn force_refresh_sync(&self) -> Result<()> {
+        let cfg = match &self.inner.refresh {
+            Some(c) => c.clone(),
+            None => return Ok(()),
+        };
+        let tokens = crate::auth::refresh_sync(
+            &cfg.client_id,
+            &cfg.client_secret,
+            &cfg.refresh_token,
+        )?;
+        let mut state = self.inner.token.write().unwrap();
+        state.access_token = tokens.access_token;
+        state.expires_at = Some(Instant::now() + Duration::from_secs(tokens.expires_in));
+        Ok(())
+    }
+
+    /// Run an async closure that builds and executes a request, auto-
+    /// refreshing the access token first if expired, and retrying once if
+    /// the server returns 401. The closure takes the current token string
+    /// and returns the future to execute.
+    ///
+    /// ```ignore
+    /// client.call(|token| async move {
+    ///     req::ListFolderRequest { access_token: &token, payload: Some(...) }
+    ///         .call().await
+    /// }).await?;
+    /// ```
+    pub async fn call<T, F, Fut>(&self, mut f: F) -> Result<T>
+    where
+        F: FnMut(String) -> Fut,
+        Fut: std::future::Future<Output = Result<T>>,
+    {
+        self.ensure_fresh().await?;
+        let token = self.token();
+        match f(token).await {
+            Ok(v) => Ok(v),
+            Err(e) => {
+                // If the error is specifically an Unauthorized wrapped in the
+                // ApiError enum, try one force-refresh + replay.
+                let is_401 = e
+                    .downcast_ref::<crate::errors::ApiError>()
+                    .is_some_and(|api| matches!(api, crate::errors::ApiError::Unauthorized(_)));
+                if !is_401 || self.inner.refresh.is_none() {
+                    return Err(e);
+                }
+                self.force_refresh().await?;
+                let token = self.token();
+                f(token).await
+            }
+        }
+    }
+
     /// Sync version of [`ensure_fresh`] for blocking callers.
     pub fn ensure_fresh_sync(&self) -> Result<()> {
         if !self.is_expired() {

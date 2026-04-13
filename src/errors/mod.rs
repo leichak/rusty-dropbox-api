@@ -14,6 +14,10 @@ pub enum ApiError {
     Parsing(anyhow::Error),
     #[error("Dropbox error: {0}")] // display trait
     DropBox(anyhow::Error),
+    /// HTTP 401. Split from `DropBox` so `Client::call` can detect expired
+    /// access tokens and retry once after refreshing.
+    #[error("Unauthorized: {0}")]
+    Unauthorized(anyhow::Error),
 }
 
 /// Decode a Dropbox error response body into a human-readable `anyhow::Error`.

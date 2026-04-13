@@ -89,10 +89,13 @@ macro_rules! implement_service {
                     .map_err(|err| ApiError::Parsing(err.into()))?;
 
                 if !status.is_success() {
-                    return Err(ApiError::DropBox(
-                        $crate::errors::decode_dropbox_error::<serde_json::Value>(status, &text),
-                    )
-                    .into());
+                    let err = $crate::errors::decode_dropbox_error::<serde_json::Value>(
+                        status, &text,
+                    );
+                    if status == reqwest::StatusCode::UNAUTHORIZED {
+                        return Err(ApiError::Unauthorized(err).into());
+                    }
+                    return Err(ApiError::DropBox(err).into());
                 }
 
                 let is_download_endpoint = headers
@@ -194,12 +197,13 @@ macro_rules! implement_service {
                         .map_err(|err| ApiError::Parsing(err.into()))?;
 
                     if !status.is_success() {
-                        return Err(ApiError::DropBox(
-                            $crate::errors::decode_dropbox_error::<serde_json::Value>(
-                                status, &text,
-                            ),
-                        )
-                        .into());
+                        let err = $crate::errors::decode_dropbox_error::<serde_json::Value>(
+                            status, &text,
+                        );
+                        if status == reqwest::StatusCode::UNAUTHORIZED {
+                            return Err(ApiError::Unauthorized(err).into());
+                        }
+                        return Err(ApiError::DropBox(err).into());
                     }
 
                     let payload_source = if is_download_endpoint {
@@ -272,10 +276,13 @@ macro_rules! implement_download_service {
 
                 if !status.is_success() {
                     let text = String::from_utf8_lossy(&bytes);
-                    return Err(ApiError::DropBox(
-                        $crate::errors::decode_dropbox_error::<serde_json::Value>(status, &text),
-                    )
-                    .into());
+                    let err = $crate::errors::decode_dropbox_error::<serde_json::Value>(
+                        status, &text,
+                    );
+                    if status == reqwest::StatusCode::UNAUTHORIZED {
+                        return Err(ApiError::Unauthorized(err).into());
+                    }
+                    return Err(ApiError::DropBox(err).into());
                 }
 
                 let header_json = api_result_header.unwrap_or_default();
@@ -352,12 +359,13 @@ macro_rules! implement_download_service {
 
                     if !status.is_success() {
                         let text = String::from_utf8_lossy(&bytes);
-                        return Err(ApiError::DropBox(
-                            $crate::errors::decode_dropbox_error::<serde_json::Value>(
-                                status, &text,
-                            ),
-                        )
-                        .into());
+                        let err = $crate::errors::decode_dropbox_error::<serde_json::Value>(
+                            status, &text,
+                        );
+                        if status == reqwest::StatusCode::UNAUTHORIZED {
+                            return Err(ApiError::Unauthorized(err).into());
+                        }
+                        return Err(ApiError::DropBox(err).into());
                     }
 
                     let header_json = api_result_header.unwrap_or_default();
