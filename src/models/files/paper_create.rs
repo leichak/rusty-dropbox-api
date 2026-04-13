@@ -5,7 +5,7 @@ use crate::{
     endpoints::headers::Headers,
     endpoints::{get_endpoint_url, Endpoint},
     errors::ApiError,
-    implement_service, implement_utils,
+    implement_content_upload_utils, implement_service,
     traits::{Service, Utils},
     AsyncClient, BoxFuture, SyncClient,
 };
@@ -24,6 +24,8 @@ type ResponsePayload = RequestResult;
 pub struct PaperCreateRequest<'a> {
     pub access_token: &'a str,
     pub payload: Option<RequestPayload>,
+    /// Binary body bytes.
+    pub data: Option<Vec<u8>>,
 }
 
 /// Response struct for adding properties
@@ -34,7 +36,7 @@ pub struct PaperCreateResponse {
 }
 
 // Impl utils trait
-implement_utils!(Request<'_>, RequestPayload);
+implement_content_upload_utils!(Request<'_>, RequestPayload);
 
 // Impl service trait
 implement_service!(

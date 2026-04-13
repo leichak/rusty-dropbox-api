@@ -11,4 +11,11 @@ pub trait Service<O: Sized, F: Sized> {
 pub trait Utils<'a> {
     type T: Serialize + Deserialize<'a>;
     fn payload(&self) -> Option<&Self::T>;
+
+    /// Binary request body for content-endpoints (upload_session/*, upload).
+    /// Default is None — only overridden by Request types that actually carry
+    /// file bytes.
+    fn content_body(&self) -> Option<&[u8]> {
+        None
+    }
 }

@@ -5,7 +5,7 @@ use crate::{
     endpoints::headers::Headers,
     endpoints::{get_endpoint_url, Endpoint},
     errors::ApiError,
-    implement_service, implement_utils,
+    implement_download_service, implement_utils,
     traits::{Service, Utils},
     AsyncClient, BoxFuture, SyncClient,
 };
@@ -31,13 +31,15 @@ pub struct GetThumbnailRequest<'a> {
 #[allow(dead_code)]
 pub struct GetThumbnailResponse {
     pub payload: ResponsePayload,
+    /// Raw binary body from Dropbox (file contents).
+    pub data: Vec<u8>,
 }
 
 // Impl utils trait
 implement_utils!(Request<'_>, RequestPayload);
 
 // Impl service trait
-implement_service!(
+implement_download_service!(
     Request<'_>,
     Response,
     ResponsePayload,
