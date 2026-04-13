@@ -389,11 +389,15 @@ pub struct PollArg {
 
 // ---- member selectors and Args ----
 
+/// Stone: `union MemberSelector { dropbox_id String | email String }`.
+/// Wire form: `{".tag": "email", "email": "..."}`. Modelled as struct
+/// variants — internally tagged enums + tuple variants of String don't work
+/// in serde.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum MemberSelector {
-    DropboxId(String),
-    Email(String),
+    DropboxId { dropbox_id: String },
+    Email { email: String },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -700,7 +704,7 @@ pub struct InviteeInfoEmail {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum InviteeInfo {
-    Email(String),
+    Email { email: String },
     Other,
 }
 

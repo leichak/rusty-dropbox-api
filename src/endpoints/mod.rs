@@ -1,7 +1,4 @@
 pub mod headers;
-use super::tests_utils::{
-    MOCK_SERVER_ASYNC_PORT, MOCK_SERVER_ASYNC_URL, MOCK_SERVER_SYNC_PORT, MOCK_SERVER_SYNC_URL,
-};
 
 /// Enum representing api available endpoints
 /// It is passed to fhe function
@@ -417,23 +414,21 @@ pub fn get_endpoint_url(endpoint: Endpoint) -> (String, Option<String>, Option<S
     binding
 }
 
-/// For testing purpose, it will replace original end-point with mock server url
+/// For tests: rewrite the live Dropbox URL to point at the per-test mock
+/// server (whose address is in the `tests_utils::URL_OVERRIDE` thread-local).
+/// When no override is set we leave the URL alone — the runtime path through
+/// `get_endpoint_url` then uses the live URL.
 #[allow(unused)]
 fn test_url(url: &str) -> (String, Option<String>, Option<String>) {
+    #[cfg(feature = "test-utils")]
+    let override_base = crate::tests_utils::get_url_override();
+    #[cfg(not(feature = "test-utils"))]
+    let override_base: Option<String> = None;
+    let base = match override_base {
+        Some(b) => b,
+        None => return (url.to_string(), None, None),
+    };
     let idx = url.find("com").expect("should have com") + 3;
-
-    let url_test_sync = format!(
-        "http://{}:{}{}",
-        MOCK_SERVER_SYNC_URL,
-        MOCK_SERVER_SYNC_PORT,
-        &url[idx..]
-    );
-    let url_test_async = format!(
-        "http://{}:{}{}",
-        MOCK_SERVER_ASYNC_URL,
-        MOCK_SERVER_ASYNC_PORT,
-        &url[idx..]
-    );
-    println!("{} {} {}", url, url_test_sync, url_test_async);
-    (url.to_string(), Some(url_test_sync), Some(url_test_async))
+    let rewritten = format!("{}{}", base, &url[idx..]);
+    (url.to_string(), Some(rewritten.clone()), Some(rewritten))
 }

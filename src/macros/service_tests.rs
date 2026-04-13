@@ -6,7 +6,7 @@
 
 use crate::api;
 use crate::api::Service;
-use crate::tests_utils::get_mut_or_init_async;
+use crate::tests_utils::with_test_server_async;
 
 const RAW_FILE_METADATA: &str = r#"{".tag":"file","name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":1,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
 
@@ -25,10 +25,8 @@ fn build_get_metadata_request<'a>(token: &'a str) -> api::files::get_metadata::G
 
 #[tokio::test]
 async fn retries_on_429_then_succeeds() {
-    let (m429, m200);
-    {
-        let mut server = get_mut_or_init_async().await;
-        m429 = server
+    with_test_server_async(|mut server| async move {
+        let m429 = server
             .mock("POST", "/2/files/get_metadata")
             .with_status(429)
             .with_header("Retry-After", "1")
@@ -36,7 +34,7 @@ async fn retries_on_429_then_succeeds() {
             .expect(1)
             .create_async()
             .await;
-        m200 = server
+        let m200 = server
             .mock("POST", "/2/files/get_metadata")
             .with_status(200)
             .with_header("Content-Type", "application/json")
@@ -44,27 +42,26 @@ async fn retries_on_429_then_succeeds() {
             .expect(1)
             .create_async()
             .await;
-    }
-    let req = build_get_metadata_request("test");
-    let resp = req.call().await.expect("retry path failed");
-    assert!(resp.is_some());
-    m429.assert();
-    m200.assert();
+        let req = build_get_metadata_request("test");
+        let resp = req.call().await.expect("retry path failed");
+        assert!(resp.is_some());
+        m429.assert();
+        m200.assert();
+    })
+    .await;
 }
 
 #[tokio::test]
 async fn retries_on_503_then_succeeds() {
-    let (m503, m200);
-    {
-        let mut server = get_mut_or_init_async().await;
-        m503 = server
+    with_test_server_async(|mut server| async move {
+        let m503 = server
             .mock("POST", "/2/files/get_metadata")
             .with_status(503)
             .with_body("")
             .expect(1)
             .create_async()
             .await;
-        m200 = server
+        let m200 = server
             .mock("POST", "/2/files/get_metadata")
             .with_status(200)
             .with_header("Content-Type", "application/json")
@@ -72,20 +69,19 @@ async fn retries_on_503_then_succeeds() {
             .expect(1)
             .create_async()
             .await;
-    }
-    let req = build_get_metadata_request("test");
-    let resp = req.call().await.expect("5xx retry failed");
-    assert!(resp.is_some());
-    m503.assert();
-    m200.assert();
+        let req = build_get_metadata_request("test");
+        let resp = req.call().await.expect("5xx retry failed");
+        assert!(resp.is_some());
+        m503.assert();
+        m200.assert();
+    })
+    .await;
 }
 
 #[tokio::test]
 async fn unauthorized_returns_typed_error_variant() {
-    let mock401;
-    {
-        let mut server = get_mut_or_init_async().await;
-        mock401 = server
+    with_test_server_async(|mut server| async move {
+        let mock401 = server
             .mock("POST", "/2/files/get_metadata")
             .with_status(401)
             .with_body(
@@ -94,14 +90,15 @@ async fn unauthorized_returns_typed_error_variant() {
             .expect(1)
             .create_async()
             .await;
-    }
-    let req = build_get_metadata_request("test");
-    let err = req.call().await.expect_err("expected 401 error");
-    let downcast = err.downcast_ref::<crate::errors::ApiError>();
-    assert!(
-        matches!(downcast, Some(crate::errors::ApiError::Unauthorized(_))),
-        "expected ApiError::Unauthorized, got: {:?}",
-        err
-    );
-    mock401.assert();
+        let req = build_get_metadata_request("test");
+        let err = req.call().await.expect_err("expected 401 error");
+        let downcast = err.downcast_ref::<crate::errors::ApiError>();
+        assert!(
+            matches!(downcast, Some(crate::errors::ApiError::Unauthorized(_))),
+            "expected ApiError::Unauthorized, got: {:?}",
+            err
+        );
+        mock401.assert();
+    })
+    .await;
 }

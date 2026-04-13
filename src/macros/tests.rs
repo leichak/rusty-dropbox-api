@@ -13,6 +13,10 @@
 /// - `$headers`: A vector of headers to include in the request.
 /// - `$req`: The request type used in the test (struct representing the API request).
 /// - `$payload`: The type of the payload being sent in the request.
+///
+/// Each test now spins up its own ephemeral mockito server via
+/// `tests_utils::with_test_server_*`. No shared mutex, no poison cascade,
+/// safe to run in parallel.
 #[macro_export]
 macro_rules! implement_tests {
     ($endpoint:expr, $headers:expr, $req:ident, $payload:ty) => {
@@ -20,22 +24,16 @@ macro_rules! implement_tests {
         pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
             let (body, response) = get_endpoint_test_body_response($endpoint);
 
-            let mut mock;
-            {
-                let mut server = get_mut_or_init_async().await;
-
-                let url = get_endpoint_url($endpoint).2;
-
-                let url_str = url.as_ref().unwrap().as_str();
-                let scheme_end = url_str.find("://").expect("scheme") + 3;
-                let postfix_idx = url_str[scheme_end..]
+            $crate::tests_utils::with_test_server_async(|mut server| async move {
+                let url = get_endpoint_url($endpoint).2.expect("test url");
+                let scheme_end = url.find("://").expect("scheme") + 3;
+                let postfix_idx = url[scheme_end..]
                     .find('/')
                     .map(|i| scheme_end + i)
                     .expect("path");
+                let path = &url[postfix_idx..];
 
-                mock = server
-                    .mock("POST", &url.unwrap().as_str()[postfix_idx..])
-                    .with_status(200);
+                let mut mock = server.mock("POST", path).with_status(200);
 
                 let headers: Vec<Headers> = $headers;
 
@@ -55,62 +53,52 @@ macro_rules! implement_tests {
                     }
                 }
 
-                let is_download_endpoint = headers
-                    .iter()
-                    .any(|h| matches!(h, Headers::DropboxApiResult));
                 if let Some(response) = &response {
-                    if is_download_endpoint {
-                        // HTTP headers cannot contain raw newlines; collapse
-                        // the pretty-printed fixture to a single line.
+                    if is_download_endpoint_req {
                         let compact = response.replace('\n', "");
                         mock = mock.with_header("Dropbox-API-Result", &compact);
                     } else {
                         mock = mock.with_body(response);
                     }
                 }
-                mock = mock.create_async().await;
-            }
+                let mock = mock.create_async().await;
 
-            let payload: Option<$payload>;
-            if let Some(body) = body {
-                payload = Some(serde_json::from_str(&body).expect("failed to deserialize"));
-            } else {
-                payload = None;
-            }
+                let payload: Option<$payload>;
+                if let Some(body) = body {
+                    payload = Some(serde_json::from_str(&body).expect("failed to deserialize"));
+                } else {
+                    payload = None;
+                }
 
-            let request = $req {
-                access_token: &TEST_AUTH_TOKEN,
-                payload,
-                ..$req::default_test_extras()
-            };
+                let request = $req {
+                    access_token: &TEST_AUTH_TOKEN,
+                    payload,
+                    ..$req::default_test_extras()
+                };
 
-            let f = request.call();
-            let _ = f.await?;
+                let f = request.call();
+                let _ = f.await?;
 
-            mock.assert();
-
-            Ok(())
+                mock.assert();
+                Ok::<(), Box<dyn std::error::Error>>(())
+            })
+            .await
         }
 
         #[test]
         pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
             let (body, response) = get_endpoint_test_body_response($endpoint);
 
-            let mut mock;
-            {
-                let mut server = get_mut_or_init();
-                let url = get_endpoint_url($endpoint).1;
-
-                let url_str = url.as_ref().unwrap().as_str();
-                let scheme_end = url_str.find("://").expect("scheme") + 3;
-                let postfix_idx = url_str[scheme_end..]
+            $crate::tests_utils::with_test_server_sync(|mut server| {
+                let url = get_endpoint_url($endpoint).1.expect("test url");
+                let scheme_end = url.find("://").expect("scheme") + 3;
+                let postfix_idx = url[scheme_end..]
                     .find('/')
                     .map(|i| scheme_end + i)
                     .expect("path");
+                let path = &url[postfix_idx..];
 
-                mock = server
-                    .mock("POST", &url.unwrap().as_str()[postfix_idx..])
-                    .with_status(200);
+                let mut mock = server.mock("POST", path).with_status(200);
 
                 let headers: Vec<Headers> = $headers;
 
@@ -129,39 +117,33 @@ macro_rules! implement_tests {
                         mock = mock.match_body(mockito::Matcher::JsonString(body.to_string()));
                     }
                 }
-                let is_download_endpoint = headers
-                    .iter()
-                    .any(|h| matches!(h, Headers::DropboxApiResult));
                 if let Some(response) = &response {
-                    if is_download_endpoint {
-                        // HTTP headers cannot contain raw newlines; collapse
-                        // the pretty-printed fixture to a single line.
+                    if is_download_endpoint_req {
                         let compact = response.replace('\n', "");
                         mock = mock.with_header("Dropbox-API-Result", &compact);
                     } else {
                         mock = mock.with_body(response);
                     }
                 }
-                mock = mock.create();
-            }
+                let mock = mock.create();
 
-            let payload: Option<$payload>;
-            if let Some(body) = body {
-                payload = Some(serde_json::from_str(&body).expect("failed to deserialise"));
-            } else {
-                payload = None;
-            }
+                let payload: Option<$payload>;
+                if let Some(body) = body {
+                    payload = Some(serde_json::from_str(&body).expect("failed to deserialise"));
+                } else {
+                    payload = None;
+                }
 
-            let request = $req {
-                access_token: &TEST_AUTH_TOKEN,
-                payload,
-                ..$req::default_test_extras()
-            };
+                let request = $req {
+                    access_token: &TEST_AUTH_TOKEN,
+                    payload,
+                    ..$req::default_test_extras()
+                };
 
-            let _ = request.call_sync()?;
-            mock.assert();
-
-            Ok(())
+                let _ = request.call_sync()?;
+                mock.assert();
+                Ok::<(), Box<dyn std::error::Error>>(())
+            })
         }
     };
 }

@@ -82,7 +82,7 @@ where
 mod tests {
     use super::upload_stream;
     use crate::api::files::WriteMode;
-    use crate::tests_utils::get_mut_or_init_async;
+    use crate::tests_utils::with_test_server_async;
     use std::io::Cursor;
 
     #[tokio::test]
@@ -90,24 +90,23 @@ mod tests {
         let meta_json =
             r#"{"name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":5,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
 
-        let mock;
-        {
-            let mut server = get_mut_or_init_async().await;
-            mock = server
+        with_test_server_async(|mut server| async move {
+            let mock = server
                 .mock("POST", "/2/files/upload")
                 .with_status(200)
                 .with_header("Content-Type", "application/json")
                 .with_body(meta_json)
                 .create_async()
                 .await;
-        }
 
-        let reader = Cursor::new(b"hello".to_vec());
-        let meta = upload_stream("test", "/f.txt", reader, WriteMode::Add)
-            .await
-            .expect("upload_stream returned error");
-        assert_eq!(meta.name, "f.txt");
-        assert_eq!(meta.size, 5);
-        mock.assert();
+            let reader = Cursor::new(b"hello".to_vec());
+            let meta = upload_stream("test", "/f.txt", reader, WriteMode::Add)
+                .await
+                .expect("upload_stream returned error");
+            assert_eq!(meta.name, "f.txt");
+            assert_eq!(meta.size, 5);
+            mock.assert();
+        })
+        .await;
     }
 }

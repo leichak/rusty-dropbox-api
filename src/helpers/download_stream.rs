@@ -69,7 +69,7 @@ pub async fn download_stream(
 #[cfg(all(test, feature = "test-utils"))]
 mod tests {
     use super::download_stream;
-    use crate::tests_utils::get_mut_or_init_async;
+    use crate::tests_utils::with_test_server_async;
     use futures::StreamExt;
 
     #[tokio::test]
@@ -78,30 +78,29 @@ mod tests {
             r#"{"name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":11,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
         let body_bytes: &[u8] = b"hello world";
 
-        let mock;
-        {
-            let mut server = get_mut_or_init_async().await;
-            mock = server
+        with_test_server_async(|mut server| async move {
+            let mock = server
                 .mock("POST", "/2/files/download")
                 .with_status(200)
                 .with_header("Dropbox-API-Result", meta_json)
                 .with_body(body_bytes)
                 .create_async()
                 .await;
-        }
 
-        let (meta, mut stream) = download_stream("test", "/f.txt")
-            .await
-            .expect("download_stream returned error");
+            let (meta, mut stream) = download_stream("test", "/f.txt")
+                .await
+                .expect("download_stream returned error");
 
-        assert_eq!(meta.name, "f.txt");
-        assert_eq!(meta.size, 11);
+            assert_eq!(meta.name, "f.txt");
+            assert_eq!(meta.size, 11);
 
-        let mut got = Vec::new();
-        while let Some(chunk) = stream.next().await {
-            got.extend_from_slice(&chunk.expect("chunk error"));
-        }
-        assert_eq!(got, body_bytes);
-        mock.assert();
+            let mut got = Vec::new();
+            while let Some(chunk) = stream.next().await {
+                got.extend_from_slice(&chunk.expect("chunk error"));
+            }
+            assert_eq!(got, body_bytes);
+            mock.assert();
+        })
+        .await;
     }
 }

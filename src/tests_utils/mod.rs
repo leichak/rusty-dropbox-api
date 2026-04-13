@@ -1,59 +1,70 @@
 #![allow(dead_code)]
 
 #[allow(unused)]
-use {
-    super::endpoints::Endpoint,
-    mockito::Server,
-    std::sync::{Mutex, MutexGuard, OnceLock},
-};
+use super::endpoints::Endpoint;
 
-/// Test servers urls and ports
-#[allow(unused)]
-pub const MOCK_SERVER_SYNC_URL: &str = "127.0.0.1";
-#[allow(unused)]
-pub const MOCK_SERVER_SYNC_PORT: u16 = 8002;
-#[allow(unused)]
-pub const MOCK_SERVER_ASYNC_URL: &str = "127.0.0.1";
-#[allow(unused)]
-pub const MOCK_SERVER_ASYNC_PORT: u16 = 1420;
+#[cfg(feature = "test-utils")]
+use std::cell::RefCell;
 
-/// Test servers
-#[cfg(feature = "test-utils")]
-pub static MOCK_SERVER_SYNC: OnceLock<Mutex<Server>> = OnceLock::new();
-#[cfg(feature = "test-utils")]
-pub static MOCK_SERVER_ASYNC: OnceLock<Mutex<Server>> = OnceLock::new();
+// Per-test mock servers replace the prior shared OnceLock<Mutex<Server>>.
+//
+// The old design serialised every test through one global mockito server;
+// any test that panicked while holding the lock poisoned it AND mockito's
+// internal state, cascading failures across the suite. The new design gives
+// each test its own ephemeral mockito::Server (random port), records the
+// server's URL in a thread-local that `endpoints::test_url` consults, runs
+// the test body, and drops the server (releasing the port).
+//
+// `#[tokio::test]` runs each test in a fresh current-thread runtime on a
+// fresh thread, so the thread_local is private to that test.
 
-/// Sync function that inits default or get mutex to test server
 #[cfg(feature = "test-utils")]
-pub fn get_mut_or_init() -> MutexGuard<'static, Server> {
-    MOCK_SERVER_SYNC
-        .get_or_init(|| {
-            Mutex::new(mockito::Server::new_with_opts(mockito::ServerOpts {
-                host: MOCK_SERVER_SYNC_URL,
-                port: MOCK_SERVER_SYNC_PORT,
-                ..Default::default()
-            }))
-        })
-        .lock()
-        .expect("Failed to lock")
+thread_local! {
+    static URL_OVERRIDE: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 
+/// Set (or clear with `None`) the URL prefix the test mock server is
+/// listening on. Read by `endpoints::test_url`.
 #[cfg(feature = "test-utils")]
-pub async fn get_mut_or_init_async() -> MutexGuard<'static, Server> {
-    MOCK_SERVER_ASYNC
-        .get_or_init(|| {
-            let server = futures::executor::block_on(mockito::Server::new_with_opts_async(
-                mockito::ServerOpts {
-                    host: MOCK_SERVER_ASYNC_URL,
-                    port: MOCK_SERVER_ASYNC_PORT,
-                    ..Default::default()
-                },
-            ));
+pub fn set_url_override(url: Option<String>) {
+    URL_OVERRIDE.with(|o| *o.borrow_mut() = url);
+}
 
-            Mutex::new(server)
-        })
-        .lock()
-        .expect("Failed to lock")
+/// Read the per-thread override. Used by the URL-rewriting path in
+/// `endpoints::mod::test_url`.
+#[cfg(feature = "test-utils")]
+pub fn get_url_override() -> Option<String> {
+    URL_OVERRIDE.with(|o| o.borrow().clone())
+}
+
+/// Spin up a fresh async mockito server for one test, set the URL override
+/// to the server's address, run the closure (which receives `&mut Server`
+/// for mock setup and the URL is already in effect for any request issued
+/// inside), then clear the override and drop the server.
+#[cfg(feature = "test-utils")]
+pub async fn with_test_server_async<F, Fut, T>(f: F) -> T
+where
+    F: FnOnce(mockito::ServerGuard) -> Fut,
+    Fut: std::future::Future<Output = T>,
+{
+    let server = mockito::Server::new_async().await;
+    set_url_override(Some(server.url()));
+    let result = f(server).await;
+    set_url_override(None);
+    result
+}
+
+/// Sync version.
+#[cfg(feature = "test-utils")]
+pub fn with_test_server_sync<F, T>(f: F) -> T
+where
+    F: FnOnce(mockito::ServerGuard) -> T,
+{
+    let server = mockito::Server::new();
+    set_url_override(Some(server.url()));
+    let result = f(server);
+    set_url_override(None);
+    result
 }
 
 #[cfg(feature = "test-utils")]
@@ -2946,9 +2957,9 @@ pub fn get_endpoint_test_body_response(
           "id": "id:1234567890abcdef",
           "name": "example_file.txt",
           "policy": {
-            "acl_update_policy": "editors",
+            "acl_update_policy": {".tag": "editors"},
             "shared_link_policy": "team_only",
-            "member_policy": "team"
+            "member_policy": {".tag": "team"}
           },
           "preview_url": "https://www.dropbox.com/preview/example_file.txt",
           "access_type": "viewer",
@@ -2992,8 +3003,8 @@ pub fn get_endpoint_test_body_response(
           "name": "file2.txt",
           "policy": {
             "acl_update_policy": "owners",
-            "shared_link_policy": "anyone",
-            "member_policy": "team"
+            "shared_link_policy": {".tag": "anyone"},
+            "member_policy": {".tag": "team"}
           },
           "preview_url": "https://www.dropbox.com/preview/file2.txt",
           "access_type": "editor",
@@ -4276,7 +4287,7 @@ pub fn get_endpoint_test_body_response(
         Endpoint::SharingSetAccessInheritancePost => (
             Some(
                 r##"{
-    "access_inheritance": "inherit",
+    "access_inheritance": {".tag": "inherit"},
     "shared_folder_id": "84528192421"
 }"##,
             ),
@@ -4344,12 +4355,12 @@ pub fn get_endpoint_test_body_response(
         Endpoint::SharingShareFolderPost => (
             Some(
                 r##"{
-    "access_inheritance": "inherit",
-    "acl_update_policy": "editors",
+    "access_inheritance": {".tag": "inherit"},
+    "acl_update_policy": {".tag": "editors"},
     "force_async": false,
-    "member_policy": "team",
+    "member_policy": {".tag": "team"},
     "path": "/example/workspace",
-    "shared_link_policy": "members"
+    "shared_link_policy": {".tag": "members"}
 }"##,
             ),
             Some(
@@ -4514,10 +4525,10 @@ pub fn get_endpoint_test_body_response(
         Endpoint::SharingUpdateFolderPolicyPost => (
             Some(
                 r##"{
-    "acl_update_policy": "owner",
-    "member_policy": "team",
+    "acl_update_policy": {".tag": "owner"},
+    "member_policy": {".tag": "team"},
     "shared_folder_id": "84528192421",
-    "shared_link_policy": "members"
+    "shared_link_policy": {".tag": "members"}
 }"##,
             ),
             Some(

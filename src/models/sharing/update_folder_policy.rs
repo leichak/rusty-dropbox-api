@@ -13,7 +13,7 @@ use std::{future::Future, pin::Pin};
 type Request<'a> = UpdateFolderPolicyRequest<'a>;
 type Response = UpdateFolderPolicyResponse;
 type RequestPayload = super::UpdateFolderPolicyArg;
-type ResponsePayload = super::ShareFolderLaunch;
+type ResponsePayload = super::SharedFolderMetadata;
 
 /// `update_folder_policy`
 /// Payload and response are modelled as `serde_json::Value` for now — the
@@ -39,3 +39,26 @@ implement_service!(
     Endpoint::SharingUpdateFolderPolicyPost,
     vec![Headers::ContentTypeAppJson]
 );
+
+#[cfg(all(test, feature = "test-utils"))]
+mod tests {
+    use crate::TEST_AUTH_TOKEN;
+
+    use super::{Request, RequestPayload};
+
+    use tokio;
+
+    use crate::{
+        endpoints::{get_endpoint_url, headers::Headers, Endpoint},
+        implement_tests,
+        tests_utils::get_endpoint_test_body_response,
+        traits::Service,
+    };
+
+    implement_tests!(
+        Endpoint::SharingUpdateFolderPolicyPost,
+        vec![Headers::TestAuthorization, Headers::ContentTypeAppJson],
+        Request,
+        RequestPayload
+    );
+}
