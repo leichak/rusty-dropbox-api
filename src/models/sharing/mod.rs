@@ -145,17 +145,45 @@ pub struct CreateSharedLinkWithSettingsArg {
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SharedLinkSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub requested_visibility: Option<String>,
+    pub requested_visibility: Option<RequestedVisibility>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link_password: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub audience: Option<String>,
+    pub audience: Option<LinkAudience>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub access: Option<String>,
+    pub access: Option<LinkAccessLevel>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_download: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum RequestedVisibility {
+    Public,
+    TeamOnly,
+    Password,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum LinkAudience {
+    Public,
+    Team,
+    NoOne,
+    Password,
+    Members,
+    Other,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum LinkAccessLevel {
+    Viewer,
+    Editor,
+    Max,
+    Other,
 }
 
 // ---- get_shared_link_metadata ----
