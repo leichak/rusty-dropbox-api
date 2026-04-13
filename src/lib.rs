@@ -9,8 +9,9 @@
 //! # async fn run() -> anyhow::Result<()> {
 //! let token = std::env::var("DROPBOX_TOKEN")?;
 //! let client = rusty_dropbox_sdk::Client::new(token);
+//! let bearer = client.token();
 //! let req = api::files::list_folder::ListFolderRequest {
-//!     access_token: client.token(),
+//!     access_token: &bearer,
 //!     payload: Some(api::files::ListFolderArgs {
 //!         path: String::new(),
 //!         recursive: Some(false),
@@ -44,6 +45,7 @@
 //! Dropbox HTTP API docs: <https://www.dropbox.com/developers/documentation/http/documentation>
 
 pub mod api;
+pub mod auth;
 mod client;
 mod endpoints;
 mod errors;
