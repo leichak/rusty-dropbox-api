@@ -12,7 +12,7 @@ use std::{future::Future, pin::Pin};
 
 type Request<'a> = RelinquishFolderMembershipRequest<'a>;
 type Response = RelinquishFolderMembershipResponse;
-type RequestPayload = super::SharedFolderIdArg;
+type RequestPayload = super::RelinquishFolderMembershipArg;
 type ResponsePayload = serde_json::Value;
 
 /// `relinquish_folder_membership`

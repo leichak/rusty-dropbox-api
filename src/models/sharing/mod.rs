@@ -141,10 +141,13 @@ pub struct CreateSharedLinkWithSettingsArg {
 
 /// Optional settings when creating a shared link. All fields optional; any
 /// unspecified key defaults to Dropbox's per-account policy.
+///
+/// Field set verified against the Stone spec at
+/// `dropbox-api-spec/shared_links.stone`.
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct SharedLinkSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub requested_visibility: Option<RequestedVisibility>,
+    pub require_password: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link_password: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -152,7 +155,9 @@ pub struct SharedLinkSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub audience: Option<LinkAudience>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub access: Option<LinkAccessLevel>,
+    pub access: Option<RequestedLinkAccessLevel>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub requested_visibility: Option<RequestedVisibility>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_download: Option<bool>,
 }
@@ -176,12 +181,27 @@ pub enum LinkAudience {
     Other,
 }
 
+/// Per Stone spec `shared_links.stone`, `LinkAccessLevel` has only two
+/// variants. `Other` is added defensively so future Dropbox additions don't
+/// break deserialization.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum LinkAccessLevel {
     Viewer,
     Editor,
+    Other,
+}
+
+/// Used by `SharedLinkSettings.access` (request-side; the spec calls it
+/// `RequestedLinkAccessLevel` and adds `max` + `default` to the response-side
+/// `LinkAccessLevel`).
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum RequestedLinkAccessLevel {
+    Viewer,
+    Editor,
     Max,
+    Default,
     Other,
 }
 
@@ -219,19 +239,19 @@ pub struct SharedFolderIdArg {
 pub struct ShareFolderArg {
     pub path: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub acl_update_policy: Option<String>,
+    pub acl_update_policy: Option<AclUpdatePolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub force_async: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub member_policy: Option<String>,
+    pub member_policy: Option<MemberPolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub shared_link_policy: Option<String>,
+    pub shared_link_policy: Option<SharedLinkPolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub viewer_info_policy: Option<String>,
+    pub viewer_info_policy: Option<ViewerInfoPolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub access_inheritance: Option<String>,
+    pub access_inheritance: Option<AccessInheritance>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub actions: Option<Vec<String>>,
+    pub actions: Option<Vec<FolderAction>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link_settings: Option<serde_json::Value>,
 }
@@ -253,24 +273,34 @@ pub struct TransferFolderArg {
 pub struct UpdateFolderPolicyArg {
     pub shared_folder_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub member_policy: Option<String>,
+    pub member_policy: Option<MemberPolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub acl_update_policy: Option<String>,
+    pub acl_update_policy: Option<AclUpdatePolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub viewer_info_policy: Option<String>,
+    pub viewer_info_policy: Option<ViewerInfoPolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub shared_link_policy: Option<String>,
+    pub shared_link_policy: Option<SharedLinkPolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link_settings: Option<serde_json::Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub actions: Option<Vec<String>>,
+    pub actions: Option<Vec<FolderAction>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SetAccessInheritanceArg {
     pub shared_folder_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub access_inheritance: Option<String>,
+    pub access_inheritance: Option<AccessInheritance>,
+}
+
+/// Per Stone spec `RelinquishFolderMembershipArg` has its own shape.
+/// Previously this endpoint reused `SharedFolderIdArg` — that worked but
+/// dropped the `leave_a_copy` flag.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RelinquishFolderMembershipArg {
+    pub shared_folder_id: String,
+    #[serde(default)]
+    pub leave_a_copy: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -318,7 +348,7 @@ pub struct GetFolderMetadataArg {
 pub struct ListFileMembersArg {
     pub file: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub actions: Option<Vec<String>>,
+    pub actions: Option<Vec<MemberAction>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_inherited: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -341,7 +371,7 @@ pub struct ListFileMembersContinueArg {
 pub struct ListFolderMembersArgs {
     pub shared_folder_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub actions: Option<Vec<String>>,
+    pub actions: Option<Vec<FolderAction>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<u32>,
 }
@@ -366,26 +396,38 @@ pub enum MemberSelector {
     Email(String),
 }
 
-/// `members` is a list of `{member, custom_message?, ...}` entries; we keep
-/// individual members as Value to avoid pulling in InviteeInfo etc.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AddFileMemberArgs {
     pub file: String,
-    pub members: Vec<serde_json::Value>,
+    pub members: Vec<MemberSelector>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_message: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quiet: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub access_level: Option<String>,
+    pub access_level: Option<AccessLevel>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub add_message_as_comment: Option<bool>,
+}
+
+/// Single entry in `AddFolderMemberArg.members`. Per Stone spec:
+///   member: MemberSelector
+///   access_level: AccessLevel = viewer
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AddMember {
+    pub member: MemberSelector,
+    #[serde(default = "default_viewer_access_level")]
+    pub access_level: AccessLevel,
+}
+
+fn default_viewer_access_level() -> AccessLevel {
+    AccessLevel::Viewer
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AddFolderMemberArg {
     pub shared_folder_id: String,
-    pub members: Vec<serde_json::Value>,
+    pub members: Vec<AddMember>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quiet: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -409,14 +451,14 @@ pub struct RemoveFolderMemberArg {
 pub struct UpdateFileMemberArgs {
     pub file: String,
     pub member: MemberSelector,
-    pub access_level: String,
+    pub access_level: AccessLevel,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateFolderMemberArg {
     pub shared_folder_id: String,
     pub member: MemberSelector,
-    pub access_level: String,
+    pub access_level: AccessLevel,
 }
 
 // ---- typed response wrappers (deeply nested fields stay as Value) ----
