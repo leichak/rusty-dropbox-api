@@ -54,7 +54,7 @@ use serde::{Deserialize, Serialize};
 // Common Metadata Structs
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum Metadata {
     #[serde(rename = "file")]
     File(FileMetadata),
@@ -271,7 +271,7 @@ pub struct DeletedMetadata {
 // Error Structs
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum ApiError {
     #[serde(rename = "path_lookup")]
     PathLookup(LookupError),
@@ -286,7 +286,7 @@ pub enum ApiError {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum LookupError {
     #[serde(rename = "malformed_path")]
     MalformedPath(Option<String>),
@@ -295,7 +295,7 @@ pub enum LookupError {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum WriteError {
     #[serde(rename = "malformed_path")]
     MalformedPath(Option<String>),
@@ -308,7 +308,7 @@ pub enum WriteError {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum ConflictType {
     #[serde(rename = "file")]
     File,
@@ -349,7 +349,7 @@ pub struct RelocationPath {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum RelocationBatchV2Launch {
     #[serde(rename = "async_job_id")]
     AsyncJobId { async_job_id: String },
@@ -363,7 +363,7 @@ pub struct RelocationBatchV2Result {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum RelocationBatchResultEntry {
     #[serde(rename = "success")]
     Success { success: Metadata },
@@ -384,7 +384,7 @@ pub struct AsyncJobCheckArgs {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum CopyBatchCheckResult {
     #[serde(rename = "complete")]
     Complete(RelocationBatchV2Result),
@@ -445,7 +445,7 @@ pub struct CreateFolderBatchArgs {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum CreateFolderBatchLaunch {
     #[serde(rename = "async_job_id")]
     AsyncJobId { async_job_id: String },
@@ -459,7 +459,7 @@ pub struct CreateFolderBatchResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum CreateFolderBatchResultEntry {
     #[serde(rename = "success")]
     Success(CreateFolderEntryResult),
@@ -473,7 +473,7 @@ pub struct CreateFolderEntryResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum CreateFolderEntryError {
     #[serde(rename = "path")]
     Path(WriteError),
@@ -482,7 +482,7 @@ pub enum CreateFolderEntryError {
 // files/create_folder_batch/check
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum CreateFolderBatchCheckResult {
     #[serde(rename = "complete")]
     Complete(CreateFolderBatchResult),
@@ -512,7 +512,7 @@ pub struct DeleteBatchArgs {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum DeleteBatchLaunch {
     #[serde(rename = "async_job_id")]
     AsyncJobId { async_job_id: String },
@@ -526,7 +526,7 @@ pub struct DeleteBatchResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum DeleteBatchResultEntry {
     #[serde(rename = "success")]
     Success(DeleteBatchResultData),
@@ -542,7 +542,7 @@ pub struct DeleteBatchResultData {
 // files/delete_batch/check
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum DeleteBatchJobStatus {
     #[serde(rename = "complete")]
     Complete(DeleteBatchResult),
@@ -632,7 +632,7 @@ pub struct LockFileBatchResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum LockFileResultEntry {
     #[serde(rename = "success")]
     Success(LockFileResult),
@@ -722,7 +722,7 @@ pub struct CommitInfo {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum WriteMode {
     #[serde(rename = "add")]
     Add,
@@ -764,7 +764,7 @@ pub struct ThumbnailV2Arg {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum PathOrLink {
     #[serde(rename = "path")]
     Path { path: String },
@@ -788,7 +788,7 @@ pub struct ThumbnailEntry {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum GetThumbnailBatchEntry {
     #[serde(rename = "success")]
     Success(ThumbnailEntry),
@@ -942,7 +942,7 @@ pub struct ListFolderContinueResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum ListFolderContinueError {
     #[serde(rename = "path")]
     Path(LookupError),
@@ -1059,7 +1059,7 @@ pub struct MoveBatchArgs {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum MoveBatchResult {
     #[serde(rename = "complete")]
     Complete(RelocationBatchV2Result),
@@ -1070,7 +1070,7 @@ pub enum MoveBatchResult {
 // files/move_batch/check_v2
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum MoveBatchJobStatus {
     #[serde(rename = "complete")]
     Complete(RelocationBatchV2Result),
@@ -1143,7 +1143,7 @@ pub struct SaveUrlArg {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum SaveUrlResult {
     #[serde(rename = "complete")]
     Complete(FileMetadata),
@@ -1152,7 +1152,7 @@ pub enum SaveUrlResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum SaveUrlError {
     Path(LookupError),
     DownloadFailed,
@@ -1163,7 +1163,7 @@ pub enum SaveUrlError {
 // files/save_url/check_job_status
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum SaveUrlJobStatus {
     #[serde(rename = "in_progress")]
     InProgress,
@@ -1239,7 +1239,7 @@ pub struct HighlightSpan {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum SearchMetadata {
     Metadata(SearchFileMatch),
 }
@@ -1265,7 +1265,7 @@ pub struct AddTagArg {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum AddTagError {
     Path(LookupError),
     TooManyTags,
@@ -1290,7 +1290,7 @@ pub struct PathToTags {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum Tag {
     #[serde(rename = "user_generated_tag")]
     UserGeneratedTag(UserGeneratedTag),
@@ -1310,7 +1310,7 @@ pub struct RemoveTagArg {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum RemoveTagError {
     Path(LookupError),
     TagNotPresent,
@@ -1349,7 +1349,7 @@ pub struct UploadArg {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum UploadError {
     Path(WriteError),
     PropertiesError,
@@ -1375,7 +1375,7 @@ pub struct UploadSessionCursor {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum UploadSessionAppendError {
     NotFound,
     IncorrectOffset,
@@ -1409,7 +1409,7 @@ pub struct UploadSessionAppendBatchResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum UploadSessionAppendBatchResultEntry {
     Success,
     Failure(UploadSessionAppendError),
@@ -1426,7 +1426,7 @@ pub struct UploadSessionFinishArg {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum UploadSessionFinishError {
     LookupFailed,
     Path(LookupError),
@@ -1504,7 +1504,7 @@ pub struct UploadSessionStartResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum UploadSessionStartError {
     ConcurrentSessionDataNotAllowed,
     ConcurrentSessionCloseNotAllowed,
@@ -1527,7 +1527,7 @@ pub struct UploadSessionStartBatchResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum UploadSessionType {
     #[serde(rename = "sequential")]
     Sequential,
@@ -1538,7 +1538,7 @@ pub enum UploadSessionType {
 // RelocationError
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum RelocationError {
     #[serde(rename = "from_lookup")]
     FromLookup(LookupError),
@@ -1575,7 +1575,7 @@ pub enum RelocationError {
 // MoveIntoVaultError
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum MoveIntoVaultError {
     #[serde(rename = "is_shared_folder")]
     IsSharedFolder,
@@ -1586,7 +1586,7 @@ pub enum MoveIntoVaultError {
 // MoveIntoFamilyError
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum MoveIntoFamilyError {
     #[serde(rename = "is_shared_folder")]
     IsSharedFolder,
@@ -1606,7 +1606,7 @@ pub struct DeleteArg {
 // DeleteError
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag")]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum DeleteError {
     #[serde(rename = "path_lookup")]
     PathLookup(LookupError),
