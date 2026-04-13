@@ -35,7 +35,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rusty_dropbox_sdk = "0.1"
+rusty_dropbox_sdk = "0.4"
 tokio = { version = "1", features = ["full"] }
 ```
 
@@ -79,6 +79,70 @@ async fn main() {
         Ok(result) => println!("Token revoked: {:?}", result),
         Err(e) => println!("Error: {:?}", e),
     }
+}
+```
+
+### Auto-refreshing access tokens
+
+```rust
+use rusty_dropbox_sdk::{api, Client, client::RefreshConfig};
+use rusty_dropbox_sdk::api::Service;
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let client = Client::with_refresh(
+        "current_access_token",
+        14_400, // expires_in (seconds), from the OAuth response
+        RefreshConfig {
+            client_id: std::env::var("DROPBOX_CLIENT_ID")?,
+            client_secret: std::env::var("DROPBOX_CLIENT_SECRET")?,
+            refresh_token: std::env::var("DROPBOX_REFRESH_TOKEN")?,
+        },
+    );
+
+    // client.call() refreshes if expired, runs your closure, and retries once on 401.
+    let result = client
+        .call(|token| async move {
+            api::files::list_folder::ListFolderRequest {
+                access_token: &token,
+                payload: Some(api::files::ListFolderArgs {
+                    path: "".to_string(),
+                    recursive: Some(false),
+                    include_media_info: None,
+                    include_deleted: None,
+                    include_has_explicit_shared_members: None,
+                    include_mounted_folders: None,
+                    limit: Some(50),
+                    shared_link: None,
+                    include_property_groups: None,
+                    include_non_downloadable_files: None,
+                }),
+            }
+            .call()
+            .await
+        })
+        .await?;
+    println!("{:?}", result);
+    Ok(())
+}
+```
+
+### Streaming a large download
+
+```rust
+use rusty_dropbox_sdk::helpers::download_stream::download_stream;
+use futures::StreamExt;
+use tokio::io::AsyncWriteExt;
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let (meta, mut stream) = download_stream("your_token", "/big.zip").await?;
+    println!("downloading {} ({} bytes)", meta.name, meta.size);
+    let mut out = tokio::fs::File::create("./big.zip").await?;
+    while let Some(chunk) = stream.next().await {
+        out.write_all(&chunk?).await?;
+    }
+    Ok(())
 }
 ```
 

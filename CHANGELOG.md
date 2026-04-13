@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0]
+
+### Added
+- `Client::call(|token| async {...})` wraps a request closure with auto
+  `ensure_fresh()` and one-shot 401 retry-with-`force_refresh()`. Opt-in;
+  `req.call().await?` still works for callers that manage tokens themselves.
+- `Client::force_refresh()` / `force_refresh_sync()` — unconditional token
+  refresh used by `call`'s 401 path.
+- `errors::ApiError::Unauthorized(anyhow::Error)` — split out of the generic
+  `DropBox` variant so 401s are programmatically detectable.
+- `helpers::download_stream(token, path)` — returns parsed `FileMetadata`
+  alongside a `Stream<Item = Result<Bytes>>` of body chunks. Avoids the
+  `Vec<u8>` buffering done by the regular `DownloadRequest`.
+- Fully typed sharing response trees: `LinkPermissions`, `VisibilityPolicy`,
+  `LinkAudienceOption`, `ResolvedVisibility`,
+  `SharedLinkAccessFailureReason`, `Team`, `TeamMemberInfo`, `UserInfo`,
+  `GroupInfo`, `GroupType`, `GroupManagementType`, `InviteeInfo`,
+  `AccessLevel`, `UserMembershipInfo`, `GroupMembershipInfo`,
+  `InviteeMembershipInfo`, `AclUpdatePolicy`, `MemberPolicy`,
+  `ViewerInfoPolicy`, `AccessInheritance`, `FolderPolicy`,
+  `SharedFolderMetadata`, `SharedFileMetadata`. Swapped into
+  `FileLinkMetadata`, `FolderLinkMetadata`, `ListFileMembersResult`,
+  `ListFolderMembersResult`, `ListFoldersResult`, `ListReceivedFilesResult`.
+- `secondary_emails` namespace (3 endpoints): `add`, `delete`,
+  `resend_verification_emails`.
+- `seen_state` namespace (1 endpoint): `mark_seen`.
+
+### Changed
+- **Breaking**: macros now return `ApiError::Unauthorized(...)` on HTTP 401
+  instead of folding it into `ApiError::DropBox(...)`. Callers that match
+  on the error variant need a new arm.
+- `reqwest` feature set adds `stream` (needed by the streaming download
+  helper); new dep `bytes = "1"`.
+
 ## [0.3.0]
 
 ### Added
