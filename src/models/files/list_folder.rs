@@ -45,6 +45,45 @@ implement_service!(
     vec![Headers::ContentTypeAppJson]
 );
 
+impl<'a> ListFolderRequest<'a> {
+    /// Walk every page of list_folder + list_folder/continue and return the
+    /// flat list of entries. Avoids callers having to implement the
+    /// cursor-follow loop themselves.
+    pub async fn collect_all(
+        &self,
+    ) -> Result<Vec<super::Metadata>> {
+        use super::list_folders_continue::ListFolderContinueRequest;
+        use super::ListFolderContinueArgs;
+        use anyhow::Context;
+
+        let token = self.access_token.to_string();
+
+        let first = self
+            .call()
+            .await?
+            .context("list_folder returned empty response")?;
+        let mut all = first.payload.entries;
+        let mut cursor = first.payload.cursor;
+        let mut has_more = first.payload.has_more;
+
+        while has_more {
+            let next_req = ListFolderContinueRequest {
+                access_token: &token,
+                payload: Some(ListFolderContinueArgs { cursor }),
+            };
+            let next = next_req
+                .call()
+                .await?
+                .context("list_folder/continue returned empty response")?;
+            all.extend(next.payload.entries);
+            cursor = next.payload.cursor;
+            has_more = next.payload.has_more;
+        }
+
+        Ok(all)
+    }
+}
+
 #[cfg(all(test, feature = "test-utils"))]
 mod tests {
     use crate::TEST_AUTH_TOKEN;

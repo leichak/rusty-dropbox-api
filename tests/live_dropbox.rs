@@ -71,6 +71,36 @@ async fn list_root_folder() {
 }
 
 #[tokio::test]
+async fn list_root_collect_all() {
+    let token = match live_token() {
+        Some(t) => t,
+        None => {
+            eprintln!("DROPBOX_TEST_TOKEN not set — skipping");
+            return;
+        }
+    };
+
+    let request = api::files::list_folder::ListFolderRequest {
+        access_token: &token,
+        payload: Some(api::files::ListFolderArgs {
+            path: "".to_string(),
+            recursive: Some(false),
+            include_media_info: None,
+            include_deleted: None,
+            include_has_explicit_shared_members: None,
+            include_mounted_folders: None,
+            limit: Some(2),  // force pagination on any non-empty root
+            shared_link: None,
+            include_property_groups: None,
+            include_non_downloadable_files: None,
+        }),
+    };
+
+    let entries = request.collect_all().await.expect("collect_all failed");
+    println!("collect_all walked {} total entries", entries.len());
+}
+
+#[tokio::test]
 async fn list_root_sync() {
     let token = match live_token() {
         Some(t) => t,
