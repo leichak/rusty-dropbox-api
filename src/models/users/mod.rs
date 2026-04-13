@@ -104,6 +104,23 @@ pub struct TeamSharingPolicies {
     pub shared_folder_member_policy: SharedFolderMemberPolicy,
     pub shared_folder_join_policy: SharedFolderJoinPolicy,
     pub shared_link_create_policy: SharedLinkCreatePolicy,
+    pub group_creation_policy: GroupCreation,
+    pub shared_folder_link_restriction_policy: SharedFolderBlanketLinkRestrictionPolicy,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum GroupCreation {
+    AdminsAndMembers,
+    AdminsOnly,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum SharedFolderBlanketLinkRestrictionPolicy {
+    Members,
+    Anyone,
+    Other,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -178,6 +195,7 @@ pub struct TeamSpaceAllocation {
     pub allocated: u64,
     pub user_within_team_space_allocated: u64,
     pub user_within_team_space_limit_type: MemberSpaceLimitType,
+    pub user_within_team_space_used_cached: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -219,16 +237,14 @@ pub enum UserFeatureValue {
     Other,
 }
 
+/// Per Stone spec: plain struct with one field, NOT a tagged union.
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag", rename_all = "snake_case")]
-pub enum PaperAsFilesValue {
-    Enabled { enabled: bool },
-    Other,
+pub struct PaperAsFilesValue {
+    pub enabled: bool,
 }
 
+/// Per Stone spec: plain struct with one field, NOT a tagged union.
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = ".tag", rename_all = "snake_case")]
-pub enum FileLockingValue {
-    Enabled { enabled: bool },
-    Other,
+pub struct FileLockingValue {
+    pub enabled: bool,
 }
