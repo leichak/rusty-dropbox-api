@@ -106,7 +106,7 @@ async fn main() {
         }),
     };
 
-    match request.call().unwrap().await {
+    match request.call().await {
         Ok(Some(result)) => {
             for entry in result.payload.entries {
                 println!("{:?}", entry);

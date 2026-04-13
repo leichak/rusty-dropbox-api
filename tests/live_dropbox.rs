@@ -59,11 +59,7 @@ async fn list_root_folder() {
         }),
     };
 
-    let result = request
-        .call()
-        .expect("call() returned Err before future")
-        .await
-        .expect("list_folder returned Err");
+    let result = request.call().await.expect("list_folder returned Err");
 
     let result = result.expect("empty response");
     println!(

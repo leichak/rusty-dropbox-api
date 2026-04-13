@@ -1,11 +1,21 @@
 use anyhow::Result;
+use futures::future::BoxFuture;
 use serde::{Deserialize, Serialize};
 
-/// Trait for both sync and async calls
+/// Trait implemented by every `*Request` type.
+///
+/// The `call()` method returns a boxed future directly — there is no outer
+/// `Result` wrapper because constructing the future never fails today.
+/// Callers use:
+///
+/// ```ignore
+/// let result = request.call().await?;
+/// let result = request.call_sync()?;
+/// ```
 #[allow(unused)]
-pub trait Service<O: Sized, F: Sized> {
+pub trait Service<O: Sized> {
     fn call_sync(&self) -> Result<Option<O>>;
-    fn call(&self) -> Result<F>;
+    fn call(&self) -> BoxFuture<'static, Result<Option<O>>>;
 }
 
 pub trait Utils<'a> {

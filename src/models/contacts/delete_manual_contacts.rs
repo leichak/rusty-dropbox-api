@@ -5,7 +5,7 @@ use crate::{
     errors::ApiError,
     implement_service, implement_utils,
     traits::{Service, Utils},
-    AsyncClient, BoxFuture, SyncClient,
+    AsyncClient, SyncClient,
 };
 use serde::Deserialize;
 use std::{future::Future, pin::Pin};

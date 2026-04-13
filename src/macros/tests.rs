@@ -84,7 +84,7 @@ macro_rules! implement_tests {
                 ..$req::default_test_extras()
             };
 
-            let f = request.call()?;
+            let f = request.call();
             let _ = f.await?;
 
             mock.assert();

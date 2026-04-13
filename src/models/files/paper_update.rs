@@ -7,7 +7,7 @@ use crate::{
     errors::ApiError,
     implement_content_upload_utils, implement_service,
     traits::{Service, Utils},
-    AsyncClient, BoxFuture, SyncClient,
+    AsyncClient, SyncClient,
 };
 use serde::Deserialize;
 use std::{future::Future, pin::Pin};

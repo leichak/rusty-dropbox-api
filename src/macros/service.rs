@@ -16,7 +16,7 @@
 #[macro_export]
 macro_rules! implement_service {
     ($req:ty, $resp:ident, $resp_payload:ty, $endpoints:expr, $headers:expr) => {
-        impl Service<$resp, BoxFuture<'_, Result<Option<$resp>>>> for $req {
+        impl Service<$resp> for $req {
             // Synchronous call implementation
             fn call_sync(&self) -> Result<Option<$resp>> {
                 let mut endpoint = get_endpoint_url($endpoints).0;
@@ -94,7 +94,7 @@ macro_rules! implement_service {
             }
 
             // Asynchronous call implementation
-            fn call(&self) -> Result<Pin<Box<dyn Future<Output = Result<Option<$resp>>> + Send>>> {
+            fn call(&self) -> Pin<Box<dyn Future<Output = Result<Option<$resp>>> + Send>> {
                 let mut endpoint = get_endpoint_url($endpoints).0;
                 if let Some(url) = get_endpoint_url($endpoints).2 {
                     endpoint = url;
@@ -175,7 +175,7 @@ macro_rules! implement_service {
 
                     Result::<Option<$resp>>::Ok(Some(response))
                 };
-                Ok(Box::pin(block))
+                Box::pin(block)
             }
         }
     };
@@ -191,7 +191,7 @@ macro_rules! implement_service {
 #[macro_export]
 macro_rules! implement_download_service {
     ($req:ty, $resp:ident, $resp_payload:ty, $endpoints:expr, $headers:expr) => {
-        impl Service<$resp, BoxFuture<'_, Result<Option<$resp>>>> for $req {
+        impl Service<$resp> for $req {
             fn call_sync(&self) -> Result<Option<$resp>> {
                 let mut endpoint = get_endpoint_url($endpoints).0;
                 if let Some(url) = get_endpoint_url($endpoints).1 {
@@ -247,7 +247,7 @@ macro_rules! implement_download_service {
                 }))
             }
 
-            fn call(&self) -> Result<Pin<Box<dyn Future<Output = Result<Option<$resp>>> + Send>>> {
+            fn call(&self) -> Pin<Box<dyn Future<Output = Result<Option<$resp>>> + Send>> {
                 let mut endpoint = get_endpoint_url($endpoints).0;
                 if let Some(url) = get_endpoint_url($endpoints).2 {
                     endpoint = url;
@@ -307,7 +307,7 @@ macro_rules! implement_download_service {
                         data: bytes.to_vec(),
                     }))
                 };
-                Ok(Box::pin(block))
+                Box::pin(block)
             }
         }
     };

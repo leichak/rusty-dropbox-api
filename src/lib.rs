@@ -8,8 +8,9 @@
 //!
 //! # async fn run() -> anyhow::Result<()> {
 //! let token = std::env::var("DROPBOX_TOKEN")?;
+//! let client = rusty_dropbox_sdk::Client::new(token);
 //! let req = api::files::list_folder::ListFolderRequest {
-//!     access_token: &token,
+//!     access_token: client.token(),
 //!     payload: Some(api::files::ListFolderArgs {
 //!         path: String::new(),
 //!         recursive: Some(false),
@@ -23,7 +24,7 @@
 //!         include_non_downloadable_files: None,
 //!     }),
 //! };
-//! let result = req.call()?.await?;
+//! let result = req.call().await?;
 //! println!("{:?}", result);
 //! # Ok(())
 //! # }
@@ -43,12 +44,24 @@
 //! Dropbox HTTP API docs: <https://www.dropbox.com/developers/documentation/http/documentation>
 
 pub mod api;
+mod client;
 mod endpoints;
 mod errors;
 mod macros;
 mod models;
 mod tests_utils;
 mod traits;
+
+pub use client::Client;
+
+/// Ergonomic re-exports. `use rusty_dropbox_sdk::prelude::*;` brings in the
+/// `Service` trait (so `request.call().await?` resolves), the `Client`
+/// token holder, and the `files` namespace.
+pub mod prelude {
+    pub use crate::api::files;
+    pub use crate::api::Service;
+    pub use crate::Client;
+}
 
 #[cfg(test)]
 static TEST_AUTH_TOKEN: &'static str = "12345";
@@ -57,7 +70,7 @@ static TEST_AUTH_TOKEN: &'static str = "12345";
 use serde::{Deserialize, Serialize};
 #[allow(unused)]
 use std::sync::{Mutex, MutexGuard, OnceLock};
-use {anyhow, futures::future::BoxFuture, lazy_static::lazy_static};
+use {anyhow, lazy_static::lazy_static};
 
 // Clients
 lazy_static! {
