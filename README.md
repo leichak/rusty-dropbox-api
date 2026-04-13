@@ -35,7 +35,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rusty_dropbox_sdk = "0.5"
+rusty_dropbox_sdk = "0.6"
 tokio = { version = "1", features = ["full"] }
 ```
 

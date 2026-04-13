@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0]
+
+### Removed
+- **Breaking**: the `secondary_emails` and `seen_state` namespaces. They
+  were added in 0.4.0 from training-data memory; the actual Dropbox
+  endpoints live under `team/members/secondary_emails/*` (a Dropbox Business
+  team-admin namespace, intentionally out of scope) and `seen_state` has
+  no public routes at all (only the `PlatformType` union, used by
+  `team_log`). They would have 404'd against real Dropbox.
+
+### Added
+- `errors::ApiError::Unauthorized(anyhow::Error)` — split from the generic
+  `DropBox` variant so `Client::call` can detect 401 and refresh.
+- 5 missing variants on `files::LookupError`: `not_file`, `not_folder`,
+  `restricted_content`, `unsupported_content_type`, `locked`.
+- 4 missing variants on `files::WriteError`: `no_write_permission`,
+  `team_folder`, `operation_suppressed`, `too_many_write_operations`.
+- `files::DownloadArg.rev: Option<String>` — was missing.
+- `users::GroupCreation` and `users::SharedFolderBlanketLinkRestrictionPolicy`
+  enums plus the two corresponding fields on `TeamSharingPolicies`.
+- `users::TeamSpaceAllocation.user_within_team_space_used_cached: u64` —
+  was missing.
+- `sharing::RequestedLinkAccessLevel` enum (separate from `LinkAccessLevel`,
+  used by `SharedLinkSettings.access`).
+- `sharing::SharedLinkSettings.require_password: Option<bool>` — was missing.
+- `sharing::AddMember` struct for `AddFolderMemberArg.members`.
+- `sharing::RelinquishFolderMembershipArg` struct (replaces the prior
+  `SharedFolderIdArg` reuse, adds the missing `leave_a_copy` field).
+- Round-trip tests for `helpers::download_stream`, `helpers::upload_stream`,
+  `helpers::chunked_upload::upload_large_file`.
+- Behavioural tests for `implement_service!`: 429 retry, 5xx retry,
+  401 → `ApiError::Unauthorized`.
+
+### Changed
+- **Breaking**: `users::PaperAsFilesValue` and `users::FileLockingValue` are
+  now plain structs (`{ enabled: bool }`) per the Stone spec. They were
+  modelled as tagged unions, which is the wrong wire shape.
+- **Breaking**: `sharing::MemberSelector` and `sharing::InviteeInfo` use
+  struct variants (`Email { email: String }`) instead of tuple variants.
+  Tuple variants on internally-tagged enums don't work with serde when the
+  inner type is a single String.
+- **Breaking**: `sharing::ShareFolderArg`, `UpdateFolderPolicyArg`,
+  `SetAccessInheritanceArg`, `AddFileMemberArgs`, `AddFolderMemberArg`,
+  `UpdateFileMemberArgs`, `UpdateFolderMemberArg`, `ListFileMembersArg`,
+  `ListFolderMembersArgs`, `SharedLinkSettings.access`: stringly-typed
+  fields are now proper enum types (`AclUpdatePolicy`, `MemberPolicy`,
+  `SharedLinkPolicy`, `ViewerInfoPolicy`, `AccessInheritance`,
+  `AccessLevel`, `MemberAction`, `FolderAction`,
+  `RequestedLinkAccessLevel`).
+- **Breaking**: `sharing::LinkAccessLevel` no longer has a `Max` variant —
+  spec only defines `viewer` and `editor` for the *response-side* type.
+  `Max` and `Default` live on the new `RequestedLinkAccessLevel` for the
+  request side.
+- `helpers::download_stream` and `helpers::upload_stream` route through
+  `endpoints::get_endpoint_url` so the test-utils mock-server URL rewriter
+  intercepts.
+- `.github/workflows/ci.yml` runs unit tests with `--test-threads=1` to
+  keep the shared global mockito server stable.
+- The `SharingListFileMembersBatchPost` request fixture had a missing
+  opening `{` (parse error).
+- All sharing fixture access-level/audience/requested-visibility values
+  use the canonical object form `{".tag": "..."}` instead of the
+  shorthand string form.
+
 ## [0.5.0]
 
 ### Added
