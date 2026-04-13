@@ -6,3 +6,4 @@
 
 pub mod chunked_upload;
 pub mod download_stream;
+pub mod upload_stream;
