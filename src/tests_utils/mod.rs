@@ -4632,58 +4632,38 @@ pub fn get_endpoint_test_body_response(
 }"##,
             ),
             Some(
-                r##"{
-  "accounts": [
+                r##"[
     {
-      "account_id": "1234567890abcdefghijklmnopqrstuvwxyzabcd",
-      "name": {
-        "given_name": "John",
-        "surname": "Doe",
-        "familiar_name": "John",
-        "display_name": "John Doe",
-        "abbreviated_name": "JD"
-      },
-      "email": "john.doe@example.com",
-      "email_verified": true,
-      "disabled": false,
-      "is_teammate": true,
-      "profile_photo_url": "https://example.com/profile_photos/johndoe.jpg",
-      "team_member_id": "team1234567890abcdef"
+        "account_id": "1234567890abcdefghijklmnopqrstuvwxyzabcd",
+        "name": {
+            "given_name": "John",
+            "surname": "Doe",
+            "familiar_name": "John",
+            "display_name": "John Doe",
+            "abbreviated_name": "JD"
+        },
+        "email": "john.doe@example.com",
+        "email_verified": true,
+        "disabled": false,
+        "is_teammate": true,
+        "profile_photo_url": "https://example.com/profile_photos/johndoe.jpg",
+        "team_member_id": "team1234567890abcdef"
     },
     {
-      "account_id": "abcdefghijklmnopqrstuvwxyzabcdef1234567890",
-      "name": {
-        "given_name": "Jane",
-        "surname": "Smith",
-        "familiar_name": "Jane",
-        "display_name": "Jane Smith",
-        "abbreviated_name": "JS"
-      },
-      "email": "jane.smith@example.com",
-      "email_verified": false,
-      "disabled": false,
-      "is_teammate": false,
-      "profile_photo_url": null,
-      "team_member_id": null
-    },
-    {
-      "account_id": "abcdef1234567890abcdefghijklmnopqrstuvwxyz",
-      "name": {
-        "given_name": "Alice",
-        "surname": "Johnson",
-        "familiar_name": "Alice",
-        "display_name": "Alice Johnson",
-        "abbreviated_name": "AJ"
-      },
-      "email": "alice.johnson@example.com",
-      "email_verified": true,
-      "disabled": true,
-      "is_teammate": true,
-      "profile_photo_url": "https://example.com/profile_photos/alicejohnson.jpg",
-      "team_member_id": "teamabcdef1234567890"
+        "account_id": "abcdefghijklmnopqrstuvwxyzabcdef1234567890",
+        "name": {
+            "given_name": "Jane",
+            "surname": "Smith",
+            "familiar_name": "Jane",
+            "display_name": "Jane Smith",
+            "abbreviated_name": "JS"
+        },
+        "email": "jane.smith@example.com",
+        "email_verified": false,
+        "disabled": false,
+        "is_teammate": false
     }
-  ]
-}"##,
+]"##,
             ),
         ),
         Endpoint::UsersGetCurrentAccountPost => (
