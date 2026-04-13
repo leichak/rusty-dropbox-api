@@ -1,8 +1,0 @@
-Differentiate basic vs bearer in request 
-
-Todo:
-
-Data stream handling:
-    Request additional binary data field for binary stream
-    If this header is detected just pass the data as additional header
-    That's it 

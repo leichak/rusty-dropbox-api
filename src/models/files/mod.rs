@@ -140,6 +140,7 @@ pub struct FileMetadata {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum MediaInfo {
     Pending,
     Metadata(MediaMetadata),
@@ -216,6 +217,7 @@ pub struct PropertyField {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FileLockMetadata {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub is_lockholder: Option<bool>,
     #[serde(rename = "lockholder_name", skip_serializing_if = "Option::is_none")]
     pub lockholder_name: Option<String>,
@@ -1349,9 +1351,15 @@ pub struct UploadArg {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct UploadWriteFailed {
+    pub reason: WriteError,
+    pub upload_session_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = ".tag", rename_all = "snake_case")]
 pub enum UploadError {
-    Path(WriteError),
+    Path(UploadWriteFailed),
     PropertiesError,
     PayloadTooLarge,
     ContentHashMismatch,
