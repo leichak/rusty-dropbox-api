@@ -78,7 +78,7 @@ mod tests {
             r#"{"name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":11,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
         let body_bytes: &[u8] = b"hello world";
 
-        let mut mock;
+        let mock;
         {
             let mut server = get_mut_or_init_async().await;
             mock = server
