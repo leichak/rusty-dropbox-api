@@ -2612,7 +2612,7 @@ pub fn get_endpoint_test_body_response(
         Endpoint::SharingAddFileMemberPost => (
             Some(
                 r##"{
-    "access_level": "viewer",
+    "access_level": {".tag": "viewer"},
     "add_message_as_comment": false,
     "custom_message": "This is a custom message about ACME.doc",
     "file": "id:3kmLmQFnf1AAAAAAAAAAAw",
@@ -2677,14 +2677,14 @@ pub fn get_endpoint_test_body_response(
     "custom_message": "Documentation for launch day",
     "members": [
         {
-            "access_level": "editor",
+            "access_level": {".tag": "editor"},
             "member": {
                 ".tag": "email",
                 "email": "justin@example.com"
             }
         },
         {
-            "access_level": "viewer",
+            "access_level": {".tag": "viewer"},
             "member": {
                 ".tag": "dropbox_id",
                 "dropbox_id": "dbid:AAEufNrMPSPe0dMQijRP0N_aZtBJRm26W4Q"
@@ -2794,10 +2794,10 @@ pub fn get_endpoint_test_body_response(
                 r##"{
     "path": "/Prime_Numbers.txt",
     "settings": {
-        "access": "viewer",
+        "access": {".tag": "viewer"},
         "allow_download": true,
-        "audience": "public",
-        "requested_visibility": "public"
+        "audience": {".tag": "public"},
+        "requested_visibility": {".tag": "public"}
     }
 }"##,
             ),
@@ -3357,7 +3357,8 @@ pub fn get_endpoint_test_body_response(
         ),
         Endpoint::SharingListFileMembersBatchPost => (
             Some(
-                r##"    "files": [
+                r##"{
+    "files": [
         "id:3kmLmQFnf1AAAAAAAAAAAw",
         "id:VvTaJu2VZzAAAAAAAAAADQ"
     ],
@@ -3376,12 +3377,12 @@ pub fn get_endpoint_test_body_response(
               {
                 "account_id": "1234567890abcdefghijklmnopqrstuvwxyzabcd",
                 "email": "john.doe@example.com",
-                "access_level": "viewer"
+                "access_level": {".tag": "viewer"}
               },
               {
                 "account_id": "abcdefghijklmnopqrstuvwxyzabcdef1234567890",
                 "email": "jane.smith@example.com",
-                "access_level": "editor"
+                "access_level": {".tag": "editor"}
               }
             ]
           },
@@ -3414,7 +3415,7 @@ pub fn get_endpoint_test_body_response(
               {
                 "account_id": "abcdef1234567890abcdefghijklmnopqrstuvwxyz",
                 "email": "alice.johnson@example.com",
-                "access_level": "viewer"
+                "access_level": {".tag": "viewer"}
               }
             ]
           },
@@ -4038,10 +4039,10 @@ pub fn get_endpoint_test_body_response(
                 r##"{
     "remove_expiration": false,
     "settings": {
-        "access": "viewer",
+        "access": {".tag": "viewer"},
         "allow_download": true,
-        "audience": "public",
-        "requested_visibility": "public"
+        "audience": {".tag": "public"},
+        "requested_visibility": {".tag": "public"}
     },
     "url": "https://www.dropbox.com/s/2sn712vy1ovegw8/Prime_Numbers.txt?dl=0"
 }"##,
@@ -4228,18 +4229,18 @@ pub fn get_endpoint_test_body_response(
             Some(
                 r##"{
   "success": {
-    "access_level": "viewer",
+    "access_level": {".tag": "viewer"},
     "warning": "The user still has access through a shared parent folder.",
     "access_details": [
       {
         "parent_folder_id": "parent1234567890abcdef",
         "parent_folder_name": "Team Shared Folder",
-        "access_level": "viewer"
+        "access_level": {".tag": "viewer"}
       },
       {
         "parent_folder_id": "parentabcdef1234567890",
         "parent_folder_name": "Project A Folder",
-        "access_level": "editor"
+        "access_level": {".tag": "editor"}
       }
     ]
   }
@@ -4453,7 +4454,7 @@ pub fn get_endpoint_test_body_response(
         Endpoint::SharingUpdateFileMemberPost => (
             Some(
                 r##"{
-    "access_level": "viewer",
+    "access_level": {".tag": "viewer"},
     "file": "id:3kmLmQFnf1AAAAAAAAAAAw",
     "member": {
         ".tag": "email",
@@ -4463,18 +4464,18 @@ pub fn get_endpoint_test_body_response(
             ),
             Some(
                 r##"{
-  "access_level": "viewer",
+  "access_level": {".tag": "viewer"},
   "warning": "The user has limited access due to organizational policy.",
   "access_details": [
     {
       "parent_folder_id": "parent1234567890abcdef",
       "parent_folder_name": "Company Policies",
-      "access_level": "viewer"
+      "access_level": {".tag": "viewer"}
     },
     {
       "parent_folder_id": "parentabcdef1234567890",
       "parent_folder_name": "HR Documents",
-      "access_level": "editor"
+      "access_level": {".tag": "editor"}
     }
   ]
 }"##,
@@ -4483,7 +4484,7 @@ pub fn get_endpoint_test_body_response(
         Endpoint::SharingUpdateFolderMemberPost => (
             Some(
                 r##"{
-    "access_level": "editor",
+    "access_level": {".tag": "editor"},
     "member": {
         ".tag": "email",
         "email": "justin@example.com"
@@ -4493,18 +4494,18 @@ pub fn get_endpoint_test_body_response(
             ),
             Some(
                 r##"{
-  "access_level": "editor",
+  "access_level": {".tag": "editor"},
   "warning": "The user has access to the content through a shared team folder.",
   "access_details": [
     {
       "parent_folder_id": "folder1234567890abcdef",
       "parent_folder_name": "Shared Team Folder",
-      "access_level": "editor"
+      "access_level": {".tag": "editor"}
     },
     {
       "parent_folder_id": "folderabcdef1234567890",
       "parent_folder_name": "Project Documents",
-      "access_level": "viewer"
+      "access_level": {".tag": "viewer"}
     }
   ]
 }"##,
