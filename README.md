@@ -118,6 +118,64 @@ async fn main() {
 }
 ```
 
+### Uploading a large file
+
+```rust
+use rusty_dropbox_sdk::helpers::chunked_upload;
+use tokio::fs::File;
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let file = File::open("./video.mp4").await?;
+    let metadata = chunked_upload::upload_large_file(
+        "your_access_token",
+        "/videos/clip.mp4",
+        file,
+        chunked_upload::DEFAULT_CHUNK_SIZE,
+        "add",
+    )
+    .await?;
+    println!("Uploaded rev {} ({} bytes)", metadata.rev, metadata.size);
+    Ok(())
+}
+```
+
+### Recovering typed errors
+
+```rust
+use rusty_dropbox_sdk::{api, TypedError};
+use rusty_dropbox_sdk::api::files::LookupError;
+use rusty_dropbox_sdk::api::Service;
+
+# async fn run() -> anyhow::Result<()> {
+let req = api::files::get_metadata::GetMetadataRequest {
+    access_token: "your_access_token",
+    payload: Some(api::files::GetMetadataArgs {
+        path: "/does-not-exist".to_string(),
+        include_media_info: None,
+        include_deleted: None,
+        include_has_explicit_shared_members: None,
+        include_property_groups: None,
+    }),
+};
+
+match req.call().await {
+    Ok(_) => println!("metadata fetched"),
+    Err(e) => {
+        if let Some(holder) = e.downcast_ref::<TypedError<LookupError>>() {
+            match holder.get() {
+                LookupError::NotFound => println!("that path isn't there"),
+                _ => println!("other lookup error: {:?}", holder.get()),
+            }
+        } else {
+            eprintln!("non-typed error: {e}");
+        }
+    }
+}
+# Ok(())
+# }
+```
+
 ### Advanced Usage
 
 Here’s an advanced example of creating a file request using Dropbox API:

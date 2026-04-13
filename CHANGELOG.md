@@ -7,7 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+### Added (round two)
+- `Client` token holder at crate root; `prelude` module for ergonomic imports.
+- Binary body on 5 upload Request structs (`pub data: Option<Vec<u8>>`) and
+  on 5 download Response structs (`pub data: Vec<u8>`). Upload and download
+  actually work now.
+- `Utils::content_body()` trait method + `implement_content_upload_utils!`
+  macro to plug upload data into the service macro body.
+- `implement_download_service!` macro — constructs Response with raw body
+  bytes from content-endpoint responses.
+- `errors::TypedError<T>` wrapper + revised `decode_dropbox_error` so callers
+  can `err.downcast_ref::<TypedError<UploadError>>()` for pattern matching.
+- `list_folder::ListFolderRequest::collect_all()` — walks cursor pagination.
+- `users` namespace: 5 endpoints (get_current_account, get_account,
+  get_account_batch, get_space_usage, features/get_values) plus supporting
+  types (FullAccount, BasicAccount, SpaceUsage, ...).
+- `sharing` namespace skeleton: 2 of 44 endpoints (revoke_shared_link,
+  list_shared_links). Module-level rustdoc inventories the remaining 42.
+- `helpers::chunked_upload::upload_large_file()` — orchestrates
+  upload_session/{start, append_v2, finish} for files over 150 MiB.
+- `upload_session_append.rs` — was an empty stub; now implemented.
+- `TemplateFilterBase` enum replaces `Option<Vec<String>>` for
+  `include_property_groups` on list_folder / get_metadata / search args.
+
+### Changed (round two)
+- **Breaking**: `Service::call()` now returns `BoxFuture<'static, Result<...>>`
+  directly instead of `Result<BoxFuture<...>>`. Callers go from
+  `req.call()?.await?` to `req.call().await?`.
+- `Headers::ContentTypeAppOctetStream` is now a parameterless marker; the
+  previous `String` payload was dead code.
+- Endpoint test modules gated with `#[cfg(all(test, feature = "test-utils"))]`
+  so `cargo build --tests` works without the feature.
+
+### Added (round one — retroactive)
 - Complete `files` namespace — every v2 endpoint now has a working Request /
   Response model, fixture, and unit test (144 tests, 0 failures).
 - `decode_dropbox_error` utility in `src/errors` — parses Dropbox's
