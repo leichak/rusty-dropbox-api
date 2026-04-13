@@ -419,3 +419,84 @@ pub struct UpdateFolderMemberArg {
     pub member: MemberSelector,
     pub access_level: String,
 }
+
+// ---- typed response wrappers (deeply nested fields stay as Value) ----
+
+/// Result of `list_folders` / `list_mountable_folders`.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListFoldersResult {
+    pub entries: Vec<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+}
+
+/// Result of `list_received_files`.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListReceivedFilesResult {
+    pub entries: Vec<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+}
+
+/// Result of `list_file_members`.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListFileMembersResult {
+    pub users: Vec<serde_json::Value>,
+    pub groups: Vec<serde_json::Value>,
+    pub invitees: Vec<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+}
+
+/// Result of `list_folder_members`.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListFolderMembersResult {
+    pub users: Vec<serde_json::Value>,
+    pub groups: Vec<serde_json::Value>,
+    pub invitees: Vec<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+}
+
+/// Launch envelope for `share_folder`.
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum ShareFolderLaunch {
+    AsyncJobId { async_job_id: String },
+    Complete(serde_json::Value),
+}
+
+/// Launch envelope for `unshare_folder` and similar fire-and-forget folder ops.
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum LaunchEmptyResult {
+    AsyncJobId { async_job_id: String },
+    Complete,
+}
+
+/// Job status for `check_share_job_status`.
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum ShareFolderJobStatus {
+    InProgress,
+    Complete(serde_json::Value),
+    Failed(serde_json::Value),
+}
+
+/// Job status for `check_remove_member_job_status`.
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum RemoveMemberJobStatus {
+    InProgress,
+    Complete(serde_json::Value),
+    Failed(serde_json::Value),
+}
+
+/// Job status for `check_job_status` (generic).
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = ".tag", rename_all = "snake_case")]
+pub enum JobStatus {
+    InProgress,
+    Complete,
+    Failed(serde_json::Value),
+}

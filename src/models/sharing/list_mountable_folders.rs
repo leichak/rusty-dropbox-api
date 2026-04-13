@@ -13,7 +13,7 @@ use std::{future::Future, pin::Pin};
 type Request<'a> = ListMountableFoldersRequest<'a>;
 type Response = ListMountableFoldersResponse;
 type RequestPayload = super::ListFoldersArgs;
-type ResponsePayload = serde_json::Value;
+type ResponsePayload = super::ListFoldersResult;
 
 /// `list_mountable_folders`
 /// Payload and response are modelled as `serde_json::Value` for now — the

@@ -13,7 +13,7 @@ use std::{future::Future, pin::Pin};
 type Request<'a> = UpdateFolderPolicyRequest<'a>;
 type Response = UpdateFolderPolicyResponse;
 type RequestPayload = super::UpdateFolderPolicyArg;
-type ResponsePayload = serde_json::Value;
+type ResponsePayload = super::ShareFolderLaunch;
 
 /// `update_folder_policy`
 /// Payload and response are modelled as `serde_json::Value` for now — the

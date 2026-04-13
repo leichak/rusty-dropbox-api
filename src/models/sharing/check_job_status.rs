@@ -13,7 +13,7 @@ use std::{future::Future, pin::Pin};
 type Request<'a> = CheckJobStatusRequest<'a>;
 type Response = CheckJobStatusResponse;
 type RequestPayload = super::PollArg;
-type ResponsePayload = serde_json::Value;
+type ResponsePayload = super::JobStatus;
 
 /// `check_job_status`
 /// Payload and response are modelled as `serde_json::Value` for now — the

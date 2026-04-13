@@ -13,7 +13,7 @@ use std::{future::Future, pin::Pin};
 type Request<'a> = ShareFolderRequest<'a>;
 type Response = ShareFolderResponse;
 type RequestPayload = super::ShareFolderArg;
-type ResponsePayload = serde_json::Value;
+type ResponsePayload = super::ShareFolderLaunch;
 
 /// `share_folder`
 /// Payload and response are modelled as `serde_json::Value` for now — the
