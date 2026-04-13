@@ -294,6 +294,16 @@ pub enum LookupError {
     MalformedPath(Option<String>),
     #[serde(rename = "not_found")]
     NotFound,
+    #[serde(rename = "not_file")]
+    NotFile,
+    #[serde(rename = "not_folder")]
+    NotFolder,
+    #[serde(rename = "restricted_content")]
+    RestrictedContent,
+    #[serde(rename = "unsupported_content_type")]
+    UnsupportedContentType,
+    #[serde(rename = "locked")]
+    Locked,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -303,10 +313,18 @@ pub enum WriteError {
     MalformedPath(Option<String>),
     #[serde(rename = "conflict")]
     Conflict(ConflictType),
+    #[serde(rename = "no_write_permission")]
+    NoWritePermission,
     #[serde(rename = "insufficient_space")]
     InsufficientSpace,
     #[serde(rename = "disallowed_name")]
     DisallowedName,
+    #[serde(rename = "team_folder")]
+    TeamFolder,
+    #[serde(rename = "operation_suppressed")]
+    OperationSuppressed,
+    #[serde(rename = "too_many_write_operations")]
+    TooManyWriteOperations,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -557,6 +575,8 @@ pub enum DeleteBatchJobStatus {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DownloadArg {
     pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rev: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

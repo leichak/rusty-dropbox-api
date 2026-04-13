@@ -28,6 +28,7 @@ pub async fn download_stream(
 ) -> Result<(FileMetadata, impl Stream<Item = Result<Bytes>> + Unpin)> {
     let arg = DownloadArg {
         path: path.to_string(),
+        rev: None,
     };
     let arg_json = serde_json::to_string(&arg).context("serialise DownloadArg")?;
 
