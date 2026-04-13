@@ -28,7 +28,8 @@ futures = "0.3.30"
 tokio = "1.38.0"
 
 # HTTP client and request handling
-reqwest = { version = "0.12.5", features = ["blocking", "json"] }
+reqwest = { version = "0.12.5", features = ["blocking", "json", "stream"] }
+bytes = "1"
 
 # Error handling
 anyhow = "1.0.86"

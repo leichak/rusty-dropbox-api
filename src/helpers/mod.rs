@@ -5,3 +5,4 @@
 //! single function call.
 
 pub mod chunked_upload;
+pub mod download_stream;
