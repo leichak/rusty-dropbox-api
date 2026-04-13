@@ -5,6 +5,36 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1]
+
+### Added (round three — typed sharing + audit sweep)
+- `sharing::SharedLinkMetadata` (file/folder), `FileLinkMetadata`,
+  `FolderLinkMetadata`, `SharedLinkSettings`,
+  `CreateSharedLinkWithSettingsArg`, `GetSharedLinkMetadataArg`,
+  `ModifySharedLinkSettingsArgs`. Wired into the 4 shared-link endpoints.
+- Typed Args for 27 more sharing endpoints (folders, file/folder members,
+  list_*, check_*_job_status). `SharedFolderIdArg`, `ShareFolderArg`,
+  `UnshareFolderArg`, `TransferFolderArg`, `UpdateFolderPolicyArg`,
+  `SetAccessInheritanceArg`, `ListFoldersArgs`, `ListFoldersContinueArg`,
+  `MemberSelector`, `AddFileMemberArgs`, `AddFolderMemberArg`,
+  `RemoveFileMemberArg`, `RemoveFolderMemberArg`, `UpdateFileMemberArgs`,
+  `UpdateFolderMemberArg`, `UnshareFileArg`, `GetFileMetadataArg`,
+  `GetFileMetadataBatchArg`, `GetFolderMetadataArg`, `ListFileMembersArg`,
+  `ListFileMembersBatchArg`, `ListFileMembersContinueArg`,
+  `ListFolderMembersArgs`, `ListFolderMembersContinueArg`, `PollArg`.
+- `files::UploadWriteFailed { reason, upload_session_id }` — replaces the
+  wrong inner type on `UploadError::Path`.
+
+### Changed (round three)
+- All tagged-union enums in `files/mod.rs` carry `rename_all = "snake_case"`
+  in addition to per-variant renames — defensive for any future variant
+  added without an explicit rename.
+- `MediaInfo` now declares `tag = ".tag"` (was untagged — would have
+  serialized as `{"Pending": null}` instead of `{".tag": "pending"}`).
+- `FileLockMetadata.is_lockholder` gains `skip_serializing_if`.
+- `CreateSharedLinkWithSettingsPost` request fixture: add the missing
+  opening `{` (was a syntax error).
+
 ## [Unreleased]
 
 ### Added (round two)
