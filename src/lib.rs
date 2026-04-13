@@ -47,6 +47,7 @@ pub mod api;
 mod client;
 mod endpoints;
 mod errors;
+pub mod helpers;
 mod macros;
 mod models;
 mod tests_utils;
