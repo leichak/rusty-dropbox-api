@@ -2,11 +2,14 @@
 name = "rusty_dropbox_sdk"
 description = "Unofficial SDK for dropbox in Rust"
 repository = "https://github.com/leichak/rusty-dropbox-api"
+documentation = "https://docs.rs/rusty_dropbox_sdk"
 readme = "README.md"
 version = "0.7.1"
 edition = "2021"
+rust-version = "1.75"
 license = "GPL-3.0-only"
-keywords = ["sdk", "dropbox"]
+keywords = ["sdk", "dropbox", "api", "client", "async"]
+categories = ["api-bindings", "web-programming::http-client"]
 authors = ["Dan Kac <dankaccoder@icloud.com>"]
 
 [dependencies]
