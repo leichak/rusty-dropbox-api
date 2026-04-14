@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0]
+
+### Added
+- `LICENSE` (GPL-3.0) at repo root — required by crates.io and downstream
+  license detectors.
+- `Cargo.toml` metadata: `categories`, `documentation`, `rust-version`,
+  expanded `keywords`.
+
+### Changed
+- **Breaking**: every type in `file_properties` renamed to match the
+  Dropbox Stone IDL.
+  - `Field` → `PropertyField`
+  - `PathWithPropertyGroupsArgs` → `AddPropertiesArg`
+    (with `OverwritePropertyGroupArg` as a type alias)
+  - `PathWithTemplateIdsArgs` → `RemovePropertiesArg`
+  - `PathWithUpdatePropertyGroupsArgs` → `UpdatePropertiesArg`
+  - `Mode` → `PropertiesSearchMode`
+  - `Query` → `PropertiesSearchQuery`
+    (also: `logical_operator` field is now `pub`, was private)
+  - `QueriesWithTemplateFilterArgs` → `PropertiesSearchArg`
+  - `Match` → `PropertiesSearchMatch`
+  - `MatchesWithPropertyGroupsResult` → `PropertiesSearchResult`
+  - `CursorArgs` → `PropertiesSearchContinueArg`
+  - `AddOrUpdateField` removed — Stone reuses `PropertyField`.
+  - `UpdatePropertyGroup` → `PropertyGroupUpdate`
+  - `FieldDescription` → `PropertyFieldTemplate`
+  - `PropertyTemplateArgs` → `AddTemplateArg`
+  - `TaggedFieldType` → `PropertyType`
+  - `FieldWithTaggedType` → `PropertyFieldTemplateTagged`
+  - `PropertyTemplateWithTaggedTypeResult` → `GetTemplateResult`
+  - `TemplateIdsResult` → `ListTemplateResult`
+  - `TemplateIdResult` → `AddTemplateResult` (with `UpdateTemplateResult`
+    as a type alias)
+  - `TemplateIdArgs` → `GetTemplateArg` (with `RemoveTemplateArg` as a
+    type alias)
+  - `AddField` removed — Stone reuses `PropertyFieldTemplate`.
+  - `AddFieldsToTemplateArgs` → `UpdateTemplateArg`
+
 ## [0.7.1]
 
 ### Added

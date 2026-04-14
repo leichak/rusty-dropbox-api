@@ -1,4 +1,4 @@
-use super::PathWithPropertyGroupsArgs;
+use super::AddPropertiesArg;
 
 use crate::{
     anyhow::Result,
@@ -15,7 +15,7 @@ use std::{future::Future, pin::Pin};
 /// Type aliases for readability
 type Request<'a> = PropertiesAddRequest<'a>;
 type Response = PropertiesAddResponse;
-type RequestPayload = PathWithPropertyGroupsArgs;
+type RequestPayload = AddPropertiesArg;
 type ResponsePayload = ();
 
 /// Add properties struct for file request

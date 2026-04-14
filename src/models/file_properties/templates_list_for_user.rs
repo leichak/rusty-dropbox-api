@@ -1,4 +1,4 @@
-use super::TemplateIdsResult;
+use super::ListTemplateResult;
 
 use crate::{
     anyhow::Result,
@@ -16,7 +16,7 @@ use std::{future::Future, pin::Pin};
 type Request<'a> = TemplatesListForUserRequest<'a>;
 type Response = TemplatesListForUserResponse;
 type RequestPayload = ();
-type ResponsePayload = TemplateIdsResult;
+type ResponsePayload = ListTemplateResult;
 
 /// Add properties struct for file request
 /// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-templates-list_for_user
