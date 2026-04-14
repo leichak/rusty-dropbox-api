@@ -55,7 +55,7 @@ mod models;
 mod tests_utils;
 mod traits;
 
-pub use client::Client;
+pub use client::{Client, RefreshConfig};
 pub use errors::TypedError;
 
 /// Ergonomic re-exports. `use rusty_dropbox_sdk::prelude::*;` brings in the

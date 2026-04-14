@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2]
+
+### Added
+- `examples/` directory with five runnable end-to-end programs:
+  `quickstart`, `oauth_refresh`, `download_stream`, `chunked_upload`, and
+  `typed_errors`. Each is invokable via `cargo run --example <name>` and
+  no-ops cleanly when the relevant env vars aren't set.
+- `RefreshConfig` is now re-exported from the crate root
+  (`use rusty_dropbox_sdk::RefreshConfig;`); previously it was only
+  reachable via the private `client` module, which made
+  `Client::with_refresh(...)` impossible to call from outside the crate.
+
+### Changed
+- `README.md` rewritten: feature-led "Why this crate" section, runnable
+  examples listing, scoped recipes under collapsible blocks, badges,
+  explicit MSRV, and a one-line acknowledgement of the other community
+  Rust SDK.
+
 ## [0.8.1]
 
 ### Changed
