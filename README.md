@@ -7,27 +7,30 @@ This crate provides a simple and idiomatic Rust interface to interact with the D
 
 ## Features
 
-- Partial support for Dropbox API v2, planned full support.
-- Token authentication.
-- Async and sync API calls.
+- Coverage of the Dropbox API v2 user-facing surface across 11 namespaces.
+- Token authentication and OAuth2 refresh-token grant with automatic 401 retry.
+- Async and sync API calls (every request implements both `call()` and `call_sync()`).
+- Streaming uploads and downloads, plus chunked-upload helper for large files.
+- Built-in retry on 429 / 5xx with exponential backoff.
+- Typed per-endpoint error envelopes via `TypedError<E>`.
 
 ## Supported Endpoints
 
-The following Dropbox API categories have support in the SDK:
+The following Dropbox API namespaces are implemented and tested:
 
 - `account`
-- `auth`
-- `check`
+- `auth` — OAuth code exchange, refresh, token revoke
+- `check` — `app` and `user` health probes
 - `contacts`
-- `file_properties`
+- `file_properties` — properties + templates (matches Stone IDL naming)
 - `file_requests`
 - `files` — all v2 endpoints (copy, move, delete, download, upload,
   upload_session/\*, list_folder, search, tags, lock_file, paper, etc.)
+- `openid` — `userinfo`
+- `sharing` — folders, file members, shared links, invitees
+- `users` — account, current account, space usage, features
 
-Planned:
-- `sharing`, `users`
-
-Full support for all Dropbox API endpoints is coming soon!
+Out of scope today: team-admin endpoints (the `team*` namespaces).
 
 ## Installation
 
@@ -35,7 +38,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rusty_dropbox_sdk = "0.7"
+rusty_dropbox_sdk = "0.8"
 tokio = { version = "1", features = ["full"] }
 ```
 

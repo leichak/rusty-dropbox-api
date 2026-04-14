@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1]
+
+### Changed
+- `mockito` is now an optional dependency, gated behind the `test-utils`
+  feature. Default builds no longer pull mockito (or its transitive tree)
+  into downstream lockfiles. Contributors and consumers running the test
+  helpers continue to enable it via `--features test-utils`.
+
+### Fixed
+- `README.md` supported-endpoints list updated to reflect actual coverage:
+  `openid`, `sharing`, and `users` are implemented (the previous "Planned"
+  line was stale).
+- `README.md` install snippet now references `rusty_dropbox_sdk = "0.8"`.
+- Wrapped bare URLs in doc comments (`<...>`) and fixed two intra-doc links
+  in `client.rs` so `cargo doc --no-deps --all-features` runs warning-free.
+
 ## [0.8.0]
 
 ### Added
