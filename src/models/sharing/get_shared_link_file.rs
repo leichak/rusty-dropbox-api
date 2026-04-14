@@ -49,3 +49,30 @@ implement_download_service!(
     ]
 );
 
+
+#[cfg(all(test, feature = "test-utils"))]
+mod tests {
+    use crate::TEST_AUTH_TOKEN;
+
+    use super::{Request, RequestPayload};
+
+    use tokio;
+
+    use crate::{
+        endpoints::{get_endpoint_url, headers::Headers, Endpoint},
+        implement_tests,
+        tests_utils::get_endpoint_test_body_response,
+        traits::Service,
+    };
+
+    implement_tests!(
+        Endpoint::SharingGetSharedLinkFilePost,
+        vec![
+            Headers::TestAuthorization,
+            Headers::DropboxApiArg("".to_string()),
+            Headers::DropboxApiResult,
+        ],
+        Request,
+        RequestPayload
+    );
+}
