@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1]
+
+### Added
+- Test for `sharing::get_shared_link_file` (download endpoint).
+- `account::SetProfilePhotoError` enum (matches Stone spec).
+- `Endpoint::OAuth2TokenPost` so the OAuth2 token URL goes through the same
+  test-URL rewriter as every other endpoint. Lets unit tests intercept
+  refresh calls with mockito.
+- End-to-end test for `Client::call`: 401 → refresh via mocked
+  `oauth2/token` → retry → 200, with assertion that the in-memory token
+  updates.
+
+### Changed
+- `account::PhotoSourceArg` reshaped from a hand-rolled `untagged` enum
+  with a manual `tag` field to the proper `tag = ".tag"` form. Wire shape
+  unchanged.
+- `auth/mod.rs` no longer hardcodes the OAuth2 token URL — uses
+  `get_endpoint_url(Endpoint::OAuth2TokenPost)`.
+
 ## [0.7.0]
 
 ### Added
