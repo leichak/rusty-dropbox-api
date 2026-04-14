@@ -4,6 +4,10 @@ pub mod headers;
 /// It is passed to fhe function
 #[derive(Debug)]
 #[allow(dead_code)]
+// Every variant ends in `Post` because every Dropbox v2 endpoint is POST;
+// the suffix is intentional and kept for forward-compat if any GET / WS
+// endpoints land later.
+#[allow(clippy::enum_variant_names)]
 pub enum Endpoint {
     CheckAppPost,
     CheckUserPost,

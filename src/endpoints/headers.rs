@@ -20,7 +20,7 @@ impl Headers {
             Headers::ContentTypeAppJson => ("Content-type", "application/json"),
             Headers::ContentTypeAppOctetStream => ("Content-Type", "application/octet-stream"),
             Headers::TestAuthorization => ("Authorization", "Bearer user"),
-            Headers::DropboxApiArg(path) => ("Dropbox-API-Arg", &path),
+            Headers::DropboxApiArg(path) => ("Dropbox-API-Arg", path),
             Headers::DropboxApiResult => ("Dropbox-API-Result", ""),
         }
     }

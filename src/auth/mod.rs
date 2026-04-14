@@ -94,7 +94,7 @@ pub async fn exchange_code(
         .context("oauth2/token send failed")?
         .error_for_status()
         .context("oauth2/token returned non-2xx")?;
-    Ok(resp.json().await.context("oauth2/token parse")?)
+    resp.json().await.context("oauth2/token parse")
 }
 
 /// Get a fresh access token using a refresh token. The refresh token itself
@@ -114,7 +114,7 @@ pub async fn refresh(client_id: &str, client_secret: &str, refresh_token: &str) 
         .context("oauth2/token refresh send failed")?
         .error_for_status()
         .context("oauth2/token refresh returned non-2xx")?;
-    Ok(resp.json().await.context("oauth2/token refresh parse")?)
+    resp.json().await.context("oauth2/token refresh parse")
 }
 
 /// Synchronous variant of [`refresh`] for blocking callers.
@@ -132,7 +132,7 @@ pub fn refresh_sync(client_id: &str, client_secret: &str, refresh_token: &str) -
         .context("oauth2/token refresh send failed")?
         .error_for_status()
         .context("oauth2/token refresh returned non-2xx")?;
-    Ok(resp.json().context("oauth2/token refresh parse")?)
+    resp.json().context("oauth2/token refresh parse")
 }
 
 /// Revoke the current access token. After this, both the access token and the

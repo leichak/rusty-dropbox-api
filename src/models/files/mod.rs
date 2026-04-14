@@ -1,3 +1,9 @@
+// Wire types follow the Dropbox Stone IDL exactly. Stone tagged unions
+// nest large structs as variants (e.g. `Metadata::File(FileMetadata)`),
+// which makes `clippy::large_enum_variant` fire across this module. Boxing
+// would change the public API, so we silence the lint at the module level.
+#![allow(clippy::large_enum_variant)]
+
 pub mod copy;
 pub mod copy_batch;
 pub mod copy_batch_check;

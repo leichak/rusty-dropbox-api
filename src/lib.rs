@@ -68,12 +68,15 @@ pub mod prelude {
 }
 
 #[cfg(test)]
-static TEST_AUTH_TOKEN: &'static str = "12345";
+static TEST_AUTH_TOKEN: &str = "12345";
 
 #[allow(unused)]
 use serde::{Deserialize, Serialize};
 #[allow(unused)]
 use std::sync::{Mutex, MutexGuard, OnceLock};
+// `use anyhow;` is intentional: it exposes `crate::anyhow` to dozens of
+// `src/models/**/*.rs` files which import `Result` via `crate::anyhow::Result`.
+#[allow(clippy::single_component_path_imports)]
 use {anyhow, lazy_static::lazy_static};
 
 /// User-Agent advertised on every request. Lets Dropbox support trace traffic

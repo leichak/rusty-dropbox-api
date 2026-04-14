@@ -20,6 +20,10 @@
 #[macro_export]
 macro_rules! implement_tests {
     ($endpoint:expr, $headers:expr, $req:ident, $payload:ty) => {
+        // Generated tests use struct-update syntax (`..default_test_extras()`)
+        // unconditionally; many Request structs don't have any fields beyond
+        // those already supplied, which trips `clippy::needless_update`.
+        #[allow(clippy::needless_update)]
         #[tokio::test]
         pub async fn test_async() -> Result<(), Box<dyn std::error::Error>> {
             let (body, response) = get_endpoint_test_body_response($endpoint);
@@ -85,6 +89,7 @@ macro_rules! implement_tests {
             .await
         }
 
+        #[allow(clippy::needless_update)]
         #[test]
         pub fn test_sync_pass() -> Result<(), Box<dyn std::error::Error>> {
             let (body, response) = get_endpoint_test_body_response($endpoint);
