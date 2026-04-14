@@ -4766,5 +4766,9 @@ pub fn get_endpoint_test_body_response(
 }"##,
             ),
         ),
+        // OAuth2 token endpoint: not used by the per-endpoint
+        // `implement_tests!` macro path. Body / response are configured per
+        // test in `client.rs`'s refresh-roundtrip suite.
+        Endpoint::OAuth2TokenPost => (None, None),
     }
 }

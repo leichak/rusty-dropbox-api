@@ -219,6 +219,83 @@ mod tests {
         assert!(!c.is_expired());
     }
 
+    #[cfg(feature = "test-utils")]
+    #[tokio::test]
+    async fn call_refreshes_on_401_and_retries() {
+        use crate::api;
+        use crate::api::Service;
+        use crate::tests_utils::with_test_server_async;
+
+        const RAW_FILE_METADATA: &str = r#"{".tag":"file","name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":1,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
+        const TOKEN_RESPONSE: &str = r#"{"access_token":"new-token","expires_in":14400,"token_type":"bearer"}"#;
+
+        with_test_server_async(|mut server| async move {
+            // First call: 401.
+            let m_initial = server
+                .mock("POST", "/2/files/get_metadata")
+                .with_status(401)
+                .with_body(
+                    r#"{"error_summary":"expired_access_token/.","error":{".tag":"expired_access_token"}}"#,
+                )
+                .expect(1)
+                .create_async()
+                .await;
+            // Refresh hits oauth2/token.
+            let m_refresh = server
+                .mock("POST", "/oauth2/token")
+                .with_status(200)
+                .with_header("Content-Type", "application/json")
+                .with_body(TOKEN_RESPONSE)
+                .expect(1)
+                .create_async()
+                .await;
+            // Retry with the new token: 200.
+            let m_retry = server
+                .mock("POST", "/2/files/get_metadata")
+                .with_status(200)
+                .with_header("Content-Type", "application/json")
+                .with_body(RAW_FILE_METADATA)
+                .expect(1)
+                .create_async()
+                .await;
+
+            let client = Client::with_refresh(
+                "stale-token",
+                14400, // not-yet-expired by clock — only the 401 should trigger refresh
+                RefreshConfig {
+                    client_id: "id".into(),
+                    client_secret: "secret".into(),
+                    refresh_token: "rt".into(),
+                },
+            );
+
+            let result = client
+                .call(|token| async move {
+                    api::files::get_metadata::GetMetadataRequest {
+                        access_token: &token,
+                        payload: Some(api::files::GetMetadataArgs {
+                            path: "/f.txt".to_string(),
+                            include_media_info: None,
+                            include_deleted: None,
+                            include_has_explicit_shared_members: None,
+                            include_property_groups: None,
+                        }),
+                    }
+                    .call()
+                    .await
+                })
+                .await
+                .expect("Client::call should refresh and succeed");
+            assert!(result.is_some());
+            assert_eq!(client.token(), "new-token");
+
+            m_initial.assert();
+            m_refresh.assert();
+            m_retry.assert();
+        })
+        .await;
+    }
+
     #[test]
     fn with_refresh_marks_expiry() {
         let c = Client::with_refresh(

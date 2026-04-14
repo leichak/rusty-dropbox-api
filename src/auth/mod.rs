@@ -10,8 +10,21 @@
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
+use crate::endpoints::{get_endpoint_url, Endpoint};
+
 const AUTHORIZE_URL: &str = "https://www.dropbox.com/oauth2/authorize";
-const TOKEN_URL: &str = "https://api.dropboxapi.com/oauth2/token";
+
+/// Resolve the OAuth2 token endpoint, honoring the test-utils URL override
+/// so unit tests can intercept the call with mockito.
+fn token_url() -> String {
+    let (live, _sync_test, async_test) = get_endpoint_url(Endpoint::OAuth2TokenPost);
+    async_test.unwrap_or(live)
+}
+
+fn token_url_sync() -> String {
+    let (live, sync_test, _async_test) = get_endpoint_url(Endpoint::OAuth2TokenPost);
+    sync_test.unwrap_or(live)
+}
 
 /// Token bundle returned by `exchange_code` and `refresh`.
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -74,7 +87,7 @@ pub async fn exchange_code(
         ("redirect_uri", redirect_uri),
     ];
     let resp = crate::AsyncClient
-        .post(TOKEN_URL)
+        .post(token_url())
         .form(&form)
         .send()
         .await
@@ -98,7 +111,7 @@ pub async fn refresh(
         ("client_secret", client_secret),
     ];
     let resp = crate::AsyncClient
-        .post(TOKEN_URL)
+        .post(token_url())
         .form(&form)
         .send()
         .await
@@ -121,7 +134,7 @@ pub fn refresh_sync(
         ("client_secret", client_secret),
     ];
     let resp = crate::SyncClient
-        .post(TOKEN_URL)
+        .post(token_url_sync())
         .form(&form)
         .send()
         .context("oauth2/token refresh send failed")?
