@@ -89,7 +89,7 @@ async fn list_root_collect_all() {
             include_deleted: None,
             include_has_explicit_shared_members: None,
             include_mounted_folders: None,
-            limit: Some(2),  // force pagination on any non-empty root
+            limit: Some(2), // force pagination on any non-empty root
             shared_link: None,
             include_property_groups: None,
             include_non_downloadable_files: None,

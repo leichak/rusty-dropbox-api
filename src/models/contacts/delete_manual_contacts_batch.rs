@@ -19,7 +19,7 @@ type RequestPayload = Option<DeleteManualContactsBatchArg>;
 type ResponsePayload = ();
 
 /// Add properties struct for setting up a profile picture
-/// https://www.dropbox.com/developers/documentation/http/documentation#contacts-delete_manual_contacts_batch
+/// <https://www.dropbox.com/developers/documentation/http/documentation#contacts-delete_manual_contacts_batch>
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct DeleteManualContactsBatchRequest<'a> {
@@ -55,7 +55,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
     use tokio;

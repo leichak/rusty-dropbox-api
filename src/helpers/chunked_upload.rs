@@ -8,9 +8,8 @@
 use crate::api::files::{
     upload_session_append::UploadSessionAppendRequest,
     upload_session_finish::UploadSessionFinishRequest,
-    upload_session_start::UploadSessionStartRequest,
-    CommitInfo, FileMetadata, UploadSessionAppendArg, UploadSessionCursor,
-    UploadSessionFinishArg, UploadSessionStartArg,
+    upload_session_start::UploadSessionStartRequest, CommitInfo, FileMetadata,
+    UploadSessionAppendArg, UploadSessionCursor, UploadSessionFinishArg, UploadSessionStartArg,
 };
 use crate::api::Service;
 use anyhow::{Context, Result};
@@ -130,10 +129,7 @@ pub async fn upload_large_file<R: AsyncRead + Unpin>(
     let finish_req = UploadSessionFinishRequest {
         access_token: token,
         payload: Some(UploadSessionFinishArg {
-            cursor: UploadSessionCursor {
-                session_id,
-                offset,
-            },
+            cursor: UploadSessionCursor { session_id, offset },
             commit: CommitInfo {
                 path: path.to_string(),
                 mode,

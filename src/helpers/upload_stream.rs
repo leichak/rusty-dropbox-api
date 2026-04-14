@@ -48,10 +48,7 @@ where
             Ok(0) => None,
             Ok(n) => {
                 buf.truncate(n);
-                Some((
-                    Ok::<Bytes, std::io::Error>(Bytes::from(buf)),
-                    reader,
-                ))
+                Some((Ok::<Bytes, std::io::Error>(Bytes::from(buf)), reader))
             }
             Err(e) => Some((Err(e), reader)),
         }
@@ -87,8 +84,7 @@ mod tests {
 
     #[tokio::test]
     async fn streams_payload_and_parses_metadata() {
-        let meta_json =
-            r#"{"name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":5,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
+        let meta_json = r#"{"name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":5,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
 
         with_test_server_async(|mut server| async move {
             let mock = server

@@ -74,8 +74,7 @@ mod tests {
 
     #[tokio::test]
     async fn streams_body_and_parses_metadata() {
-        let meta_json =
-            r#"{"name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":11,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
+        let meta_json = r#"{"name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":11,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
         let body_bytes: &[u8] = b"hello world";
 
         with_test_server_async(|mut server| async move {

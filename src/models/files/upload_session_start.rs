@@ -1,4 +1,3 @@
-
 use super::{UploadSessionStartArg, UploadSessionStartResult};
 
 use crate::{
@@ -20,7 +19,7 @@ type RequestPayload = UploadSessionStartArg;
 type ResponsePayload = UploadSessionStartResult;
 
 /// UploadSessionStart
-/// https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionStart
+/// <https://www.dropbox.com/developers/documentation/http/documentation#files-UploadSessionStart>
 #[derive(Debug)]
 pub struct UploadSessionStartRequest<'a> {
     pub access_token: &'a str,
@@ -62,7 +61,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
 

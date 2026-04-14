@@ -54,11 +54,11 @@ macro_rules! implement_service {
 
                 let mut attempts = 0u32;
                 let response = loop {
-                    let builder = response
-                        .try_clone()
-                        .ok_or_else(|| ApiError::Request(anyhow::anyhow!(
+                    let builder = response.try_clone().ok_or_else(|| {
+                        ApiError::Request(anyhow::anyhow!(
                             "request body not clonable; retry unsupported"
-                        )))?;
+                        ))
+                    })?;
                     let r = builder
                         .send()
                         .map_err(|err| ApiError::Request(err.into()))?;
@@ -89,9 +89,8 @@ macro_rules! implement_service {
                     .map_err(|err| ApiError::Parsing(err.into()))?;
 
                 if !status.is_success() {
-                    let err = $crate::errors::decode_dropbox_error::<serde_json::Value>(
-                        status, &text,
-                    );
+                    let err =
+                        $crate::errors::decode_dropbox_error::<serde_json::Value>(status, &text);
                     if status == reqwest::StatusCode::UNAUTHORIZED {
                         return Err(ApiError::Unauthorized(err).into());
                     }
@@ -160,11 +159,11 @@ macro_rules! implement_service {
                 let block = async move {
                     let mut attempts = 0u32;
                     let response = loop {
-                        let builder = response
-                            .try_clone()
-                            .ok_or_else(|| ApiError::Request(anyhow::anyhow!(
+                        let builder = response.try_clone().ok_or_else(|| {
+                            ApiError::Request(anyhow::anyhow!(
                                 "request body not clonable; retry unsupported"
-                            )))?;
+                            ))
+                        })?;
                         let r = builder
                             .send()
                             .await
@@ -276,9 +275,8 @@ macro_rules! implement_download_service {
 
                 if !status.is_success() {
                     let text = String::from_utf8_lossy(&bytes);
-                    let err = $crate::errors::decode_dropbox_error::<serde_json::Value>(
-                        status, &text,
-                    );
+                    let err =
+                        $crate::errors::decode_dropbox_error::<serde_json::Value>(status, &text);
                     if status == reqwest::StatusCode::UNAUTHORIZED {
                         return Err(ApiError::Unauthorized(err).into());
                     }
@@ -321,11 +319,11 @@ macro_rules! implement_download_service {
                 let block = async move {
                     let mut attempts = 0u32;
                     let response = loop {
-                        let builder = response
-                            .try_clone()
-                            .ok_or_else(|| ApiError::Request(anyhow::anyhow!(
+                        let builder = response.try_clone().ok_or_else(|| {
+                            ApiError::Request(anyhow::anyhow!(
                                 "request body not clonable; retry unsupported"
-                            )))?;
+                            ))
+                        })?;
                         let r = builder
                             .send()
                             .await

@@ -49,7 +49,6 @@ implement_download_service!(
     ]
 );
 
-
 #[cfg(all(test, feature = "test-utils"))]
 mod tests {
     use crate::TEST_AUTH_TOKEN;

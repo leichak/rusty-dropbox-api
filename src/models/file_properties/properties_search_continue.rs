@@ -19,7 +19,7 @@ type RequestPayload = PropertiesSearchContinueArg;
 type ResponsePayload = PropertiesSearchResult;
 
 /// Add properties struct for file request
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-search-continue
+/// <https://www.dropbox.com/developers/documentation/http/documentation#file_properties-properties-search-continue>
 #[derive(Debug)]
 pub struct PropertiesSearchContinueRequest<'a> {
     pub access_token: &'a str,
@@ -54,7 +54,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
     use tokio;

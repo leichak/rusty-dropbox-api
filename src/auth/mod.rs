@@ -99,11 +99,7 @@ pub async fn exchange_code(
 
 /// Get a fresh access token using a refresh token. The refresh token itself
 /// stays valid across this call.
-pub async fn refresh(
-    client_id: &str,
-    client_secret: &str,
-    refresh_token: &str,
-) -> Result<Tokens> {
+pub async fn refresh(client_id: &str, client_secret: &str, refresh_token: &str) -> Result<Tokens> {
     let form = [
         ("grant_type", "refresh_token"),
         ("refresh_token", refresh_token),
@@ -122,11 +118,7 @@ pub async fn refresh(
 }
 
 /// Synchronous variant of [`refresh`] for blocking callers.
-pub fn refresh_sync(
-    client_id: &str,
-    client_secret: &str,
-    refresh_token: &str,
-) -> Result<Tokens> {
+pub fn refresh_sync(client_id: &str, client_secret: &str, refresh_token: &str) -> Result<Tokens> {
     let form = [
         ("grant_type", "refresh_token"),
         ("refresh_token", refresh_token),

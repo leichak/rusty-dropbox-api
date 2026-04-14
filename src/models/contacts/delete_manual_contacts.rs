@@ -17,7 +17,7 @@ type RequestPayload = ();
 type ResponsePayload = ();
 
 /// Struct for removing manually contacts batch
-/// https://www.dropbox.com/developers/documentation/http/documentation#contacts-delete_manual_contacts
+/// <https://www.dropbox.com/developers/documentation/http/documentation#contacts-delete_manual_contacts>
 #[derive(Debug)]
 pub struct DeleteManualContactsRequest<'a> {
     access_token: &'a str,
@@ -51,7 +51,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
     use tokio;

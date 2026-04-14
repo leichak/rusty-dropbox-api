@@ -19,7 +19,7 @@ type RequestPayload = ();
 type ResponsePayload = CountFileRequestsResult;
 
 /// Count files
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-count
+/// <https://www.dropbox.com/developers/documentation/http/documentation#file_requests-count>
 #[derive(Debug)]
 pub struct CountFilesRequest<'a> {
     pub access_token: &'a str,
@@ -56,7 +56,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
 

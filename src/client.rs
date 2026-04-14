@@ -101,12 +101,8 @@ impl Client {
             Some(c) => c.clone(),
             None => return Ok(()),
         };
-        let tokens = crate::auth::refresh(
-            &cfg.client_id,
-            &cfg.client_secret,
-            &cfg.refresh_token,
-        )
-        .await?;
+        let tokens =
+            crate::auth::refresh(&cfg.client_id, &cfg.client_secret, &cfg.refresh_token).await?;
         let mut state = self.inner.token.write().unwrap();
         state.access_token = tokens.access_token;
         state.expires_at = Some(Instant::now() + Duration::from_secs(tokens.expires_in));
@@ -122,29 +118,22 @@ impl Client {
             Some(c) => c.clone(),
             None => return Ok(()),
         };
-        let tokens = crate::auth::refresh(
-            &cfg.client_id,
-            &cfg.client_secret,
-            &cfg.refresh_token,
-        )
-        .await?;
+        let tokens =
+            crate::auth::refresh(&cfg.client_id, &cfg.client_secret, &cfg.refresh_token).await?;
         let mut state = self.inner.token.write().unwrap();
         state.access_token = tokens.access_token;
         state.expires_at = Some(Instant::now() + Duration::from_secs(tokens.expires_in));
         Ok(())
     }
 
-    /// Sync variant of [`force_refresh`].
+    /// Sync variant of [`Client::force_refresh`].
     pub fn force_refresh_sync(&self) -> Result<()> {
         let cfg = match &self.inner.refresh {
             Some(c) => c.clone(),
             None => return Ok(()),
         };
-        let tokens = crate::auth::refresh_sync(
-            &cfg.client_id,
-            &cfg.client_secret,
-            &cfg.refresh_token,
-        )?;
+        let tokens =
+            crate::auth::refresh_sync(&cfg.client_id, &cfg.client_secret, &cfg.refresh_token)?;
         let mut state = self.inner.token.write().unwrap();
         state.access_token = tokens.access_token;
         state.expires_at = Some(Instant::now() + Duration::from_secs(tokens.expires_in));
@@ -187,7 +176,7 @@ impl Client {
         }
     }
 
-    /// Sync version of [`ensure_fresh`] for blocking callers.
+    /// Sync version of [`Client::ensure_fresh`] for blocking callers.
     pub fn ensure_fresh_sync(&self) -> Result<()> {
         if !self.is_expired() {
             return Ok(());
@@ -196,11 +185,8 @@ impl Client {
             Some(c) => c.clone(),
             None => return Ok(()),
         };
-        let tokens = crate::auth::refresh_sync(
-            &cfg.client_id,
-            &cfg.client_secret,
-            &cfg.refresh_token,
-        )?;
+        let tokens =
+            crate::auth::refresh_sync(&cfg.client_id, &cfg.client_secret, &cfg.refresh_token)?;
         let mut state = self.inner.token.write().unwrap();
         state.access_token = tokens.access_token;
         state.expires_at = Some(Instant::now() + Duration::from_secs(tokens.expires_in));
@@ -227,7 +213,8 @@ mod tests {
         use crate::tests_utils::with_test_server_async;
 
         const RAW_FILE_METADATA: &str = r#"{".tag":"file","name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":1,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
-        const TOKEN_RESPONSE: &str = r#"{"access_token":"new-token","expires_in":14400,"token_type":"bearer"}"#;
+        const TOKEN_RESPONSE: &str =
+            r#"{"access_token":"new-token","expires_in":14400,"token_type":"bearer"}"#;
 
         with_test_server_async(|mut server| async move {
             // First call: 401.

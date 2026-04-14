@@ -10,7 +10,9 @@ use crate::tests_utils::with_test_server_async;
 
 const RAW_FILE_METADATA: &str = r#"{".tag":"file","name":"f.txt","id":"id:abc","client_modified":"2025-01-01T00:00:00Z","server_modified":"2025-01-01T00:00:00Z","rev":"r1","size":1,"path_lower":"/f.txt","path_display":"/f.txt","is_downloadable":true}"#;
 
-fn build_get_metadata_request<'a>(token: &'a str) -> api::files::get_metadata::GetMetadataRequest<'a> {
+fn build_get_metadata_request<'a>(
+    token: &'a str,
+) -> api::files::get_metadata::GetMetadataRequest<'a> {
     api::files::get_metadata::GetMetadataRequest {
         access_token: token,
         payload: Some(api::files::GetMetadataArgs {

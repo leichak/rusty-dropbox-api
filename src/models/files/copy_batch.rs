@@ -19,7 +19,7 @@ type RequestPayload = Args;
 type ResponsePayload = RequestResult;
 
 /// Copy batch
-/// https://api.dropboxapi.com/2/files/copy_batch_v2
+/// <https://api.dropboxapi.com/2/files/copy_batch_v2>
 #[derive(Debug)]
 pub struct CopyBatchRequest<'a> {
     pub access_token: &'a str,
@@ -56,7 +56,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
 

@@ -19,7 +19,7 @@ type RequestPayload = Args;
 type ResponsePayload = RequestResult;
 
 /// Get thumbnail batch
-/// https://content.dropboxapi.com/2/files/get_thumbnail_batch
+/// <https://content.dropboxapi.com/2/files/get_thumbnail_batch>
 #[derive(Debug)]
 pub struct GetThumbnailBatchRequest<'a> {
     pub access_token: &'a str,
@@ -56,7 +56,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
 

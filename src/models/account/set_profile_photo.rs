@@ -20,7 +20,7 @@ type RequestPayload = SetProfilePhotoArg;
 type ResponsePayload = SetProfilePhotoResult;
 
 /// Set profile photo request
-/// https://www.dropbox.com/developers/documentation/http/documentation#account-set_profile_photo
+/// <https://www.dropbox.com/developers/documentation/http/documentation#account-set_profile_photo>
 #[derive(Debug)]
 pub struct SetProfilePhotoRequest<'a> {
     access_token: &'a str,
@@ -57,7 +57,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
 

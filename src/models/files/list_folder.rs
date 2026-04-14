@@ -19,7 +19,7 @@ type RequestPayload = Args;
 type ResponsePayload = RequestResult;
 
 /// List files
-/// https://www.dropbox.com/developers/documentation/http/documentation#files-list_folder
+/// <https://www.dropbox.com/developers/documentation/http/documentation#files-list_folder>
 #[derive(Debug)]
 pub struct ListFolderRequest<'a> {
     pub access_token: &'a str,
@@ -49,9 +49,7 @@ impl<'a> ListFolderRequest<'a> {
     /// Walk every page of list_folder + list_folder/continue and return the
     /// flat list of entries. Avoids callers having to implement the
     /// cursor-follow loop themselves.
-    pub async fn collect_all(
-        &self,
-    ) -> Result<Vec<super::Metadata>> {
+    pub async fn collect_all(&self) -> Result<Vec<super::Metadata>> {
         use super::list_folders_continue::ListFolderContinueRequest;
         use super::ListFolderContinueArgs;
         use anyhow::Context;
@@ -95,7 +93,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
 

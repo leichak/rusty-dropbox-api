@@ -19,7 +19,7 @@ type RequestPayload = ListFileRequestsContinueArgs;
 type ResponsePayload = ListFileRequestsContinueResult;
 
 /// List continue files
-/// https://www.dropbox.com/developers/documentation/http/documentation#file_requests-list-continue
+/// <https://www.dropbox.com/developers/documentation/http/documentation#file_requests-list-continue>
 #[derive(Debug)]
 pub struct ListContinueRequest<'a> {
     pub access_token: &'a str,
@@ -56,7 +56,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
 

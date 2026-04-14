@@ -103,10 +103,8 @@ mod tests {
     fn downcasts_to_typed_error() {
         use crate::api::files::LookupError;
         let body = r#"{"error_summary": "path/not_found/.", "error": {".tag": "not_found"}}"#;
-        let err = decode_dropbox_error::<LookupError>(
-            reqwest::StatusCode::from_u16(409).unwrap(),
-            body,
-        );
+        let err =
+            decode_dropbox_error::<LookupError>(reqwest::StatusCode::from_u16(409).unwrap(), body);
         let typed = err
             .downcast_ref::<TypedError<LookupError>>()
             .expect("typed error attached as context");

@@ -19,7 +19,7 @@ type RequestPayload = EchoArg;
 type ResponsePayload = EchoResult;
 
 /// Struct for app authentication
-/// https://www.dropbox.com/developers/documentation/http/documentation#check-app
+/// <https://www.dropbox.com/developers/documentation/http/documentation#check-app>
 #[derive(Debug)]
 pub struct CheckAppRequest<'a> {
     access_token: &'a str,
@@ -54,7 +54,7 @@ mod tests {
     use crate::{
         endpoints::{get_endpoint_url, headers::Headers, Endpoint},
         implement_tests,
-        tests_utils::{get_endpoint_test_body_response},
+        tests_utils::get_endpoint_test_body_response,
         traits::Service,
     };
     use tokio;
